@@ -1,4 +1,5 @@
 import csv
+import os.path
 
 class PlanetParser():
     def __init__(self):
@@ -6,7 +7,9 @@ class PlanetParser():
 
     # Parses the input File
     def parse_file(self):
-        file = csv.reader(open('resources\Planets.csv', newline=''), delimiter=',')
+        path = os.path.join('resources', "Planets.csv")
+        file = csv.reader(open(path, newline=''), delimiter=',')
+        #file = csv.reader(open('resources\Planets.csv', newline=''), delimiter=',')
         for row in file:
             element = []
             # Check if it is the header row, if it is, ignore it.

@@ -4,7 +4,6 @@ from tkinter import StringVar
 from PIL import ImageTk, Image
 import os
 import sys
-# from numbers import Number
 
 
 class MainApplication(ttk.Frame):
@@ -281,7 +280,7 @@ class StarMapFrame(ttk.Frame):
             directory = os.path.dirname(sys.executable)
         elif __file__:
             directory = os.path.dirname(__file__)
-        filename = os.path.join(directory, 'Pictures', 'star_map_background.jpg')
+        filename = os.path.join(directory, 'resources', 'star_map_background.jpg')
 
         self.image = Image.open(filename)
         dimmensions = (self.star_map_frame.winfo_width(), self.star_map_frame.winfo_height())

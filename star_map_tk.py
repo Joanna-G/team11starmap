@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import StringVar
+from tkinter import Canvas
 from PIL import ImageTk, Image
 import os
 import sys
@@ -12,7 +13,7 @@ class MainApplication(ttk.Frame):
         self.parent = parent
 
         self.grid(column=0, row=0, sticky='nsew')
-        self.columnconfigure(0, weight=4)
+        self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=3)
         self.rowconfigure(1, weight=1)
 
@@ -266,44 +267,48 @@ class StarMapFrame(ttk.Frame):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
-        style = ttk.Style()
-        style.configure('StarMap.TFrame', background='black')
-
-        self.star_map_frame = ttk.Frame(self, style='StarMap.TFrame')
+        self.star_map_frame = ttk.Frame(self)
         self.star_map_frame.grid(column=0, row=0, sticky='nsew')
         self.star_map_frame.columnconfigure(0, weight=1)
         self.star_map_frame.rowconfigure(0, weight=1)
-        # self.star_map_frame.bind('<Configure>', self.on_resize)
+        self.star_map_frame.bind('<Configure>', self.on_resize)
 
         directory = ''
         if getattr(sys, 'frozen', False):
             directory = os.path.dirname(sys.executable)
         elif __file__:
             directory = os.path.dirname(__file__)
-        filename = os.path.join(directory, 'resources', 'star_map_background.jpg')
+        filename = os.path.join(directory, 'resources', 'mars.png')
+        self.image = ImageTk.PhotoImage(Image.open(filename))
 
-        self.image = Image.open(filename)
-        dimmensions = (self.star_map_frame.winfo_width(), self.star_map_frame.winfo_height())
-        self.image.resize(dimmensions)
-        self.converted_image = ImageTk.PhotoImage(self.image)
+        self.canvas = Canvas(self.star_map_frame)
+        self.canvas.grid(column=0, row=0, sticky='nsew')
+        self.vsb_canvas = tk.Scrollbar(self.star_map_frame, orient=tk.VERTICAL)
+        self.vsb_canvas.grid(column=1, row=0, sticky='ns')
+        self.vsb_canvas.config(command=self.canvas.yview)
+        self.hsb_canvas = tk.Scrollbar(self.star_map_frame, orient=tk.HORIZONTAL)
+        self.hsb_canvas.grid(column=0, row=1, sticky='ew')
+        self.hsb_canvas.config(command=self.canvas.xview)
+        self.canvas.config(xscrollcommand=self.hsb_canvas.set, yscrollcommand=self.vsb_canvas.set, background='white')
 
+        self.canvas.create_rectangle(1200, 0, 0, 100, fill='blue')
+        self.canvas.create_image(200, 400, image=self.image)
 
-
-        # self.converted_image = ImageTk.PhotoImage(Image.open(filename))
-
-        self.panel = tk.Label(self.star_map_frame, image=self.converted_image)
-        self.panel.grid(column=0, row=0, sticky='nsew')
-
-    #     self.button_print = tk.Button(self.star_map_frame, text='Print', command=self.print_stuff)
-    #     self.button_print.config(height=1, width=100)
-    #     self.button_print.grid(column=0, row=0, sticky='nsew')
-    #
-    # def print_stuff(self):
-    #     print(self.star_map_frame.winfo_height())
-    #     print(self.star_map_frame.winfo_width())
-    #
-    # def on_resize(self, event):
-    #     print("here")
+    def on_resize(self, event):
+        canvas_items = self.canvas.find_all()
+        max_width = 0
+        max_height = 0
+        for item in canvas_items:
+            last_index = len(self.canvas.coords(item))
+            width_index = last_index - 2
+            height_index = last_index - 1
+            temp_width = self.canvas.coords(item)[width_index]
+            temp_height = self.canvas.coords(item)[height_index]
+            if temp_width > max_width:
+                max_width = temp_width
+            if temp_height > max_height:
+                max_height = temp_height
+        self.canvas.config(scrollregion=(0,0,max_width+100,max_height+100))
 
 
 if __name__ == "__main__":

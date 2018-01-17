@@ -9,7 +9,6 @@ class StarParser():
     def parse_file(self):
         path = os.path.join('resources', "hyg.csv")
         file = csv.reader(open(path, newline=''), delimiter=',')
-        #file = csv.reader(open('resources\hyg.csv', newline=''), delimiter=',')
         for row in file:
             element = []
             # Check if it is the header row, if it is, ignore it.
@@ -19,12 +18,13 @@ class StarParser():
             elif abs(float(row[10])) > 6:
                 continue
             else:
-                # Store StarID, ProperName ("" if it doesn't have one), Right Ascension, Declination, and Magnitude
-                element.append(row[0])
-                element.append(row[6])
-                element.append(row[7])
-                element.append(row[8])
-                element.append(row[10])
+                # Store HD, ProperName ("" if it doesn't have one), Right Ascension, Declination, and Magnitude
+                element.append(row[0])  # StarID -- Numbering system, not used for drawing charts
+                element.append(row[2])  # Henry Draper ID
+                element.append(row[6])  # Proper Name ("" if it doesn't have one)
+                element.append(row[7])  # Right Ascension (RA)
+                element.append(row[8])  # Declination
+                element.append(row[10]) # Magnitude
 
             self.ElementsList.append(element)
 

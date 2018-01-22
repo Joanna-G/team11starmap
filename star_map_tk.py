@@ -323,7 +323,6 @@ class StarMapFrame(ttk.Frame):
 
     def save_canvas(self, event):
         save_file = asksaveasfilename(filetypes=[('', '.pdf')])
-        print(save_file)
         self.canvas.update()
         self.canvas.postscript(file='canvas.ps', x=0, y=0, width=self.max_width+100, height=self.max_height+100)
         os.system('ps2pdf -dEPSCrop canvas.ps ' + save_file)

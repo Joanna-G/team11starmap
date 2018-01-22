@@ -2,7 +2,8 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import StringVar
 from tkinter import Canvas
-from PIL import ImageTk, Image
+from PIL import ImageTk, Image, ImageDraw
+from tkinter.filedialog import asksaveasfilename
 import os
 import sys
 
@@ -24,12 +25,7 @@ class MainApplication(ttk.Frame):
         self.menu_frame.grid(column=0, row=1)
         self.star_map_frame.grid(column=1, row=1)
 
-        # self.header_frame = HeaderFrame(self)
-        # self.header_frame.pack(expand=True, fill='both')
-        # self.menu_frame = MenuFrame(self)
-        # self.menu_frame.pack(expand=True, fill='both')
-        # self.star_map_frame = StarMapFrame(self)
-        # self.star_map_frame.pack(expand=True, fill='both')
+        self.header_frame.button_save.bind("<Button-1>", self.star_map_frame.save_canvas)
 
 
 class HeaderFrame(ttk.Frame):
@@ -77,7 +73,8 @@ class MenuFrame(ttk.Frame):
         style = ttk.Style()
         style.configure('Menu.TFrame', background='green')
 
-        self.menu_frame = ttk.Frame(self, style='Menu.TFrame')
+        # self.menu_frame = ttk.Frame(self, style='Menu.TFrame')
+        self.menu_frame = ttk.Frame(self)
         self.menu_frame.grid(column=0, row=0, sticky='nsew')
         self.menu_frame.columnconfigure(0, weight=1)
         self.menu_frame.rowconfigure(0, weight=1)
@@ -112,11 +109,13 @@ class MenuFrame(ttk.Frame):
 
         self.label_title = tk.Label(self.menu_frame, text='Lumarium')
         self.label_title.grid(column=0, row=0, sticky='nsew')
-        self.label_title.config(font=('Magneto', 22), anchor='s', background='green')
+        # self.label_title.config(font=('Magneto', 22), anchor='s', background='green')
+        self.label_title.config(font=('Magneto', 22), anchor='s')
 
         self.label_date_time = tk.Label(self.menu_frame, text='Date and Time')
         self.label_date_time.grid(column=0, row=1, sticky='nsew', padx=10, pady=10)
-        self.label_date_time.config(anchor='sw', background='green')
+        # self.label_date_time.config(anchor='sw', background='green')
+        self.label_date_time.config(anchor='sw')
 
         self.entry_month = tk.Entry(self.menu_frame, textvariable=self.entryval_month)
         self.entry_month.config(foreground='grey')
@@ -151,7 +150,8 @@ class MenuFrame(ttk.Frame):
 
         self.label_location = tk.Label(self.menu_frame, text='Location')
         self.label_location.grid(column=0, row=7, sticky='nsew', padx=10, pady=10)
-        self.label_location.config(anchor='sw', background='green')
+        # self.label_location.config(anchor='sw', background='green')
+        self.label_location.config(anchor='sw')
 
         self.entry_latitude = tk.Entry(self.menu_frame, textvariable=self.entryval_latitude)
         self.entry_latitude.config(foreground='grey')
@@ -169,7 +169,9 @@ class MenuFrame(ttk.Frame):
 
         self.label_or = tk.Label(self.menu_frame, text='OR')
         self.label_or.grid(column=0, row=10, sticky='nsew')
-        self.label_or.config(anchor='s', background='green')
+        # self.label_or.config(anchor='s', background='green')
+        self.label_or.config(anchor='s')
+
         self.optionmenu_city = tk.OptionMenu(self.menu_frame, self.optionval_city, 'City', 'City One', 'City Two', 'City Three')
         self.optionmenu_city.grid(column=0, row=11, sticky='nsew', padx=10, pady=10)
 
@@ -273,6 +275,9 @@ class StarMapFrame(ttk.Frame):
         self.star_map_frame.rowconfigure(0, weight=1)
         self.star_map_frame.bind('<Configure>', self.on_resize)
 
+        self.max_width = 0
+        self.max_height = 0
+
         directory = ''
         if getattr(sys, 'frozen', False):
             directory = os.path.dirname(sys.executable)
@@ -280,6 +285,7 @@ class StarMapFrame(ttk.Frame):
             directory = os.path.dirname(__file__)
         filename = os.path.join(directory, 'resources', 'mars.png')
         self.image = ImageTk.PhotoImage(Image.open(filename))
+        self.im = Image.open(filename)
 
         self.canvas = Canvas(self.star_map_frame)
         self.canvas.grid(column=0, row=0, sticky='nsew')
@@ -289,26 +295,38 @@ class StarMapFrame(ttk.Frame):
         self.hsb_canvas = tk.Scrollbar(self.star_map_frame, orient=tk.HORIZONTAL)
         self.hsb_canvas.grid(column=0, row=1, sticky='ew')
         self.hsb_canvas.config(command=self.canvas.xview)
-        self.canvas.config(xscrollcommand=self.hsb_canvas.set, yscrollcommand=self.vsb_canvas.set, background='white')
+        self.canvas.config(xscrollcommand=self.hsb_canvas.set, yscrollcommand=self.vsb_canvas.set)
 
-        self.canvas.create_rectangle(1200, 0, 0, 100, fill='blue')
-        self.canvas.create_image(200, 400, image=self.image)
+        self.canvas.create_rectangle(0, 0, 1200, 200, fill='blue')
+        self.canvas.create_image(200, 200, image=self.image)
+        self.canvas.create_image(400, 200, image=self.image)
+        self.canvas.create_image(1000, 200, image=self.image)
+        self.canvas.create_image(1700, 200, image=self.image)
+        self.canvas.create_image(600, 1400, image=self.image)
 
     def on_resize(self, event):
         canvas_items = self.canvas.find_all()
-        max_width = 0
-        max_height = 0
+        self.max_width = 0
+        self.max_height = 0
         for item in canvas_items:
             last_index = len(self.canvas.coords(item))
             width_index = last_index - 2
             height_index = last_index - 1
             temp_width = self.canvas.coords(item)[width_index]
             temp_height = self.canvas.coords(item)[height_index]
-            if temp_width > max_width:
-                max_width = temp_width
-            if temp_height > max_height:
-                max_height = temp_height
-        self.canvas.config(scrollregion=(0,0,max_width+100,max_height+100))
+            if temp_width > self.max_width:
+                self.max_width = temp_width
+            if temp_height > self.max_height:
+                self.max_height = temp_height
+        self.canvas.config(scrollregion=(0,0,self.max_width+100,self.max_height+100))
+        self.canvas.update()
+
+    def save_canvas(self, event):
+        save_file = asksaveasfilename(filetypes=[('', '.pdf')])
+        print(save_file)
+        self.canvas.update()
+        self.canvas.postscript(file='canvas.ps', x=0, y=0, width=self.max_width+100, height=self.max_height+100)
+        os.system('ps2pdf -dEPSCrop canvas.ps ' + save_file)
 
 
 if __name__ == "__main__":

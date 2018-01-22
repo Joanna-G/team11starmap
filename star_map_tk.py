@@ -25,7 +25,7 @@ class MainApplication(ttk.Frame):
         self.menu_frame.grid(column=0, row=1)
         self.star_map_frame.grid(column=1, row=1)
 
-        self.header_frame.button_save.bind("<Button-1>", self.star_map_frame.save_canvas)
+        self.header_frame.button_save.configure(command=self.star_map_frame.save_canvas)
 
 
 class HeaderFrame(ttk.Frame):
@@ -321,7 +321,7 @@ class StarMapFrame(ttk.Frame):
         self.canvas.config(scrollregion=(0,0,self.max_width+100,self.max_height+100))
         self.canvas.update()
 
-    def save_canvas(self, event):
+    def save_canvas(self):
         save_file = asksaveasfilename(filetypes=[('', '.pdf')])
         self.canvas.update()
         self.canvas.postscript(file='canvas.ps', x=0, y=0, width=self.max_width+100, height=self.max_height+100)

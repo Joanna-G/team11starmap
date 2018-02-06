@@ -16,6 +16,16 @@ class Planet(BaseCelestialObject):
     def __init__(self):
         BaseCelestialObject.__init__(self)
         self.planet_name = None
+        self.ascal = None
+        self.aprop = None
+        self.escal = None
+        self.eprop = None
+        self.iscal = None
+        self.iprop = None
+        self.wscal = None
+        self.wprop = None
+        self.oscal = None
+        self.oprop = None
         self.semi_axis = None
         self.eccentricity = None
         self.inclination = None

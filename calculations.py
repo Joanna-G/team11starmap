@@ -6,6 +6,8 @@ day = 5
 hour = 18
 minute = 30
 second = 0
+# placeholder
+cy = 0
 
 
 # Calculates the Altitude and Azimuth of a planet given Latitude (lat), Longitude (lon),
@@ -89,6 +91,36 @@ def convert_dec_dms(dec):
     minutes = int((dec - degrees) * 60.0)
     seconds = (((dec - degrees) * 60.0) - minutes) * 60.0
     return (degrees, minutes, seconds)
+
+
+# calculate semimajor axis of the orbit
+def calculate_semi_axis(planet):
+    return planet.ascal + planet.aprop * cy
+
+
+# calculate eccentricity of the orbit
+def calculate_eccentricity(planet):
+    return planet.escal + planet.eprop * cy
+
+
+# calculate inclination on the plane of the ecliptic
+def calculate_inclination(planet):
+    return math.radians(planet.iscal - planet.iprop * cy / 3600)
+
+
+# calculate argument of perihelion
+def calculate_arg_perihelion(planet):
+    return math.radians(planet.wscal + planet.wprop * cy / 3600)
+
+
+# calculate longitude of ascending node
+def calculate_long_asc_node(planet):
+    return math.radians(planet.oscal - planet.oprop * cy / 3600)
+
+
+# calculate longitude of a planet
+def calculate_longitude(planet):
+    return mod2pi(math.radians(planet.iscal + planet.lprop * cy / 3600))
 
 
 # Convert an angle above 360 degrees to one less than 360

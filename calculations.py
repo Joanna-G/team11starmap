@@ -145,6 +145,8 @@ def abs_floor(b):
 def calculate_julian_day_astropy(year, month, day):
     dt = dateutil.parser.parse(str(year) + '.' + str(month) + '.' + str(day))
     time = astropy.time.Time(dt)
+    test = time.sidereal_time('mean', 'greenwich')
+    print(test)
     return time.jd
 
 def calculate_julian_day_coleman(year, month, day, hour, minute):
@@ -180,14 +182,19 @@ def calculate_gmst(year, month, day, hour, minute):
     gmst_minutes_decimal = gmst_minutes_decimal % int(gmst_minutes_decimal)
     gmst_seconds = gmst_minutes_decimal * 60
 
-    print(gmst_hours)
+    if year < 2000:
+        gmst_minutes += 60
+        gmst_seconds += 60
+
     print(gmst_minutes)
     print(gmst_seconds)
+
+    return (gmst_hours, gmst_minutes, gmst_seconds)
 
 
 
 
 if __name__ == "__main__":
-    print(calculate_julian_day_astropy(2019, 1, 1))
+    print(calculate_julian_day_astropy(2050, 12, 14))
     print(calculate_julian_day_coleman(2019, 1, 1, 8, 0))
-    calculate_gmst(2004, 1, 1, 0, 0)
+    print(calculate_gmst(2050, 12, 14, 0, 0))

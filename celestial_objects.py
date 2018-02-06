@@ -58,6 +58,3 @@ class Messier_Objects(BaseCelestialObject)
     def __init__(self):
         BaseCelestialObject.__init__(self)
 
-
-
-

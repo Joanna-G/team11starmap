@@ -8,6 +8,9 @@ day = 5
 hour = 18
 minute = 30
 second = 0
+# placeholder
+cy = 0
+
 
 # Calculates the Altitude and Azimuth of a planet given Latitude (lat), Longitude (lon),
 # Right Ascension (ra), and Declination (dec). ra and dec are in degrees
@@ -46,6 +49,7 @@ def calculate_alt_az(lat, lon, ra, dec):
 
     return (alt, az)
 
+
 # Calculates the Mean Sidereal Time. Given Year (year), Month (month), Day (day), Hour (hour) on a
 # 24 hour clock, Minute (minute), Second (second), Latitude (lat) and Longitude (lon).
 # All times must be measured from Greenwich mean time (TimeZone = 0).
@@ -74,12 +78,14 @@ def calculate_mst(year, month, day, hour, min, sec, lat, lon):
             mst += 360.0
     return mst
 
+
 # Converts Right Ascension (ra) in degrees to Hours:Minutes:Seconds
 def convert_ra_mhs(ra):
     hours = int(ra / 15.0)
     minutes = int(((ra / 15.0) - hours) * 60.0)
     seconds = ((((ra / 15.0) - hours) * 60.0) - minutes) * 60.0
     return (hours, minutes, seconds)
+
 
 # Converts Declination (dec) in degress to Degrees:Minutes:Seconds
 def convert_dec_dms(dec):
@@ -88,9 +94,53 @@ def convert_dec_dms(dec):
     seconds = (((dec - degrees) * 60.0) - minutes) * 60.0
     return (degrees, minutes, seconds)
 
-def calculate_julian_day(year, month, day, hour, minute, second):
-    julian_day = ((367 * year) - math.floor(7.0 * (year + math.floor((month + 9.0) / 12.0) / 4.0)) + math.floor(275.0 * month / 9.0) + day - 730531.5 + hour / 24.0)
-    return julian_day
+
+# calculate semimajor axis of the orbit
+def calculate_semi_axis(planet):
+    return planet.ascal + planet.aprop * cy
+
+
+# calculate eccentricity of the orbit
+def calculate_eccentricity(planet):
+    return planet.escal + planet.eprop * cy
+
+
+# calculate inclination on the plane of the ecliptic
+def calculate_inclination(planet):
+    return math.radians(planet.iscal - planet.iprop * cy / 3600)
+
+
+# calculate argument of perihelion
+def calculate_arg_perihelion(planet):
+    return math.radians(planet.wscal + planet.wprop * cy / 3600)
+
+
+# calculate longitude of ascending node
+def calculate_long_asc_node(planet):
+    return math.radians(planet.oscal - planet.oprop * cy / 3600)
+
+
+# calculate longitude of a planet
+def calculate_longitude(planet):
+    return mod2pi(math.radians(planet.iscal + planet.lprop * cy / 3600))
+
+
+# Convert an angle above 360 degrees to one less than 360
+def mod2pi(x):
+    b = x / 2 * math.pi
+    a = (math.pi * 2) * (b - abs_floor(b))
+    if a < 0:
+        a += (2 * math.pi)
+    converted_angle = a
+    return converted_angle
+
+
+def abs_floor(b):
+    if b >= 0:
+        floor = math.floor(b)
+    else:
+        floor = math.ceil(b)
+    return floor
 
 def calculate_julian_day_astropy(year, month, day):
     dt = dateutil.parser.parse(str(year) + '.' + str(month) + '.' + str(day))
@@ -141,4 +191,3 @@ if __name__ == "__main__":
     print(calculate_julian_day_astropy(2019, 1, 1))
     print(calculate_julian_day_coleman(2019, 1, 1, 8, 0))
     calculate_gmst(2004, 1, 1, 0, 0)
-

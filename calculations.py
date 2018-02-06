@@ -7,6 +7,7 @@ hour = 18
 minute = 30
 second = 0
 
+
 # Calculates the Altitude and Azimuth of a planet given Latitude (lat), Longitude (lon),
 # Right Ascension (ra), and Declination (dec). ra and dec are in degrees
 def calculate_alt_az(lat, lon, ra, dec):
@@ -44,6 +45,7 @@ def calculate_alt_az(lat, lon, ra, dec):
 
     return (alt, az)
 
+
 # Calculates the Mean Sidereal Time. Given Year (year), Month (month), Day (day), Hour (hour) on a
 # 24 hour clock, Minute (minute), Second (second), Latitude (lat) and Longitude (lon).
 # All times must be measured from Greenwich mean time (TimeZone = 0).
@@ -72,6 +74,7 @@ def calculate_mst(year, month, day, hour, min, sec, lat, lon):
             mst += 360.0
     return mst
 
+
 # Converts Right Ascension (ra) in degrees to Hours:Minutes:Seconds
 def convert_ra_mhs(ra):
     hours = int(ra / 15.0)
@@ -79,9 +82,28 @@ def convert_ra_mhs(ra):
     seconds = ((((ra / 15.0) - hours) * 60.0) - minutes) * 60.0
     return (hours, minutes, seconds)
 
+
 # Converts Declination (dec) in degress to Degrees:Minutes:Seconds
 def convert_dec_dms(dec):
     degrees = int(dec)
     minutes = int((dec - degrees) * 60.0)
     seconds = (((dec - degrees) * 60.0) - minutes) * 60.0
     return (degrees, minutes, seconds)
+
+
+# Convert an angle above 360 degrees to one less than 360
+def mod2pi(x):
+    b = x / 2 * math.pi
+    a = (math.pi * 2) * (b - abs_floor(b))
+    if a < 0:
+        a += (2 * math.pi)
+    converted_angle = a
+    return converted_angle
+
+
+def abs_floor(b):
+    if b >= 0:
+        floor = math.floor(b)
+    else:
+        floor = math.ceil(b)
+    return floor

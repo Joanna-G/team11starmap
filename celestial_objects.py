@@ -16,6 +16,12 @@ class Planet(BaseCelestialObject):
     def __init__(self):
         BaseCelestialObject.__init__(self)
         self.planet_name = None
+        self.semi_axis = None
+        self.eccentricity = None
+        self.inclination = None
+        self.arg_perihelion = None
+        self.long_asc_node = None
+        self.mean_long = None
 
 class Star(BaseCelestialObject):
     def __init__(self):

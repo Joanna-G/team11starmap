@@ -1,6 +1,7 @@
 from Parsers.StarParser import StarParser
 from Parsers.PlanetParser import PlanetParser
 
+
 def main():
     stars = StarParser()
     starList = stars.parse_file()

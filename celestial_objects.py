@@ -7,7 +7,7 @@ class BaseCelestialObject:
         self.right_ascension = None
         self.declination = None
 
-    # example of how to do an abstract method
+    # example of how to do make an abstract method
     # @abstractmethod
     # def example(self):
     #     pass

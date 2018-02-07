@@ -26,6 +26,8 @@ class Planet(BaseCelestialObject):
         self.wprop = None
         self.oscal = None
         self.oprop = None
+        self.lscal = None
+        self.lprop = None
         self.semi_axis = None
         self.eccentricity = None
         self.inclination = None

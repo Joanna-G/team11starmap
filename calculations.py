@@ -95,33 +95,33 @@ def convert_dec_dms(dec):
 
 
 # calculate semimajor axis of the orbit
-def calculate_semi_axis(planet):
-    return planet.ascal + planet.aprop * cy
+def calculate_semi_axis(ascal, aprop, cy):
+    return ascal + aprop * cy
 
 
 # calculate eccentricity of the orbit
-def calculate_eccentricity(planet):
-    return planet.escal + planet.eprop * cy
+def calculate_eccentricity(escal, eprop, cy):
+    return escal + eprop * cy
 
 
 # calculate inclination on the plane of the ecliptic
-def calculate_inclination(planet):
-    return math.radians(planet.iscal - planet.iprop * cy / 3600)
+def calculate_inclination(iscal, iprop, cy):
+    return math.radians(iscal - iprop * cy / 3600)
 
 
 # calculate argument of perihelion
-def calculate_arg_perihelion(planet):
-    return math.radians(planet.wscal + planet.wprop * cy / 3600)
+def calculate_arg_perihelion(wscal, wprop, cy):
+    return math.radians(wscal + wprop * cy / 3600)
 
 
 # calculate longitude of ascending node
-def calculate_long_asc_node(planet):
-    return math.radians(planet.oscal - planet.oprop * cy / 3600)
+def calculate_long_asc_node(oscal, oprop, cy):
+    return math.radians(oscal - oprop * cy / 3600)
 
 
-# calculate longitude of a planet
-def calculate_longitude(planet):
-    return mod2pi(math.radians(planet.iscal + planet.lprop * cy / 3600))
+# calculate mean longitude of a planet
+def calculate_longitude(lscal, lprop, cy):
+    return mod2pi(math.radians(lscal + lprop * cy / 3600))
 
 
 # Convert an angle above 360 degrees to one less than 360

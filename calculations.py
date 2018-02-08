@@ -6,12 +6,7 @@ import astropy.units as u
 import dateutil.parser
 
 
-year = 2018
-month = 2
-day = 5
-hour = 18
-minute = 30
-second = 0
+
 # placeholder
 cy = 0
 
@@ -147,14 +142,18 @@ def abs_floor(b):
     return floor
 
 
-
+# start of calculations for the stars
 
 # uses astropy library to calculate julian date. can also get gsmt time
-def calculate_julian_day_astropy(year, month, day):
-    dt = dateutil.parser.parse(str(year) + '.' + str(month) + '.' + str(day))
-    time = astropy.time.Time(dt)
+def calculate_julian_day_astropy(year, month, day, hour, minute, lat, lon):
+    # location = (str(lat) + 'd', str(lon) + 'd')
+    location = (lat,lon)
+    dt = dateutil.parser.parse(str(year) + '.' + str(month) + '.' + str(day) + ' ' + str(hour) + ':' + str(minute) + ':' + '0')
+    time = astropy.time.Time(dt, location=('114.5d', '40d'))
     gsmt = time.sidereal_time('mean', 'greenwich')
-    print(gsmt)
+    lst = time.sidereal_time('mean')
+    print('gmst: ' + str(gsmt))
+    print('lst ?: ' + str(lst))
     return time.jd
 
 
@@ -174,6 +173,20 @@ def calculate_julian_day(year, month, day, hour, minute):
 
     jd = int(365.25 * year) + int(30.6001 * (month + 1)) + converted_day + 1720994.5 + b
     return jd
+
+def gmst_testing(year, month, day, hour, minute):
+    jd = calculate_julian_day(year, month, day, hour, minute)
+    jd = math.floor(jd) + 0.5
+    ut = hour + (minute / 60)
+    t = (jd - 2451545.0) / 36525.0
+    t_0 = 6.697374558+(2400.051336*t)+(0.000025862*math.pow(t,2))+(ut*1.0027379093)
+    if t_0 > 24:
+        while t_0 > 24.0:
+            t_0 -= 24.0
+    elif t_0 < 0.0:
+        while t_0 < 0.0:
+            t_0 += 24.0
+    print(t_0)
 
 
 # pretty confident that this is right
@@ -201,30 +214,33 @@ def calculate_gmst(year, month, day, hour, minute):
     return (gmst_hours, gmst_minutes, gmst_seconds)
 
 
-
 # this needs to be checked
 def calculate_local_sidereal_time(lon_degrees, lon_minutes, lon_direction, gmst):
     lon_decimal = lon_degrees + (lon_minutes / 60.0)
-    if lon_direction == 'W':
-        lon_decimal *= -1
+    # if lon_direction == 'W':
+    #     lon_decimal *= -1
 
-    hour_offset = lon_decimal / 15.0
-    hour = int(hour_offset)
-    minute = math.floor((hour_offset % hour) * 60)
-    second = math.floor((minute % int(minute)) * 60)
 
-    print('offset time: ' + str(hour) + ' ' + str(minute) + ' ' + str(second))
 
-    lst_hour = gmst[0] + hour
-    lst_minute = gmst[1] + minute
-    lst_second = gmst[2] + second
+    offset_decimal = lon_decimal / 15.0
+    print('offset_decimal: ' + str(offset_decimal))
+    hour_offset = int(offset_decimal)
+    minute_offset = (offset_decimal % hour_offset) * 60
+    second_offset = (minute_offset % int(minute_offset)) * 60
 
-    if lst_minute < 0:
-        lst_minute = 60 + lst_minute
-        lst_hour -= 1
-    elif lst_minute > 59:
-        lst_minute = 0
-        lst_hour += 1
+    minute_offset = int(minute_offset)
+    second_offset = int(second_offset)
+
+    gmst_decimal = gmst[0] + (gmst[1] / 60) + (gmst[2] / 3600)
+    print('gmst_decimal: ' + str(gmst_decimal))
+    lst = gmst_decimal + offset_decimal
+    print('lst_decimal: ' + str(lst))
+
+    print('offset time: ' + str(hour_offset) + ' ' + str(minute_offset) + ' ' + str(second_offset))
+
+    lst_hour = gmst[0] + hour_offset
+    lst_minute = gmst[1] + minute_offset
+    lst_second = gmst[2] + second_offset
 
     if lst_second < 0:
         lst_second = 60 + lst_second
@@ -232,6 +248,13 @@ def calculate_local_sidereal_time(lon_degrees, lon_minutes, lon_direction, gmst)
     elif lst_second > 59:
         lst_second = 0
         lst_minute += 1
+
+    if lst_minute < 0:
+        lst_minute = 60 + lst_minute
+        lst_hour -= 1
+    elif lst_minute > 59:
+        lst_minute = 0
+        lst_hour += 1
 
     return (lst_hour, lst_minute, lst_second)
 
@@ -260,14 +283,24 @@ def calculate_alt_az_astropy():
 
 
 if __name__ == "__main__":
-    print(calculate_julian_day_astropy(1900, 7, 31))
-    print(calculate_julian_day(1900, 7, 31, 0, 0))
-    gmst = calculate_gmst(1900, 7, 31, 0, 0)
-    print(gmst)
+    year = 2018
+    month = 2
+    day = 8
+    hour = 0
+    minute = 27
+    lat = 60
+    # lon = -86.59
+    lon = -86
+
+    print('astropy jd: ' + str(calculate_julian_day_astropy(year, month, day, hour, minute, lat, lon)))
+    print('jd: ' + str(calculate_julian_day(year, month, day, hour, minute)))
+    gmst = calculate_gmst(year, month, day, hour, minute)
+    # gmst_testing(year, month, day, hour, minute)
+    print('gmst: ' + str(gmst))
     # print(calculate_mst(1900, 7, 31, 0, 0, 0, 0, 0))
     # print('gmst time: ' + str(gmst))
-    # lst = calculate_local_sidereal_time(71, 18, 'W', gmst)
-    # print('lst time: ' + str(lst))
+    lst = calculate_local_sidereal_time(lon, 30, 'W', gmst)
+    print('lst time: ' + str(lst))
     #
     # calculate_alt_az(2.01372424, -19.49883745, 41.3, -74.0, lst)
     # calculate_alt_az_astropy()

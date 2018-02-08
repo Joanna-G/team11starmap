@@ -120,8 +120,14 @@ def calculate_long_asc_node(oscal, oprop, cy):
 
 
 # calculate mean longitude of a planet
-def calculate_longitude(lscal, lprop, cy):
+def calculate_mean_longitude(lscal, lprop, cy):
     return mod2pi(math.radians(lscal + lprop * cy / 3600))
+
+
+# calculate true anomaly of a planet
+def calculate_true_anomaly(mean_anomaly, eccentricity):
+    pass
+# need to figure this out
 
 
 # Convert an angle above 360 degrees to one less than 360
@@ -140,6 +146,75 @@ def abs_floor(b):
     else:
         floor = math.ceil(b)
     return floor
+
+
+# calculate right ascension and declination of a planet
+def calculate_ra_dec_planet(pl_lscal, pl_lprop, pl_ascal, pl_aprop, pl_escal, pl_eprop, pl_iscal, pl_iprop, pl_wscal,
+                            pl_wprop, pl_oscal, pl_oprop, e_lscal, e_lprop, e_ascal, e_aprop, e_escal, e_eprop,
+                            e_iscal, e_iprop, e_wscal, e_wprop, e_oscal, e_oprop, cy):
+
+    # calculate elements of planetary orbit of the planet
+    pl_mean_long = calculate_mean_longitude(pl_lscal, pl_lprop, cy)
+    pl_axis = calculate_semi_axis(pl_ascal, pl_aprop, cy)
+    pl_eccentricity = calculate_eccentricity(pl_escal, pl_eprop, cy)
+    pl_inclination = calculate_inclination(pl_iscal, pl_iprop, cy)
+    pl_arg_perihelion = calculate_arg_perihelion(pl_wscal, pl_wprop, cy)
+    pl_long_asc_node = calculate_long_asc_node(pl_oscal, pl_oprop, cy)
+
+    # calculate elements of the planetary orbit of the Earth
+    e_mean_long = calculate_mean_longitude(e_lscal, e_lprop, cy)
+    e_axis = calculate_semi_axis(e_ascal, e_aprop, cy)
+    e_eccentricity = calculate_eccentricity(e_escal, e_eprop, cy)
+    e_inclination = calculate_inclination(e_iscal, e_iprop, cy)
+    e_arg_perihelion = calculate_arg_perihelion(e_wscal, e_wprop, cy)
+    e_long_asc_node = calculate_long_asc_node(e_oscal, e_oprop, cy)
+
+    # calculate the position of the Earth in its orbit
+    e_m = mod2pi(e_mean_long - e_arg_perihelion)
+    # need to calculate mean anomaly
+    e_v = calculate_true_anomaly(e_mean_anomaly, math.radians(e_eccentricity))
+    e_r = e_axis * (1 - math.pow(e_eccentricity, 2)) / (1 + e_eccentricity * math.cos(e_v))
+
+    # calculate the heliocentric rectangular coordinates of Earth
+    e_x = e_r * math.cos(e_v + e_arg_perihelion)
+    e_y = e_r * math.sin(e_v + e_arg_perihelion)
+    e_z = 0.0
+
+    # calculate the position of the planet in its' orbit
+    pl_m = mod2pi(pl_mean_long - pl_arg_perihelion)
+    # need to calculate mean anomaly
+    pl_v = calculate_true_anomaly(pl_mean_anomaly, math.radians(pl_eccentricity))
+    pl_r = pl_axis * (1 - math.pow(pl_eccentricity, 2)) / (1 + pl_eccentricity * math.cos(pl_v))
+
+    # calculate the heliocentric rectangular coordinates of the planet
+    pl_xh = pl_r * (math.cos(pl_long_asc_node) * math.cos(pl_v + pl_arg_perihelion - pl_long_asc_node)
+                    - math.sin(pl_long_asc_node) * math.sin(pl_v + pl_arg_perihelion - pl_long_asc_node)
+                    * math.cos(pl_inclination))
+    pl_yh = pl_r * (math.sin(pl_long_asc_node) * math.cos(pl_v + pl_arg_perihelion - pl_long_asc_node)
+                    + math.cos(pl_long_asc_node) * math.sin(pl_v + pl_arg_perihelion - pl_long_asc_node)
+                    * math.cos(pl_inclination))
+    pl_zh = pl_r * (math.sin(pl_v + pl_arg_perihelion - pl_long_asc_node) * math.sin(pl_inclination))
+    # come back to this
+    # if Earth/Sun set all to 0.0
+
+    # convert to geocentric rectangular coordinates
+    xg = pl_xh - e_x
+    yg = pl_yh - e_y
+    zg = pl_zh - e_z
+
+    # rotate around X axis from ecliptic to equatorial coordinates
+    ecl = math.radians(23.439281)
+    xeq = xg
+    yeq = yg * math.cos(ecl) - zg * math.sin(ecl)
+    zeq = yg * math.sin(ecl) + zg * math.cos(ecl)
+
+    # calculate right ascension and declination from the rectangular equatorial coordinates
+    # also calculates distance in AUs
+    ra = math.radians(mod2pi(math.atan2(yeq, xeq)))
+    dec = math.degrees(math.atan(zeq / math.sqrt(math.pow(xeq, 2) + math.pow(yeq, 2))))
+    dist = math.sqrt(math.pow(xeq, 2) + math.pow(yeq, 2) + math.pow(zeq, 2))
+
+    return (ra, dec, dist)
 
 
 # start of calculations for the stars

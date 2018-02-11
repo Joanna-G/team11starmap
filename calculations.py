@@ -144,163 +144,162 @@ def abs_floor(b):
 
 # start of calculations for the stars
 
-# uses astropy library to calculate julian date. can also get gsmt time
-def calculate_julian_day_astropy(year, month, day, hour, minute, lat, lon):
-    # location = (str(lat) + 'd', str(lon) + 'd')
-    location = (lat,lon)
-    dt = dateutil.parser.parse(str(year) + '.' + str(month) + '.' + str(day) + ' ' + str(hour) + ':' + str(minute) + ':' + '0')
-    time = astropy.time.Time(dt, location=('114.5d', '40d'))
-    gsmt = time.sidereal_time('mean', 'greenwich')
-    lst = time.sidereal_time('mean')
-    print('gmst: ' + str(gsmt))
-    print('lst ?: ' + str(lst))
-    return time.jd
+class TimeCalculations:
+    def __init__(self, year, month, day, hour, minute, lat, lon):
+        self.year = year
+        self.month = month
+        self.day = day
+        self.hour = hour
+        self.minute = minute
+        self.lat = lat
+        self.lon = lon
+
+    def calculate_julian_day(self, year, month, day, hour, minute):
+        converted_time = hour + (minute / 60)
+        converted_day = day + (converted_time / 24)
+        if month > 2:
+            year = year
+            month = month
+        else:
+            year -= 1
+            month += 12
+        b = -13
+        jd = int(365.25 * year) + int(30.6001 * (month + 1)) + converted_day + 1720994.5 + b
+        return jd
+
+    def calculate_gmst(self, year, month, day, hour, minute):
+        jd = self.calculate_julian_day(year, month, day, hour, minute)
+        midnight = math.floor(jd) + 0.5
+        days_since_midnight = jd - midnight
+        hours_since_midnight = days_since_midnight * 24
+        days_since_epoch = jd - 2451545.0
+        centuries_since_epoch = days_since_epoch / 35625
+        whole_days_since_epoch = midnight - 2451545
+
+        gmst = 6.697374558 + 0.06570982441908 * whole_days_since_epoch + 1.00273790935 * hours_since_midnight + 0.000026 * math.pow(centuries_since_epoch, 2)
+        gmst_remainder = gmst % int(gmst)
+        gmst_hours = math.floor(gmst) % 24
+        gmst_minutes = math.floor(gmst_remainder * 60)
+        gmst_minutes_decimal = gmst_remainder * 60
+        gmst_minutes_decimal = gmst_minutes_decimal % int(gmst_minutes_decimal)
+        gmst_seconds = math.floor(gmst_minutes_decimal * 60)
+
+        if year < 2000:
+            gmst_minutes += 60
+            gmst_seconds += 60
+
+        gmst_decimal = gmst_hours + (gmst_minutes / 60) + (gmst_seconds / 3600)
+
+        return gmst_decimal
+
+    def calculate_lst(self, lon_decimal, gmst_decimal):
+        offset_decimal = lon_decimal / 15
+        lst_decimal = gmst_decimal + offset_decimal
+        if lst_decimal < 0:
+            lst_decimal += 24
+        elif lst_decimal > 24:
+            lst_decimal = lst_decimal - 24
+
+        return lst_decimal
+
+    def calculate_ha_time(self, lst, ra):
+        ha_time = lst - ra
+        print('ha time before correction: ' + str(ha_time))
+        if ha_time < 0:
+            while ha_time < 0:
+                ha_time += 24
+        elif ha_time > 24:
+            while ha_time > 24:
+                ha_time = ha_time - 24
+        return ha_time
+
+    def calculate_az(self, dec, lat, ha_time):
+        ha_degrees = self.ha_time_to_degrees(ha_time)
+
+        az_rad = math.atan((-1 * math.sin(math.radians(ha_degrees)) * math.cos(math.radians(dec))) / (
+                (math.cos(math.radians(lat)) * math.sin(math.radians(dec))) - (
+                math.sin(math.radians(lat)) * math.cos(math.radians(dec)) * math.cos(math.radians(ha_degrees)))))
+        az_degrees = math.degrees(az_rad)
+
+        if az_degrees < 0:
+            while az_degrees < 0:
+                az_degrees += 360
+        elif az_degrees > 360:
+            while az_degrees > 360:
+                az_degrees = 360 - az_degrees
+
+        return az_degrees
+
+    def calculate_alt(self, dec, lat, ha_time):
+        ha_degrees = self.ha_time_to_degrees(ha_time)
+        print('ha degrees: ' + str(ha_degrees))
+        alt_rad = math.asin(math.sin(math.radians(lat)) * math.sin(math.radians(dec))) + (
+                math.cos(math.radians(lat)) * math.cos(math.radians(dec)) * math.cos(math.radians(ha_degrees)))
+        alt_degrees = math.degrees(alt_rad)
+        return alt_degrees
+
+    def testing_alt(self, dec, lat, ha_time):
+        ha_degrees = self.ha_time_to_degrees(ha_time)
+        alt_rad = math.sin(math.radians(dec)) * math.sin(math.radians(lat)) + math.cos(math.radians(dec)) * math.cos(math.radians(lat)) * math.cos(math.radians(ha_degrees))
+        alt_rad = math.asin(alt_rad)
+        alt_degrees = math.degrees(alt_rad)
+        return alt_degrees
+
+    def testing_az(self, dec, lat, ha_time, alt):
+        ha_degrees = self.ha_time_to_degrees(ha_time)
+        print('ha degrees dd: ' + str(ha_degrees))
+        az_rad = (math.sin(math.radians(dec)) - (math.sin(math.radians(alt)) * math.sin(math.radians(lat)))) / (math.cos(math.radians(alt)) * math.cos(math.radians(lat)))
+        az_rad = math.acos(az_rad)
+        az_degrees = math.degrees(az_rad)
+        if math.sin(math.radians(ha_degrees)) < 0:
+            az_degrees = az_degrees
+        else:
+            az_degrees = 360 - az_degrees
+        return az_degrees
 
 
-# pretty confident that this is right
-def calculate_julian_day(year, month, day, hour, minute):
-    converted_time = hour + (minute / 60)
-    converted_day = day + (converted_time / 24)
-
-    if month > 2:
-        year = year
-        month = month
-    else:
-        year -= 1
-        month += 12
-
-    b = -13
-
-    jd = int(365.25 * year) + int(30.6001 * (month + 1)) + converted_day + 1720994.5 + b
-    return jd
-
-def gmst_testing(year, month, day, hour, minute):
-    jd = calculate_julian_day(year, month, day, hour, minute)
-    jd = math.floor(jd) + 0.5
-    ut = hour + (minute / 60)
-    t = (jd - 2451545.0) / 36525.0
-    t_0 = 6.697374558+(2400.051336*t)+(0.000025862*math.pow(t,2))+(ut*1.0027379093)
-    if t_0 > 24:
-        while t_0 > 24.0:
-            t_0 -= 24.0
-    elif t_0 < 0.0:
-        while t_0 < 0.0:
-            t_0 += 24.0
-    print(t_0)
+    def ha_time_to_degrees(self, ha_time):
+        ha_degrees_hours = int(ha_time * 15)
+        ha_degrees_minutes = (((ha_time * 15) - ha_degrees_hours))
+        ha_degrees_seconds = ((((ha_time * 15) - ha_degrees_hours)) - ha_degrees_minutes)
+        ha_degrees = ha_degrees_hours + ha_degrees_minutes + ha_degrees_seconds
+        return ha_degrees
 
 
-# pretty confident that this is right
-def calculate_gmst(year, month, day, hour, minute):
-    jd = calculate_julian_day(year, month, day, hour, minute)
-    midnight = math.floor(jd) + 0.5
-    days_since_midnight = jd - midnight
-    hours_since_midnight = days_since_midnight * 24
-    days_since_epoch = jd - 2451545.0
-    centuries_since_epoch = days_since_epoch / 35625
-    whole_days_since_epoch = midnight - 2451545.0
-
-    gmst = 6.697374558 + 0.06570982441908 * whole_days_since_epoch + 1.00273790935 * hours_since_midnight + 0.000026 * math.pow(centuries_since_epoch, 2)
-    gmst_remainder = gmst % int(gmst)
-    gmst_hours = math.floor(gmst) % 24
-    gmst_minutes = math.floor(gmst_remainder * 60)
-    gmst_minutes_decimal = gmst_remainder * 60
-    gmst_minutes_decimal = gmst_minutes_decimal % int(gmst_minutes_decimal)
-    gmst_seconds = math.floor(gmst_minutes_decimal * 60)
-
-    if year < 2000:
-        gmst_minutes += 60
-        gmst_seconds += 60
-
-    return (gmst_hours, gmst_minutes, gmst_seconds)
-
-
-# this needs to be checked
-def calculate_local_sidereal_time(lon_degrees, lon_minutes, lon_direction, gmst):
-    lon_decimal = lon_degrees + (lon_minutes / 60.0)
-    # if lon_direction == 'W':
-    #     lon_decimal *= -1
-
-
-
-    offset_decimal = lon_decimal / 15.0
-    print('offset_decimal: ' + str(offset_decimal))
-    hour_offset = int(offset_decimal)
-    minute_offset = (offset_decimal % hour_offset) * 60
-    second_offset = (minute_offset % int(minute_offset)) * 60
-
-    minute_offset = int(minute_offset)
-    second_offset = int(second_offset)
-
-    gmst_decimal = gmst[0] + (gmst[1] / 60) + (gmst[2] / 3600)
-    print('gmst_decimal: ' + str(gmst_decimal))
-    lst = gmst_decimal + offset_decimal
-    print('lst_decimal: ' + str(lst))
-
-    print('offset time: ' + str(hour_offset) + ' ' + str(minute_offset) + ' ' + str(second_offset))
-
-    lst_hour = gmst[0] + hour_offset
-    lst_minute = gmst[1] + minute_offset
-    lst_second = gmst[2] + second_offset
-
-    if lst_second < 0:
-        lst_second = 60 + lst_second
-        lst_minute -= 1
-    elif lst_second > 59:
-        lst_second = 0
-        lst_minute += 1
-
-    if lst_minute < 0:
-        lst_minute = 60 + lst_minute
-        lst_hour -= 1
-    elif lst_minute > 59:
-        lst_minute = 0
-        lst_hour += 1
-
-    return (lst_hour, lst_minute, lst_second)
-
-
-# pretty sure this is not right
-def calculate_alt_az(ra, dec, lat, lon, lst):
-    lst_decimal = lst[0] + (lst[1] / 60)
-    hour_angle = lst_decimal - ra
-    az = math.atan((math.sin(hour_angle) * math.cos(dec) * -1) / (math.cos(lat) * math.sin(dec) - math.sin(lat) * math.cos(dec) * math.cos(hour_angle)))
-    alt = math.asin(math.sin(lat) * math.sin(dec) + math.cos(lat) * math.cos(dec) * math.cos(hour_angle))
-    print(az)
-    print(alt)
-
-# uses astropy library to calculate altitude and azimuth
-def calculate_alt_az_astropy():
-    m33 = SkyCoord.from_name('M33')
-    bear_mountain = EarthLocation(lat=41.3*u.deg, lon=-74*u.deg, height=390*u.m)
-    utcoffset = -4*u.hour
-    time = Time('2012-7-12 23:00:00') - utcoffset
-
-    m33altaz = m33.transform_to(AltAz(obstime=time, location=bear_mountain))
-    print("M33's Altitude = {0.alt:.4}".format(m33altaz))
-    print("M33's Azimuth = {0.az:.4}".format(m33altaz))
-
-    print(m33altaz.alt)
+    def ra_degrees_to_time_decimal(self, ra):
+        hours = int(ra / 15.0)
+        minutes = int(((ra / 15.0) - hours) * 60)
+        seconds = ((((ra / 15.0) - hours) * 60.0) - minutes) * 60
+        print('hh:mm:ss: ' + str(hours) + ' ' + str(minutes) + ' ' + str(seconds))
+        ra_time_decimal = hours + (minutes / 60) + (seconds / 3600)
+        return ra_time_decimal
 
 
 if __name__ == "__main__":
-    year = 2018
+    year = 1905
     month = 2
-    day = 8
-    hour = 0
-    minute = 27
-    lat = 60
-    # lon = -86.59
-    lon = -86
+    day = 16
+    hour = 12
+    minute = 0
+    lat = 34.71
+    lon = 86.6
 
-    print('astropy jd: ' + str(calculate_julian_day_astropy(year, month, day, hour, minute, lat, lon)))
-    print('jd: ' + str(calculate_julian_day(year, month, day, hour, minute)))
-    gmst = calculate_gmst(year, month, day, hour, minute)
-    # gmst_testing(year, month, day, hour, minute)
-    print('gmst: ' + str(gmst))
-    # print(calculate_mst(1900, 7, 31, 0, 0, 0, 0, 0))
-    # print('gmst time: ' + str(gmst))
-    lst = calculate_local_sidereal_time(lon, 30, 'W', gmst)
-    print('lst time: ' + str(lst))
-    #
-    # calculate_alt_az(2.01372424, -19.49883745, 41.3, -74.0, lst)
-    # calculate_alt_az_astropy()
+    ra = 1.28435588
+    dec = -66.39789075
+
+    time_calc = TimeCalculations(year, month, day, hour, minute, lat, lon)
+    gmst_decimal = time_calc.calculate_gmst(year, month, day, hour, minute)
+    lst_decimal = time_calc.calculate_lst(lon, gmst_decimal)
+    ha_time = time_calc.calculate_ha_time(lst_decimal, ra)
+    az_degrees = time_calc.calculate_az(dec, lat, ha_time)
+    alt_degrees = time_calc.calculate_alt(dec, lat, ha_time)
+    testing_alt_degrees = time_calc.testing_alt(dec, lat, ha_time)
+    testing_az_degrees = time_calc.testing_az(dec, lat, ha_time, testing_alt_degrees)
+
+    print('gmst decimal: ' + str(gmst_decimal))
+    print('lst decimal: ' + str(lst_decimal))
+    print('ha decimal: ' + str(ha_time))
+    print('az degrees: ' + str(az_degrees))
+    print('alt degrees: ' + str(alt_degrees))
+    print('tesing az: ' + str(testing_az_degrees))
+    print('tesing alt: ' + str(testing_alt_degrees))

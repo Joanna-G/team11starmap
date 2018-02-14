@@ -15,6 +15,8 @@ class PlanetParser():
             # Check if it is the header row, if it is, ignore it.
             if row[0] == "ï»¿PlanetName":
                 continue
+            if row[0] in (None, ""):
+                break
             else:
                 for i in range(0, 13, 1):
                     element.append(row[i])

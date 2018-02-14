@@ -56,7 +56,7 @@ class Constellation(BaseCelestialObject):
         self.number_lines = None
         self.stars = []
 
-class Messier_Objects(BaseCelestialObject)
+class Messier_Objects(BaseCelestialObject):
     def __init__(self):
         BaseCelestialObject.__init__(self)
 

@@ -124,6 +124,18 @@ def calculate_mean_longitude(lscal, lprop, cy):
     return mod2pi(math.radians(lscal + lprop * cy / 3600))
 
 
+# calculate mean anomaly of a planet
+def calculate_mean_anomaly():
+    pass
+# need to figure this out
+
+
+# calculate eccentric anomaly of a planet
+def calculate_eccentric_anomaly():
+    pass
+# need to figure this out
+
+
 # calculate true anomaly of a planet
 def calculate_true_anomaly(mean_anomaly, eccentricity):
     pass

@@ -16,7 +16,7 @@ class PlanetParser():
             if row[0] == "ï»¿PlanetName":
                 continue
             else:
-                for i in range (0, 12, 1):
+                for i in range(0, 13, 1):
                     element.append(row[i])
 
             self.ElementsList.append(element)

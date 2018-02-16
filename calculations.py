@@ -363,6 +363,80 @@ class TimeCalculations:
         ra_time_decimal = hours + (minutes / 60) + (seconds / 3600)
         return ra_time_decimal
 
+# Start of Moon Calculations
+def lunar_phase(year, month, day, hour, minute, lat, lon):
+
+    NEW = 0
+    FIRST = 1
+    FULL = 2
+    LAST = 3
+
+    # Calculate the Decimal Year
+    N1 = math.floor(275 * month / 9)
+    N2 = math.floor((month + 9) / 12)
+    N3 = (1 + math.floor((year - 4 * math.floor(year / 4) + 2) / 3))
+    dec_year = year + ((N1 - (N2 * N3) + day - 30)/365)
+
+    # Calculate k for JD
+    k = math.floor((dec_year - 1900.0) * 12.3685)
+
+    # Calculate T for JD of Phase
+    T = k / 1236.85
+
+    # Calculate Julian Day for given phase
+    def jd_phase(phase, k, T):
+        if phase == NEW:
+            k = k
+        elif phase == FIRST:
+            k = k + 0.25
+        elif phase == FULL:
+            k = k + 0.50
+        elif phase == LAST:
+            k = k + 0.75
+        else:
+            print("Error\n")
+
+        RAD = math.pi/180
+        jd = 2415020.75933 + (29.53058868 * k) + (0.0001178 * T) - (0.000000155 * T * T * T) + \
+             (0.00033 * math.sin((166.56 + (132.87 * T) - (0.009173 * T * T))) * RAD)
+
+        # testing
+        print("jd: " + str(jd))
+
+        return jd
+
+    get_jd = TimeCalculations(year, month, day, hour, minute, lat, lon)
+    current_jd = get_jd.calculate_julian_day(year, month, day, hour, minute)
+
+    # testing
+    print("current jd: " + str(current_jd))
+
+    if jd_phase(NEW, k, T) <= current_jd <= jd_phase(FIRST, k, T):
+        current_phase = NEW
+    elif jd_phase(FIRST, k, T) < current_jd <= jd_phase(FULL, k, T):
+        current_phase = FIRST
+    elif jd_phase(FULL, k, T) <= current_jd <= jd_phase(LAST, k, T):
+        current_phase = FULL
+    elif jd_phase(LAST, k, T) < current_jd:
+        current_phase = LAST
+    else:
+        print("Error\n")
+
+    # testing for print
+    if current_phase == NEW:
+        phase = "new"
+    elif current_phase == FIRST:
+        phase = "first"
+    elif current_phase == FULL:
+        phase = "full"
+    else:
+        phase = "last"
+    # testing return statement
+    return phase
+
+    # Actual return statement
+    # return current_phase
+
 
 # Start of Moon Calculations
 def lunar_phase(year, month, day, hour, minute, lat, lon):

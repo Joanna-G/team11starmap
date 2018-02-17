@@ -363,6 +363,7 @@ class TimeCalculations:
         ra_time_decimal = hours + (minutes / 60) + (seconds / 3600)
         return ra_time_decimal
 
+
 # Start of Moon Calculations
 def lunar_phase(year, month, day, hour, minute, lat, lon):
 
@@ -371,56 +372,25 @@ def lunar_phase(year, month, day, hour, minute, lat, lon):
     FULL = 2
     LAST = 3
 
-    # Calculate the Decimal Year
-    N1 = math.floor(275 * month / 9)
-    N2 = math.floor((month + 9) / 12)
-    N3 = (1 + math.floor((year - 4 * math.floor(year / 4) + 2) / 3))
-    dec_year = year + ((N1 - (N2 * N3) + day - 30)/365)
-
-    # Calculate k for JD
-    k = math.floor((dec_year - 1900.0) * 12.3685)
-
-    # Calculate T for JD of Phase
-    T = k / 1236.85
-
-    # Calculate Julian Day for given phase
-    def jd_phase(phase, k, T):
-        if phase == NEW:
-            k = k
-        elif phase == FIRST:
-            k = k + 0.25
-        elif phase == FULL:
-            k = k + 0.50
-        elif phase == LAST:
-            k = k + 0.75
-        else:
-            print("Error\n")
-
-        RAD = math.pi/180
-        jd = 2415020.75933 + (29.53058868 * k) + (0.0001178 * T) - (0.000000155 * T * T * T) + \
-             (0.00033 * math.sin((166.56 + (132.87 * T) - (0.009173 * T * T))) * RAD)
-
-        # testing
-        print("jd: " + str(jd))
-
+    def get_jd(year, month, day):
+        jd = day + (153 * month + 2)/5 + 365 * year + year/4 - year/100 + year/400 - 32045
         return jd
 
-    get_jd = TimeCalculations(year, month, day, hour, minute, lat, lon)
-    current_jd = get_jd.calculate_julian_day(year, month, day, hour, minute)
+    new_moon_ref = get_jd(1, 1, 1900)
+    jd_current = get_jd(year, month, day)
 
-    # testing
-    print("current jd: " + str(current_jd))
+    phase_jd = jd_current - new_moon_ref
+    sc = 29.53059
+    age_of_moon = phase_jd % sc
 
-    if jd_phase(NEW, k, T) <= current_jd <= jd_phase(FIRST, k, T):
+    if (0 <= age_of_moon < 7.38) or (age_of_moon == 29):
         current_phase = NEW
-    elif jd_phase(FIRST, k, T) < current_jd <= jd_phase(FULL, k, T):
+    elif 7.38 <= age_of_moon < 14.76:
         current_phase = FIRST
-    elif jd_phase(FULL, k, T) <= current_jd <= jd_phase(LAST, k, T):
+    elif 14.76 <= age_of_moon < 22.15:
         current_phase = FULL
-    elif jd_phase(LAST, k, T) < current_jd:
+    elif 22.15 <= age_of_moon < 29:
         current_phase = LAST
-    else:
-        print("Error\n")
 
     # testing for print
     if current_phase == NEW:
@@ -431,81 +401,7 @@ def lunar_phase(year, month, day, hour, minute, lat, lon):
         phase = "full"
     else:
         phase = "last"
-    # testing return statement
-    return phase
 
-    # Actual return statement
-    # return current_phase
-
-
-# Start of Moon Calculations
-def lunar_phase(year, month, day, hour, minute, lat, lon):
-
-    NEW = 0
-    FIRST = 1
-    FULL = 2
-    LAST = 3
-
-    # Calculate the Decimal Year
-    N1 = math.floor(275 * month / 9)
-    N2 = math.floor((month + 9) / 12)
-    N3 = (1 + math.floor((year - 4 * math.floor(year / 4) + 2) / 3))
-    dec_year = year + ((N1 - (N2 * N3) + day - 30)/365)
-
-    # Calculate k for JD
-    k = math.floor((dec_year - 1900.0) * 12.3685)
-
-    # Calculate T for JD of Phase
-    T = k / 1236.85
-
-    # Calculate Julian Day for given phase
-    def jd_phase(phase, k, T):
-        if phase == NEW:
-            k = k
-        elif phase == FIRST:
-            k = k + 0.25
-        elif phase == FULL:
-            k = k + 0.50
-        elif phase == LAST:
-            k = k + 0.75
-        else:
-            print("Error\n")
-
-        RAD = math.pi/180
-        jd = 2415020.75933 + (29.53058868 * k) + (0.0001178 * T) - (0.000000155 * T * T * T) + \
-             (0.00033 * math.sin((166.56 + (132.87 * T) - (0.009173 * T * T))) * RAD)
-
-        # testing
-        print("jd: " + str(jd))
-
-        return jd
-
-    get_jd = TimeCalculations(year, month, day, hour, minute, lat, lon)
-    current_jd = get_jd.calculate_julian_day(year, month, day, hour, minute)
-
-    # testing
-    print("current jd: " + str(current_jd))
-
-    if jd_phase(NEW, k, T) <= current_jd <= jd_phase(FIRST, k, T):
-        current_phase = NEW
-    elif jd_phase(FIRST, k, T) < current_jd <= jd_phase(FULL, k, T):
-        current_phase = FIRST
-    elif jd_phase(FULL, k, T) <= current_jd <= jd_phase(LAST, k, T):
-        current_phase = FULL
-    elif jd_phase(LAST, k, T) < current_jd:
-        current_phase = LAST
-    else:
-        print("Error\n")
-
-    # testing for print
-    if current_phase == NEW:
-        phase = "new"
-    elif current_phase == FIRST:
-        phase = "first"
-    elif current_phase == FULL:
-        phase = "full"
-    else:
-        phase = "last"
     # testing return statement
     return phase
 
@@ -515,8 +411,8 @@ def lunar_phase(year, month, day, hour, minute, lat, lon):
 
 if __name__ == "__main__":
     year = 2018
-    month = 1
-    day = 23
+    month = 2
+    day = 16
     hour = 12
     minute = 0
     lat = 34.71
@@ -534,6 +430,7 @@ if __name__ == "__main__":
     testing_alt_degrees = time_calc.testing_alt(dec, lat, ha_time)
     testing_az_degrees = time_calc.testing_az(dec, lat, ha_time, testing_alt_degrees)
     phase = lunar_phase(year, month, day, hour, minute, lat, lon)
+    jd = time_calc.calculate_julian_day(year, month, day, hour, minute)
 
     print('gmst decimal: ' + str(gmst_decimal))
     print('lst decimal: ' + str(lst_decimal))
@@ -542,4 +439,4 @@ if __name__ == "__main__":
     print('alt degrees: ' + str(alt_degrees))
     print('tesing az: ' + str(testing_az_degrees))
     print('tesing alt: ' + str(testing_alt_degrees))
-    print('testing phase: ' + phase)
+    print('testing phase: ' + str(phase))

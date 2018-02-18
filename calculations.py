@@ -409,12 +409,52 @@ def lunar_phase(year, month, day, hour, minute, lat, lon):
     # return current_phase
 
 
+# Calculate Lunar Geocentric Latitude and Longitude
+# Not working yet, not well tested
+def lunar_location(year, month, day, hour, minute, lat, lon):
+
+    jd_calc = TimeCalculations(year, month, day, hour, minute, lat, lon)
+    jd = jd_calc.calculate_julian_day(year, month, day, hour, minute)
+
+    t = (jd - 2415020.0)/36525
+    l_prime = 270.434164 + (481267.8831 * t)
+    m = 358.475833 + (35999.0498 * t)
+    m_prime = 296.104608 + (477198.8491 * t)
+    D = 350.737486 + (445267.1142 * t)
+    F = 11.250889 + (483202.0251 * t)
+    e = (1 - 0.002495 * t) - (0.00000752 * t * t)
+
+    lunar_lat = (5.128189 * math.sin(math.radians(F))) + \
+                (0.280606 * math.sin(math.radians(m_prime + F))) + \
+                (0.277693 * math.sin(math.radians(m_prime - F))) + \
+                (0.173238 * math.sin(math.radians(2 * D - F))) + \
+                (0.055413 * math.sin(math.radians(2 * D + F - m_prime))) + \
+                (0.046272 * math.sin(math.radians(2 * D - F - m_prime))) + \
+                (0.032573 * math.sin(math.radians(2 * D + F))) + \
+                (0.017198 * math.sin(math.radians(2 * m_prime + F))) + \
+                (0.009267 * math.sin(math.radians(2 * D + m_prime - F))) + \
+                (0.008823 * math.sin(math.radians(2 * m_prime - F)))
+
+    lunar_long = l_prime + (6.288750 * math.sin(math.radians(m_prime))) + \
+                 (1.274018 * math.sin(math.radians(2 * D - m_prime))) + \
+                 (0.658309 * math.sin(math.radians(2 * D))) + \
+                 (0.213616 * math.sin(math.radians(2 * m_prime))) - \
+                 (0.185596 * math.sin(math.radians(m) * e)) - \
+                 (0.114336 * math.sin(math.radians(2 * F))) + \
+                 (0.058793 * math.sin(math.radians(2 * D - 2 * m_prime))) + \
+                 (0.057212 * math.sin(math.radians(2 * D - m - m_prime)) * e) + \
+                 (0.053320 * math.sin(math.radians(2 * D + m_prime))) + \
+                 (0.045874 * math.sin(math.radians(2 * D - m)) * e)
+
+    return lunar_lat, lunar_long
+
+
 if __name__ == "__main__":
     year = 2018
     month = 2
-    day = 16
-    hour = 12
-    minute = 0
+    day = 18
+    hour = 19
+    minute = 10
     lat = 34.71
     lon = 86.6
 
@@ -431,6 +471,7 @@ if __name__ == "__main__":
     testing_az_degrees = time_calc.testing_az(dec, lat, ha_time, testing_alt_degrees)
     phase = lunar_phase(year, month, day, hour, minute, lat, lon)
     jd = time_calc.calculate_julian_day(year, month, day, hour, minute)
+    lun_lat, lun_long = lunar_location(year, month, day, hour, minute, lat, lon)
 
     print('gmst decimal: ' + str(gmst_decimal))
     print('lst decimal: ' + str(lst_decimal))
@@ -439,4 +480,6 @@ if __name__ == "__main__":
     print('alt degrees: ' + str(alt_degrees))
     print('tesing az: ' + str(testing_az_degrees))
     print('tesing alt: ' + str(testing_alt_degrees))
-    print('testing phase: ' + str(phase))
+    print('testing moon phase: ' + str(phase))
+    print('testing lunar lat: ' + str(lun_lat))
+    print('testing lunar long: ' + str(lun_long))

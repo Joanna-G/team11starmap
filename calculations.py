@@ -252,7 +252,13 @@ class TimeCalculations:
         else:
             year -= 1
             month += 12
+
+        # Added by Joanna - This was in the document, but not in the code. Is it needed?
+        # a = math.floor(year/100)
+        # b = 2 - a + math.floor(a / 4)
+
         b = -13
+
         jd = int(365.25 * year) + int(30.6001 * (month + 1)) + converted_day + 1720994.5 + b
         return jd
 
@@ -372,17 +378,23 @@ def lunar_phase(year, month, day, hour, minute, lat, lon):
     FULL = 2
     LAST = 3
 
-    def get_jd(year, month, day):
-        jd = day + (153 * month + 2)/5 + 365 * year + year/4 - year/100 + year/400 - 32045
-        return jd
+    # def get_jd(year, month, day):
+        # jd = day + (153 * month + 2)/5 + 365 * year + year/4 - year/100 + year/400 - 32045
+        # return jd
 
-    new_moon_ref = get_jd(1, 1, 1900)
-    jd_current = get_jd(year, month, day)
+    # new_moon_ref = get_jd(1, 1, 1900)
+    # jd_current = get_jd(year, month, day)
 
+    jd_calc = TimeCalculations(year, month, day, hour, minute, lat, lon)
+    jd_current = jd_calc.calculate_julian_day(year, month, day, hour, minute)
+    new_moon_ref = jd_calc.calculate_julian_day(1900, 1, 1, 0, 0)
     phase_jd = jd_current - new_moon_ref
     sc = 29.53059
     age_of_moon = phase_jd % sc
 
+    # This is very rudimentary and doesn't work all that well. I'm going
+    # to change it so that the "center" of each time span is on the date that
+    # is the actual phase. It will look better visually that way, I think.
     if (0 <= age_of_moon < 7.38) or (age_of_moon == 29):
         current_phase = NEW
     elif 7.38 <= age_of_moon < 14.76:
@@ -410,51 +422,62 @@ def lunar_phase(year, month, day, hour, minute, lat, lon):
 
 
 # Calculate Lunar Geocentric Latitude and Longitude
-# Not working yet, not well tested
+# Not working yet, not well tested, no idea what any of this means
+# I think these calculations have to be adjusted for topocentric
+# which requires way more calculating.
 def lunar_location(year, month, day, hour, minute, lat, lon):
 
     jd_calc = TimeCalculations(year, month, day, hour, minute, lat, lon)
     jd = jd_calc.calculate_julian_day(year, month, day, hour, minute)
 
     t = (jd - 2415020.0)/36525
-    l_prime = 270.434164 + (481267.8831 * t)
-    m = 358.475833 + (35999.0498 * t)
-    m_prime = 296.104608 + (477198.8491 * t)
-    D = 350.737486 + (445267.1142 * t)
-    F = 11.250889 + (483202.0251 * t)
-    e = (1 - 0.002495 * t) - (0.00000752 * t * t)
+    moon_mean_long = 270.434164 + (481267.8831 * t)
+    sun_mean_anom = 358.475833 + (35999.0498 * t)
+    moon_mean_anom = 296.104608 + (477198.8491 * t)
+    moon_mean_elong = 350.737486 + (445267.1142 * t)
+    moon_mean_dist = 11.250889 + (483202.0251 * t)
+    e = 1 - (0.002495 * t) - (0.00000752 * t * t)
 
-    lunar_lat = (5.128189 * math.sin(math.radians(F))) + \
-                (0.280606 * math.sin(math.radians(m_prime + F))) + \
-                (0.277693 * math.sin(math.radians(m_prime - F))) + \
-                (0.173238 * math.sin(math.radians(2 * D - F))) + \
-                (0.055413 * math.sin(math.radians(2 * D + F - m_prime))) + \
-                (0.046272 * math.sin(math.radians(2 * D - F - m_prime))) + \
-                (0.032573 * math.sin(math.radians(2 * D + F))) + \
-                (0.017198 * math.sin(math.radians(2 * m_prime + F))) + \
-                (0.009267 * math.sin(math.radians(2 * D + m_prime - F))) + \
-                (0.008823 * math.sin(math.radians(2 * m_prime - F)))
+    lunar_lat = (5.128189 * math.sin(math.radians(moon_mean_dist))) + \
+                (0.280606 * math.sin(math.radians(moon_mean_anom + moon_mean_dist))) + \
+                (0.277693 * math.sin(math.radians(moon_mean_anom - moon_mean_dist))) + \
+                (0.173238 * math.sin(math.radians(2 * moon_mean_elong - moon_mean_dist))) + \
+                (0.055413 * math.sin(math.radians(2 * moon_mean_elong + moon_mean_dist - moon_mean_anom))) + \
+                (0.046272 * math.sin(math.radians(2 * moon_mean_elong - moon_mean_dist - moon_mean_anom))) + \
+                (0.032573 * math.sin(math.radians(2 * moon_mean_elong + moon_mean_dist))) + \
+                (0.017198 * math.sin(math.radians(2 * moon_mean_anom + moon_mean_dist))) + \
+                (0.009267 * math.sin(math.radians(2 * moon_mean_elong + moon_mean_anom - moon_mean_dist))) + \
+                (0.008823 * math.sin(math.radians(2 * moon_mean_anom - moon_mean_dist)))
 
-    lunar_long = l_prime + (6.288750 * math.sin(math.radians(m_prime))) + \
-                 (1.274018 * math.sin(math.radians(2 * D - m_prime))) + \
-                 (0.658309 * math.sin(math.radians(2 * D))) + \
-                 (0.213616 * math.sin(math.radians(2 * m_prime))) - \
-                 (0.185596 * math.sin(math.radians(m) * e)) - \
-                 (0.114336 * math.sin(math.radians(2 * F))) + \
-                 (0.058793 * math.sin(math.radians(2 * D - 2 * m_prime))) + \
-                 (0.057212 * math.sin(math.radians(2 * D - m - m_prime)) * e) + \
-                 (0.053320 * math.sin(math.radians(2 * D + m_prime))) + \
-                 (0.045874 * math.sin(math.radians(2 * D - m)) * e)
+    lunar_long = moon_mean_long + (6.288750 * math.sin(math.radians(moon_mean_anom))) + \
+                 (1.274018 * math.sin(math.radians(2 * moon_mean_elong - moon_mean_anom))) + \
+                 (0.658309 * math.sin(math.radians(2 * moon_mean_elong))) + \
+                 (0.213616 * math.sin(math.radians(2 * moon_mean_anom))) - \
+                 (0.185596 * math.sin(math.radians(sun_mean_anom)) * e) - \
+                 (0.114336 * math.sin(math.radians(2 * moon_mean_dist))) + \
+                 (0.058793 * math.sin(math.radians(2 * moon_mean_elong - 2 * moon_mean_anom))) + \
+                 (0.057212 * math.sin(math.radians(2 * moon_mean_elong - sun_mean_anom - moon_mean_anom)) * e) + \
+                 (0.053320 * math.sin(math.radians(2 * moon_mean_elong + moon_mean_anom))) + \
+                 (0.045874 * math.sin(math.radians(2 * moon_mean_elong - sun_mean_anom)) * e)
+
+    while lunar_long > 180:
+        lunar_long = lunar_long - 360
+    while lunar_long < -180:
+        lunar_long = lunar_long + 360
+    while lunar_lat > 90:
+        lunar_lat = lunar_lat - 360
+    while lunar_lat < -90:
+        lunar_lat = lunar_lat + 360
 
     return lunar_lat, lunar_long
 
 
 if __name__ == "__main__":
-    year = 2018
-    month = 2
+    year = 1951
+    month = 7
     day = 18
-    hour = 19
-    minute = 10
+    hour = 18
+    minute = 0
     lat = 34.71
     lon = 86.6
 
@@ -480,6 +503,7 @@ if __name__ == "__main__":
     print('alt degrees: ' + str(alt_degrees))
     print('tesing az: ' + str(testing_az_degrees))
     print('tesing alt: ' + str(testing_alt_degrees))
+    print('testing jd: ' + str(jd))
     print('testing moon phase: ' + str(phase))
     print('testing lunar lat: ' + str(lun_lat))
     print('testing lunar long: ' + str(lun_long))

@@ -98,37 +98,48 @@ def convert_dec_dms(dec):
 
 # calculate semimajor axis of the orbit
 def calculate_semi_axis(ascal, aprop, cy):
-    return ascal + aprop * cy
+    return float(ascal) + float(aprop) * cy
 
 
 # calculate eccentricity of the orbit
 def calculate_eccentricity(escal, eprop, cy):
-    return escal + eprop * cy
+    return float(escal) + float(eprop) * cy
 
 
 # calculate inclination on the plane of the ecliptic
 def calculate_inclination(iscal, iprop, cy):
-    return math.radians(iscal - iprop * cy / 3600)
-
+    # return math.radians(float(iscal) - float(iprop) * cy / 3600)
+    return math.radians(float(iscal) - float(iprop) * cy / 3600)
 
 # calculate argument of perihelion
 def calculate_arg_perihelion(wscal, wprop, cy):
-    return math.radians(wscal + wprop * cy / 3600)
+    return math.radians(float(wscal) + float(wprop) * cy / 3600)
 
 
 # calculate longitude of ascending node
 def calculate_long_asc_node(oscal, oprop, cy):
-    return math.radians(oscal - oprop * cy / 3600)
+    return math.radians(float(oscal) - float(oprop) * cy / 3600)
 
 
 # calculate mean longitude of a planet
 def calculate_mean_longitude(lscal, lprop, cy):
-    return mod2pi(math.radians(lscal + lprop * cy / 3600))
+    return mod2pi(math.radians(float(lscal) + float(lprop) * cy / 3600))
 
 
 # calculate mean anomaly of a planet
-def calculate_mean_anomaly():
-    pass
+def calculate_mean_anomaly(planet_name, cy):
+    if planet_name == "Mercury":
+        return 102.27938 + 149472.51529 * cy + 0.000007 * math.pow(cy, 2)
+    elif planet_name == "Venus":
+        return 212.60322 + 58517.80387 * cy + 0.001286 * math.pow(cy, 2)
+    elif planet_name == "Mars":
+        return 319.51913 + 19139.85475 * cy + 0.000181 * math.pow(cy, 2)
+    elif planet_name == "Jupiter":
+        return 225.32833 + 3034.69202 * cy - 0.000722 * math.pow(cy, 2)
+    elif planet_name == "Saturn":
+        return 175.46622 + 1221.55147 * cy - 0.000502 * math.pow(cy, 2)
+    else:
+        return 1
 # need to figure this out
 
 
@@ -261,6 +272,14 @@ class TimeCalculations:
 
         jd = int(365.25 * year) + int(30.6001 * (month + 1)) + converted_day + 1720994.5 + b
         return jd
+
+    # Added by Ben - I need this for planet calculations. Can move if needed, but is time related
+    def calculate_julian_century(self, jd):
+        return math.radians(jd / 36525)
+
+    # Added by Ben - also needed this
+    def calculate_T(self, jd):
+        return (jd - 2415020.0) / 36525
 
     def calculate_gmst(self, year, month, day, hour, minute):
         jd = self.calculate_julian_day(year, month, day, hour, minute)

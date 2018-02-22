@@ -8,7 +8,6 @@ import astropy.units as u
 # import dateutil.parser
 
 
-
 # placeholder
 cy = 0
 
@@ -21,7 +20,7 @@ def calculate_planet_alt_az(lat, lon, ra, dec):
     if lon < 0:
         lon *= -1.0
 
-    hour_angle = calculate_mst(year, month, day, hour, minute, second, lat, lon)
+    hour_angle = calculate_mst(year, month, day, hour, minute, 0, lat, lon)
     if hour_angle < 0:
         hour_angle += 360
 
@@ -80,6 +79,58 @@ def calculate_mst(year, month, day, hour, min, sec, lat, lon):
     return mst
 
 
+# Conversions added by Joanna for moon, but may be applicable elsewhere.
+# Not all working yet?
+
+
+# Reduces an angle to between 0 and 360 degrees
+def rev(x):
+    return x - math.floor(x / 360.0) * 360.0
+
+
+# Convert from ra, dec or long,lat or az, alt to x,y,z
+# Returns in degrees
+def ra_dec_to_rect(ra, dec, dist):
+    if dist == 0:
+        r = 1
+    else:
+        r = dist
+
+    x = (r * math.cos(math.radians(ra)) * math.cos(math.radians(dec)))
+    y = (r * math.sin(math.radians(ra)) * math.cos(math.radians(dec)))
+    z = (r * math.sin(math.radians(dec)))
+
+    return x, y, z
+
+
+def rect_to_spherical(x, y, z):
+    r = math.sqrt(x * x + y * y + z * z)
+    ra = math.atan2(y, x)
+    if x == 0 and y == 0:
+        dec = math.atan2(z, math.sqrt(x * x + y * y))
+    else:
+        dec = math.asin(z/r)
+    return math.degrees(ra), math.degrees(dec)
+
+
+# Convert between ecliptic and equatorial coordinates.
+def ecliptic_to_equatorial(x_ecl, y_ecl, z_ecl):
+    obl = math.radians(23.439281)
+    x_eq = x_ecl
+    y_eq = y_ecl * math.cos(obl) - z_ecl * math.sin(obl)
+    z_eq = y_ecl * math.sin(obl) + z_ecl * math.cos(obl)
+    return x_eq, y_eq, z_eq
+
+
+# Convert between equatorial and ecliptic
+def equatorial_to_ecliptic(x_eq, y_eq, z_eq):
+    obl = math.radians(23.439281)
+    x_ecl = x_eq
+    y_ecl = y_eq * math.cos(obl) + z_eq * math.sin(obl)
+    z_ecl = - y_eq * math.sin(obl) + z_eq * math.cos(obl)
+    return x_ecl, y_ecl, z_ecl
+
+
 # Converts Right Ascension (ra) in degrees to Hours:Minutes:Seconds
 def convert_ra_mhs(ra):
     hours = int(ra / 15.0)
@@ -110,6 +161,7 @@ def calculate_eccentricity(escal, eprop, cy):
 def calculate_inclination(iscal, iprop, cy):
     # return math.radians(float(iscal) - float(iprop) * cy / 3600)
     return math.radians(float(iscal) - float(iprop) * cy / 3600)
+
 
 # calculate argument of perihelion
 def calculate_arg_perihelion(wscal, wprop, cy):
@@ -278,8 +330,15 @@ class TimeCalculations:
         return math.radians(jd / 36525)
 
     # Added by Ben - also needed this
+    # Joanna also needs this
     def calculate_T(self, jd):
         return (jd - 2415020.0) / 36525
+
+    # Added by Jo - May need this later
+    def calculate_day_number(self, year, month, day, hour, minute):
+        jd = self.calculate_julian_day(year, month, day, hour, minute)
+        day_num = jd - 2451543.5
+        return day_num
 
     def calculate_gmst(self, year, month, day, hour, minute):
         jd = self.calculate_julian_day(year, month, day, hour, minute)
@@ -390,20 +449,21 @@ class TimeCalculations:
 
 
 # Start of Moon Calculations
+
+# Calculates the current phase of the moon.
+# Returns an integer representation with 0 being new,
+# 1 being first quarter, 2 being full, and 3 being last quarter
 def lunar_phase(year, month, day, hour, minute, lat, lon):
 
+    # Moon Phases
     NEW = 0
     FIRST = 1
     FULL = 2
     LAST = 3
 
-    # def get_jd(year, month, day):
-        # jd = day + (153 * month + 2)/5 + 365 * year + year/4 - year/100 + year/400 - 32045
-        # return jd
-
-    # new_moon_ref = get_jd(1, 1, 1900)
-    # jd_current = get_jd(year, month, day)
-
+    # Calculate the current Julian Date and the Julian Date of the first
+    # new moon of 1900. Use the JD of first moon as reference for current
+    # moon phase.
     jd_calc = TimeCalculations(year, month, day, hour, minute, lat, lon)
     jd_current = jd_calc.calculate_julian_day(year, month, day, hour, minute)
     new_moon_ref = jd_calc.calculate_julian_day(1900, 1, 1, 0, 0)
@@ -411,19 +471,23 @@ def lunar_phase(year, month, day, hour, minute, lat, lon):
     sc = 29.53059
     age_of_moon = phase_jd % sc
 
-    # This is very rudimentary and doesn't work all that well. I'm going
-    # to change it so that the "center" of each time span is on the date that
-    # is the actual phase. It will look better visually that way, I think.
-    if (0 <= age_of_moon < 7.38) or (age_of_moon == 29):
-        current_phase = NEW
-    elif 7.38 <= age_of_moon < 14.76:
-        current_phase = FIRST
-    elif 14.76 <= age_of_moon < 22.15:
-        current_phase = FULL
-    elif 22.15 <= age_of_moon < 29:
-        current_phase = LAST
+    # Testing age of moon
+    print("Age of moon: " + str(age_of_moon))
 
-    # testing for print
+    # The age of the moon determines the phase, with the actual
+    # date of the phase at the center of the range
+    if 0 <= age_of_moon < 3.69:
+        current_phase = NEW
+    elif 3.69 <= age_of_moon < 11.07:
+        current_phase = FIRST
+    elif 11.07 <= age_of_moon < 18.45:
+        current_phase = FULL
+    elif 18.45 <= age_of_moon < 25.84:
+        current_phase = LAST
+    elif 25.84 <= age_of_moon <= sc:
+        current_phase = NEW
+
+    # Testing for print
     if current_phase == NEW:
         phase = "new"
     elif current_phase == FIRST:
@@ -433,7 +497,7 @@ def lunar_phase(year, month, day, hour, minute, lat, lon):
     else:
         phase = "last"
 
-    # testing return statement
+    # Testing return statement
     return phase
 
     # Actual return statement
@@ -441,22 +505,28 @@ def lunar_phase(year, month, day, hour, minute, lat, lon):
 
 
 # Calculate Lunar Geocentric Latitude and Longitude
-# Not working yet, not well tested, no idea what any of this means
+# Not working yet, not well tested.
 # I think these calculations have to be adjusted for topocentric
-# which requires way more calculating.
+# which requires more calculating.
 def lunar_location(year, month, day, hour, minute, lat, lon):
 
+    # Get current Julian Date
     jd_calc = TimeCalculations(year, month, day, hour, minute, lat, lon)
     jd = jd_calc.calculate_julian_day(year, month, day, hour, minute)
 
-    t = (jd - 2415020.0)/36525
-    moon_mean_long = 270.434164 + (481267.8831 * t)
-    sun_mean_anom = 358.475833 + (35999.0498 * t)
-    moon_mean_anom = 296.104608 + (477198.8491 * t)
-    moon_mean_elong = 350.737486 + (445267.1142 * t)
-    moon_mean_dist = 11.250889 + (483202.0251 * t)
+    # No idea what this is, but I need it.
+    t = jd_calc.calculate_T(jd)
+
+    # Get moon mean longitude, sun mean anomaly, moon mean anomaly,
+    # moon mean elongation, moon mean distance, sun's mean longitude, e
+    moon_mean_long = 270.434164 + 481267.8831 * t
+    sun_mean_anom = 358.475833 + 35999.0498 * t
+    moon_mean_anom = 296.104608 + 477198.8491 * t
+    moon_mean_elong = 350.737486 + 445267.1142 * t
+    moon_mean_dist = 11.250889 + 483202.0251 * t
     e = 1 - (0.002495 * t) - (0.00000752 * t * t)
 
+    # Calculate Lunar geocentric latitude
     lunar_lat = (5.128189 * math.sin(math.radians(moon_mean_dist))) + \
                 (0.280606 * math.sin(math.radians(moon_mean_anom + moon_mean_dist))) + \
                 (0.277693 * math.sin(math.radians(moon_mean_anom - moon_mean_dist))) + \
@@ -468,6 +538,7 @@ def lunar_location(year, month, day, hour, minute, lat, lon):
                 (0.009267 * math.sin(math.radians(2 * moon_mean_elong + moon_mean_anom - moon_mean_dist))) + \
                 (0.008823 * math.sin(math.radians(2 * moon_mean_anom - moon_mean_dist)))
 
+    # Calculate Lunar geocentric longitude
     lunar_long = moon_mean_long + (6.288750 * math.sin(math.radians(moon_mean_anom))) + \
                  (1.274018 * math.sin(math.radians(2 * moon_mean_elong - moon_mean_anom))) + \
                  (0.658309 * math.sin(math.radians(2 * moon_mean_elong))) + \
@@ -479,23 +550,21 @@ def lunar_location(year, month, day, hour, minute, lat, lon):
                  (0.053320 * math.sin(math.radians(2 * moon_mean_elong + moon_mean_anom))) + \
                  (0.045874 * math.sin(math.radians(2 * moon_mean_elong - sun_mean_anom)) * e)
 
-    while lunar_long > 180:
-        lunar_long = lunar_long - 360
-    while lunar_long < -180:
-        lunar_long = lunar_long + 360
-    while lunar_lat > 90:
-        lunar_lat = lunar_lat - 360
-    while lunar_lat < -90:
-        lunar_lat = lunar_lat + 360
+    lunar_long = rev(lunar_long)
+
+    # lunar_x, lunar_y, lunar_z = ra_dec_to_rect(lunar_long, lunar_lat, 0)
+    # lunar_x_eq, lunar_y_eq, lunar_z_eq = ecliptic_to_equatorial(lunar_x, lunar_y, lunar_z)
+    # lunar_ra, lunar_dec = rect_to_spherical(lunar_x_eq, lunar_y_eq, lunar_z_eq)
+    # print("Testing lunar ra, dec: " + str(lunar_ra) + " " + str(lunar_dec))
 
     return lunar_lat, lunar_long
 
 
 if __name__ == "__main__":
-    year = 1951
-    month = 7
-    day = 18
-    hour = 18
+    year = 1990
+    month = 4
+    day = 19
+    hour = 2
     minute = 0
     lat = 34.71
     lon = 86.6
@@ -526,3 +595,5 @@ if __name__ == "__main__":
     print('testing moon phase: ' + str(phase))
     print('testing lunar lat: ' + str(lun_lat))
     print('testing lunar long: ' + str(lun_long))
+#    print('testing lunar alt: ' + str(lun_alt))
+#    print('testing lunar az: ' + str(lun_az))

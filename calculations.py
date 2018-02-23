@@ -80,24 +80,15 @@ def calculate_mst(year, month, day, hour, min, sec, lat, lon):
 
 
 # Conversions added by Joanna for moon, but may be applicable elsewhere.
-# Not all working yet?
-
-
 # Reduces an angle to between 0 and 360 degrees
 def rev(x):
     return x - math.floor(x / 360.0) * 360.0
 
 
-# Convert from ra, dec or long,lat or az, alt to x,y,z
-# Returns in degrees
-def ra_dec_to_rect(ra, dec, dist):
-    if dist == 0:
-        r = 1
-    else:
-        r = dist
-
-    x = (r * math.cos(math.radians(ra)) * math.cos(math.radians(dec)))
-    y = (r * math.sin(math.radians(ra)) * math.cos(math.radians(dec)))
+# Convert from ra, dec or long, lat or alt, az to x,y,z
+def ra_dec_to_rect(ra, dec, r):
+    x = (r * math.cos(math.radians(dec)) * math.cos(math.radians(ra)))
+    y = (r * math.cos(math.radians(dec)) * math.sin(math.radians(ra)))
     z = (r * math.sin(math.radians(dec)))
 
     return x, y, z
@@ -106,10 +97,12 @@ def ra_dec_to_rect(ra, dec, dist):
 def rect_to_spherical(x, y, z):
     r = math.sqrt(x * x + y * y + z * z)
     ra = math.atan2(y, x)
+
     if x == 0 and y == 0:
-        dec = math.atan2(z, math.sqrt(x * x + y * y))
+       dec = math.atan2(z, math.sqrt(x * x + y * y))
     else:
-        dec = math.asin(z/r)
+       dec = math.asin(z/r)
+
     return math.degrees(ra), math.degrees(dec)
 
 
@@ -316,10 +309,6 @@ class TimeCalculations:
             year -= 1
             month += 12
 
-        # Added by Joanna - This was in the document, but not in the code. Is it needed?
-        # a = math.floor(year/100)
-        # b = 2 - a + math.floor(a / 4)
-
         b = -13
 
         jd = int(365.25 * year) + int(30.6001 * (month + 1)) + converted_day + 1720994.5 + b
@@ -413,7 +402,8 @@ class TimeCalculations:
 
     def testing_alt(self, dec, lat, ha_time):
         ha_degrees = self.ha_time_to_degrees(ha_time)
-        alt_rad = math.sin(math.radians(dec)) * math.sin(math.radians(lat)) + math.cos(math.radians(dec)) * math.cos(math.radians(lat)) * math.cos(math.radians(ha_degrees))
+        alt_rad = math.sin(math.radians(dec)) * math.sin(math.radians(lat)) + math.cos(math.radians(dec)) * \
+                  math.cos(math.radians(lat)) * math.cos(math.radians(ha_degrees))
         alt_rad = math.asin(alt_rad)
         alt_degrees = math.degrees(alt_rad)
         return alt_degrees
@@ -421,7 +411,8 @@ class TimeCalculations:
     def testing_az(self, dec, lat, ha_time, alt):
         ha_degrees = self.ha_time_to_degrees(ha_time)
         print('ha degrees dd: ' + str(ha_degrees))
-        az_rad = (math.sin(math.radians(dec)) - (math.sin(math.radians(alt)) * math.sin(math.radians(lat)))) / (math.cos(math.radians(alt)) * math.cos(math.radians(lat)))
+        az_rad = (math.sin(math.radians(dec)) - (math.sin(math.radians(alt)) * math.sin(math.radians(lat)))) / \
+                 (math.cos(math.radians(alt)) * math.cos(math.radians(lat)))
         az_rad = math.acos(az_rad)
         az_degrees = math.degrees(az_rad)
         if math.sin(math.radians(ha_degrees)) < 0:
@@ -429,7 +420,6 @@ class TimeCalculations:
         else:
             az_degrees = 360 - az_degrees
         return az_degrees
-
 
     def ha_time_to_degrees(self, ha_time):
         ha_degrees_hours = int(ha_time * 15)
@@ -487,27 +477,10 @@ def lunar_phase(year, month, day, hour, minute, lat, lon):
     elif 25.84 <= age_of_moon <= sc:
         current_phase = NEW
 
-    # Testing for print
-    if current_phase == NEW:
-        phase = "new"
-    elif current_phase == FIRST:
-        phase = "first"
-    elif current_phase == FULL:
-        phase = "full"
-    else:
-        phase = "last"
-
-    # Testing return statement
-    return phase
-
-    # Actual return statement
-    # return current_phase
+    return current_phase
 
 
-# Calculate Lunar Geocentric Latitude and Longitude
-# Not working yet, not well tested.
-# I think these calculations have to be adjusted for topocentric
-# which requires more calculating.
+# Calculate Lunar geocentric RA and Dec, which is close enough to the topocentric that it doesn't matter
 def lunar_location(year, month, day, hour, minute, lat, lon):
 
     # Get current Julian Date
@@ -550,24 +523,29 @@ def lunar_location(year, month, day, hour, minute, lat, lon):
                  (0.053320 * math.sin(math.radians(2 * moon_mean_elong + moon_mean_anom))) + \
                  (0.045874 * math.sin(math.radians(2 * moon_mean_elong - sun_mean_anom)) * e)
 
-    lunar_long = rev(lunar_long)
+    # Convert from latitude and longitude to cartesian
+    x, y, z = ra_dec_to_rect(lunar_long, lunar_lat, 1)
 
-    # lunar_x, lunar_y, lunar_z = ra_dec_to_rect(lunar_long, lunar_lat, 0)
-    # lunar_x_eq, lunar_y_eq, lunar_z_eq = ecliptic_to_equatorial(lunar_x, lunar_y, lunar_z)
-    # lunar_ra, lunar_dec = rect_to_spherical(lunar_x_eq, lunar_y_eq, lunar_z_eq)
-    # print("Testing lunar ra, dec: " + str(lunar_ra) + " " + str(lunar_dec))
+    # Convert from ecliptic to equatorial
+    x2, y2, z2 = ecliptic_to_equatorial(x, y, z)
 
-    return lunar_lat, lunar_long
+    # Convert back to spherical
+    ra, dec = rect_to_spherical(x2, y2, z2)
+
+    # Normalize right ascension
+    ra = rev(ra)
+
+    return dec, ra
 
 
 if __name__ == "__main__":
-    year = 1990
-    month = 4
-    day = 19
-    hour = 2
+    year = 2018
+    month = 3
+    day = 1
+    hour = 0
     minute = 0
-    lat = 34.71
-    lon = 86.6
+    lat = 34.73
+    lon = 86.58
 
     ra = 1.28435588
     dec = -66.39789075
@@ -580,9 +558,21 @@ if __name__ == "__main__":
     alt_degrees = time_calc.calculate_alt(dec, lat, ha_time)
     testing_alt_degrees = time_calc.testing_alt(dec, lat, ha_time)
     testing_az_degrees = time_calc.testing_az(dec, lat, ha_time, testing_alt_degrees)
-    phase = lunar_phase(year, month, day, hour, minute, lat, lon)
     jd = time_calc.calculate_julian_day(year, month, day, hour, minute)
-    lun_lat, lun_long = lunar_location(year, month, day, hour, minute, lat, lon)
+    phase = lunar_phase(year, month, day, hour, minute, lat, lon)
+    lun_dec, lun_ra = lunar_location(year, month, day, hour, minute, lat, lon)
+    lun_az = time_calc.calculate_az(lun_dec, lat, ha_time)
+    lun_alt = time_calc.calculate_alt(lun_dec, lat, ha_time)
+
+    # Testing for print
+    if phase == 0:
+        phase = "new"
+    elif phase == 1:
+        phase = "first"
+    elif phase == 2:
+        phase = "full"
+    else:
+        phase = "last"
 
     print('gmst decimal: ' + str(gmst_decimal))
     print('lst decimal: ' + str(lst_decimal))
@@ -593,7 +583,10 @@ if __name__ == "__main__":
     print('tesing alt: ' + str(testing_alt_degrees))
     print('testing jd: ' + str(jd))
     print('testing moon phase: ' + str(phase))
-    print('testing lunar lat: ' + str(lun_lat))
-    print('testing lunar long: ' + str(lun_long))
-#    print('testing lunar alt: ' + str(lun_alt))
-#    print('testing lunar az: ' + str(lun_az))
+    print('testing lunar ra: ' + str(lun_ra))
+    print('testing lunar dec: ' + str(lun_dec))
+    print('testing lunar az: ' + str(lun_az))
+    print('testing lunar alt: ' + str(lun_alt))
+    print(str(convert_ra_mhs(lun_ra)))
+    print(str(convert_dec_dms(lun_dec)))
+

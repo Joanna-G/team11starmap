@@ -7,7 +7,6 @@ from astropy.coordinates import SkyCoord, EarthLocation, AltAz, Angle, Latitude,
 import astropy.units as u
 # import dateutil.parser
 
-
 # placeholder
 cy = 0
 
@@ -354,6 +353,37 @@ class TimeCalculations:
 
         return gmst_decimal
 
+    # Jo is testing something
+    def calculate_gst(self, jd):
+        T = self.calculate_T(jd)
+        theta0 = 280.46061837 + 360.98564736629 * (jd - 2451545.0) + 0.000387933 * T * T - T * T * T / 38710000.0
+        return theta0
+
+    def calc_lst_jo(self, theta0, lon):
+        return theta0 + lon
+
+    def calc_ha_jo(self, lst, ra):
+        return lst - ra
+
+    def calc_alt_jo(self, dec, lat, ha):
+        dec = math.radians(dec)
+        lat = math.radians(lat)
+        ha = math.radians(ha)
+
+        alt = math.sin(dec) * math.sin(lat) + math.cos(dec) * math.cos(lat) * math.cos(ha)
+        alt = math.degrees(math.asin(alt))
+        return alt
+
+    def calc_az_jo(self, dec, lat, alt):
+        dec = math.radians(dec)
+        lat = math.radians(lat)
+        alt = math.radians(alt)
+
+        az = (math.sin(dec) - math.sin(lat) * math.sin(alt)) / math.cos(lat) * math.cos(alt)
+        az = math.degrees((math.acos(az)))
+        return az
+    # Jo is done testing something
+
     def calculate_lst(self, lon_decimal, gmst_decimal):
         offset_decimal = lon_decimal / 15
         lst_decimal = gmst_decimal + offset_decimal
@@ -535,14 +565,24 @@ def lunar_location(year, month, day, hour, minute, lat, lon):
     # Normalize right ascension
     ra = rev(ra)
 
-    return dec, ra
+    theta0 = rev(jd_calc.calculate_gst(jd))
+    print("Theta0: " + str(theta0))
+    lst = rev(jd_calc.calc_lst_jo(theta0, lon))
+    print("lst: " + str(lst))
+    ha = rev(jd_calc.calc_ha_jo(lst, ra))
+    print("hr: " + str(ha))
+
+    alt = jd_calc.calc_alt_jo(dec, lat, ha)
+    az = jd_calc.calc_az_jo(dec, lat, alt)
+
+    return dec, ra, alt, az
 
 
 if __name__ == "__main__":
     year = 2018
-    month = 3
-    day = 1
-    hour = 0
+    month = 2
+    day = 25
+    hour = 9
     minute = 0
     lat = 34.73
     lon = 86.58
@@ -560,9 +600,7 @@ if __name__ == "__main__":
     testing_az_degrees = time_calc.testing_az(dec, lat, ha_time, testing_alt_degrees)
     jd = time_calc.calculate_julian_day(year, month, day, hour, minute)
     phase = lunar_phase(year, month, day, hour, minute, lat, lon)
-    lun_dec, lun_ra = lunar_location(year, month, day, hour, minute, lat, lon)
-    lun_az = time_calc.calculate_az(lun_dec, lat, ha_time)
-    lun_alt = time_calc.calculate_alt(lun_dec, lat, ha_time)
+    lun_dec, lun_ra, lun_alt, lun_az = lunar_location(year, month, day, hour, minute, lat, lon)
 
     # Testing for print
     if phase == 0:
@@ -585,8 +623,8 @@ if __name__ == "__main__":
     print('testing moon phase: ' + str(phase))
     print('testing lunar ra: ' + str(lun_ra))
     print('testing lunar dec: ' + str(lun_dec))
-    print('testing lunar az: ' + str(lun_az))
     print('testing lunar alt: ' + str(lun_alt))
+    print('testing lunar az: ' + str(lun_az))
     print(str(convert_ra_mhs(lun_ra)))
     print(str(convert_dec_dms(lun_dec)))
 

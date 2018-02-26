@@ -88,7 +88,7 @@ class MenuFrame(ttk.Frame):
         self.menu_frame.rowconfigure(8, weight=1)
         self.menu_frame.rowconfigure(9, weight=1)
         self.menu_frame.rowconfigure(10, weight=1)
-        self.menu_frame.rowconfigure(11, weight=1)
+        # self.menu_frame.rowconfigure(11, weight=1)
 
         self.entryval_month = StringVar(self.parent)
         self.entryval_month.set('Month (1-12)')
@@ -97,7 +97,9 @@ class MenuFrame(ttk.Frame):
         self.entryval_year = StringVar(self.parent)
         self.entryval_year.set('Year (1900-2100)')
         self.entryval_time = StringVar(self.parent)
-        self.entryval_time.set('00:00 (Military Time)')
+        self.entryval_time.set('00:00 (24 Hour Clock Local Time)')
+        self.entryval_utc_offset = StringVar(self.parent)
+        self.entryval_utc_offset.set('UTC Offset (-14-12)')
         self.optionval_timezone = StringVar(self.parent)
         self.optionval_timezone.set('Timezone')
         self.entryval_latitude = StringVar(self.parent)
@@ -142,11 +144,22 @@ class MenuFrame(ttk.Frame):
         self.entry_time.config(foreground='grey')
         self.entry_time.grid(column=0, row=5, sticky='nsew', padx=10, pady=10)
         self.entry_time.bind('<FocusIn>', lambda e: self.clear_widget_text(e, 'Time'))
-        self.entry_time.bind('<FocusOut>', lambda e: self.check_widget_text(e, 'Time', '00:00 (Military Time)'))
+        self.entry_time.bind('<FocusOut>', lambda e: self.check_widget_text(e, 'Time', '00:00 (24 Hour Clock Local Time)'))
         self.widgets_list.append(self.entry_time)
 
-        self.optionmenu_timezone = tk.OptionMenu(self.menu_frame, self.optionval_timezone, 'Timezone', 'Timezone One', 'Timezone Two', 'Timezone Three')
-        self.optionmenu_timezone.grid(column=0, row=6, sticky='nsew', padx=10)
+        self.entry_utc_offset = tk.Entry(self.menu_frame, textvariable=self.entryval_utc_offset)
+        self.entry_utc_offset.config(foreground='grey')
+        self.entry_utc_offset.grid(column=0, row=6, sticky='nsew', padx=10, pady=10)
+        self.entry_utc_offset.bind('<FocusIn>', lambda e: self.clear_widget_text(e, 'UTC Offset'))
+        self.entry_utc_offset.bind('<FocusOut>', lambda e: self.check_widget_text(e, 'UTC Offset', 'UTC Offset (-14-12)'))
+        self.widgets_list.append(self.entry_utc_offset)
+
+        # self.optionmenu_timezone = tk.OptionMenu(self.menu_frame, self.optionval_timezone, 'Timezone', 'Timezone One', 'Timezone Two', 'Timezone Three')
+        # self.optionmenu_timezone.grid(column=0, row=6, sticky='nsew', padx=10)
+        # self.combo_timezone = ttk.Combobox(self.menu_frame)
+        # self.combo_timezone.config(values=[-12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14])
+        # self.combo_timezone.set(0)
+        # self.combo_timezone.grid(column=0, row=6, sticky='nsew', padx=10)
 
         self.label_location = tk.Label(self.menu_frame, text='Location')
         self.label_location.grid(column=0, row=7, sticky='nsew', padx=10, pady=10)
@@ -167,13 +180,20 @@ class MenuFrame(ttk.Frame):
         self.entry_longitude.bind('<FocusOut>', lambda e: self.check_widget_text(e, 'Longitude', 'Longitude (-180-180)'))
         self.widgets_list.append(self.entry_year)
 
-        self.label_or = tk.Label(self.menu_frame, text='OR')
-        self.label_or.grid(column=0, row=10, sticky='nsew')
-        # self.label_or.config(anchor='s', background='green')
-        self.label_or.config(anchor='s')
+        self.button_generate_map = tk.Button(self.menu_frame, text='Generate Map')
+        self.button_generate_map.grid(column=0, row=10, sticky='nsew', padx=10)
+        self.button_generate_map.config(command=self.generate_map)
 
-        self.optionmenu_city = tk.OptionMenu(self.menu_frame, self.optionval_city, 'City', 'City One', 'City Two', 'City Three')
-        self.optionmenu_city.grid(column=0, row=11, sticky='nsew', padx=10, pady=10)
+        # self.label_or = tk.Label(self.menu_frame, text='OR')
+        # self.label_or.grid(column=0, row=10, sticky='nsew')
+        # # self.label_or.config(anchor='s', background='green')
+        # self.label_or.config(anchor='s')
+        #
+        # self.optionmenu_city = tk.OptionMenu(self.menu_frame, self.optionval_city, 'City', 'City One', 'City Two', 'City Three')
+        # self.optionmenu_city.grid(column=0, row=11, sticky='nsew', padx=10, pady=10)
+
+    def generate_map(self):
+        pass
 
     def clear_widget_text(self, event, tag):
         widget_value = event.widget.get()
@@ -190,7 +210,11 @@ class MenuFrame(ttk.Frame):
                 event.widget.delete(0, tk.END)
                 event.widget.config(foreground='black')
         elif tag == 'Time':
-            if widget_value == '00:00 (Military Time)':
+            if widget_value == '00:00 (24 Hour Clock Local Time)':
+                event.widget.delete(0, tk.END)
+                event.widget.config(foreground='black')
+        elif tag == 'UTC Offset':
+            if widget_value == 'UTC Offset (-14-12)':
                 event.widget.delete(0, tk.END)
                 event.widget.config(foreground='black')
         elif tag == 'Latitude':
@@ -232,11 +256,27 @@ class MenuFrame(ttk.Frame):
                 event.widget.config(foreground='grey')
                 event.widget.insert(0, text)
         elif tag == 'Time':
+            hour = None
+            minute = None
+            try:
+                time = widget_value.split(':')
+                hour = int(time[0])
+                minute = int(time[1])
+                print(str(hour) + ':' + str(minute))
+            except IndexError:
+                widget_value = ''
+            except ValueError:
+                widget_value = ''
+            if widget_value == '' or hour < 0 or hour > 24 or minute < 0 or minute > 60:
+                event.widget.delete(0, tk.END)
+                event.widget.config(foreground='grey')
+                event.widget.insert(0, text)
+        elif tag == 'UTC Offset':
             try:
                 widget_value = int(widget_value)
             except ValueError:
                 widget_value = ''
-            if widget_value == '':
+            if widget_value == '' or widget_value < -14 or widget_value > 12:
                 event.widget.delete(0, tk.END)
                 event.widget.config(foreground='grey')
                 event.widget.insert(0, text)

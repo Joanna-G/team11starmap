@@ -328,6 +328,41 @@ class TimeCalculations:
         day_num = jd - 2451543.5
         return day_num
 
+    # Jo is testing something
+    def calculate_gst(self, jd):
+        T = self.calculate_T(jd)
+        theta0 = 280.46061837 + 360.98564736629 * (jd - 2451545.0) + 0.000387933 * T * T - T * T * T / 38710000.0
+        return theta0
+
+    def calc_lst_jo(self, theta0, lon):
+        return theta0 + lon
+
+    def calc_ha_jo(self, lst, ra):
+        return lst - ra
+
+    def calc_alt_jo(self, dec, lat, ha):
+        dec = math.radians(dec)
+        lat = math.radians(lat)
+        ha = math.radians(ha)
+
+        alt = math.sin(dec) * math.sin(lat) + math.cos(dec) * math.cos(lat) * math.cos(ha)
+        alt = math.degrees(math.asin(alt))
+        return alt
+
+    def calc_az_jo(self, dec, lat, alt, ha):
+        dec = math.radians(dec)
+        lat = math.radians(lat)
+        alt = math.radians(alt)
+
+        az = (math.sin(dec) - (math.sin(lat) * math.sin(alt))) / (math.cos(lat) * math.cos(alt))
+        az = math.degrees((math.acos(az)))
+        if math.sin(math.radians(ha)) < 0:
+            az = az
+        else:
+            az = 360 - az
+        return az
+    # Jo is done testing something
+
     def calculate_gmst(self, year, month, day, hour, minute):
         jd = self.calculate_julian_day(year, month, day, hour, minute)
         midnight = math.floor(jd) + 0.5
@@ -352,37 +387,6 @@ class TimeCalculations:
         gmst_decimal = gmst_hours + (gmst_minutes / 60) + (gmst_seconds / 3600)
 
         return gmst_decimal
-
-    # Jo is testing something
-    def calculate_gst(self, jd):
-        T = self.calculate_T(jd)
-        theta0 = 280.46061837 + 360.98564736629 * (jd - 2451545.0) + 0.000387933 * T * T - T * T * T / 38710000.0
-        return theta0
-
-    def calc_lst_jo(self, theta0, lon):
-        return theta0 + lon
-
-    def calc_ha_jo(self, lst, ra):
-        return lst - ra
-
-    def calc_alt_jo(self, dec, lat, ha):
-        dec = math.radians(dec)
-        lat = math.radians(lat)
-        ha = math.radians(ha)
-
-        alt = math.sin(dec) * math.sin(lat) + math.cos(dec) * math.cos(lat) * math.cos(ha)
-        alt = math.degrees(math.asin(alt))
-        return alt
-
-    def calc_az_jo(self, dec, lat, alt):
-        dec = math.radians(dec)
-        lat = math.radians(lat)
-        alt = math.radians(alt)
-
-        az = (math.sin(dec) - math.sin(lat) * math.sin(alt)) / math.cos(lat) * math.cos(alt)
-        az = math.degrees((math.acos(az)))
-        return az
-    # Jo is done testing something
 
     def calculate_lst(self, lon_decimal, gmst_decimal):
         offset_decimal = lon_decimal / 15
@@ -492,7 +496,7 @@ def lunar_phase(year, month, day, hour, minute, lat, lon):
     age_of_moon = phase_jd % sc
 
     # Testing age of moon
-    print("Age of moon: " + str(age_of_moon))
+    # print("Age of moon: " + str(age_of_moon))
 
     # The age of the moon determines the phase, with the actual
     # date of the phase at the center of the range
@@ -570,10 +574,10 @@ def lunar_location(year, month, day, hour, minute, lat, lon):
     lst = rev(jd_calc.calc_lst_jo(theta0, lon))
     print("lst: " + str(lst))
     ha = rev(jd_calc.calc_ha_jo(lst, ra))
-    print("hr: " + str(ha))
+    print("ha: " + str(ha))
 
     alt = jd_calc.calc_alt_jo(dec, lat, ha)
-    az = jd_calc.calc_az_jo(dec, lat, alt)
+    az = jd_calc.calc_az_jo(dec, lat, alt, ha)
 
     return dec, ra, alt, az
 
@@ -581,11 +585,11 @@ def lunar_location(year, month, day, hour, minute, lat, lon):
 if __name__ == "__main__":
     year = 2018
     month = 2
-    day = 25
-    hour = 9
-    minute = 0
+    day = 26
+    hour = 10
+    minute = 2
     lat = 34.73
-    lon = 86.58
+    lon = 86.55
 
     ra = 1.28435588
     dec = -66.39789075
@@ -601,6 +605,10 @@ if __name__ == "__main__":
     jd = time_calc.calculate_julian_day(year, month, day, hour, minute)
     phase = lunar_phase(year, month, day, hour, minute, lat, lon)
     lun_dec, lun_ra, lun_alt, lun_az = lunar_location(year, month, day, hour, minute, lat, lon)
+    lun_ha = time_calc.calculate_ha_time(lst_decimal, lun_ra)
+    lun_ha = time_calc.ha_time_to_degrees(lun_ha)
+    lun_alt2 = time_calc.testing_alt(lun_dec, lat, lun_ha)
+    lun_az2 = time_calc.testing_az(lun_dec, lat, lun_ha, lun_alt2)
 
     # Testing for print
     if phase == 0:
@@ -625,6 +633,8 @@ if __name__ == "__main__":
     print('testing lunar dec: ' + str(lun_dec))
     print('testing lunar alt: ' + str(lun_alt))
     print('testing lunar az: ' + str(lun_az))
+    print('testing lunar alt2: ' + str(lun_alt2))
+    print('testing lunar az2: ' + str(lun_az2))
     print(str(convert_ra_mhs(lun_ra)))
     print(str(convert_dec_dms(lun_dec)))
 

@@ -59,4 +59,6 @@ class Constellation(BaseCelestialObject):
 class Messier_Objects(BaseCelestialObject):
     def __init__(self):
         BaseCelestialObject.__init__(self)
+        # A type so that the GUI knows the correct "sprite" to display?
+        self.type = None
 

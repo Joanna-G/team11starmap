@@ -1,0 +1,71 @@
+﻿By Order,MessierCatOrder,RA Hours,RA Minutes,RA Sec,Dec Degrees,Dec Min,Dec Sec,Magnitude,Common Name,Desc
+1,31,0,29,56,39,9,32,3.4,Andromeda Galaxy,Galaxy in Andromeda
+2,32,0,29,50,38,45,34,8.1,,Galaxy in Andromeda
+3,33,1,40,37,29,32,25,5.7,Triangulum Galaxy,Galaxy in Triangulum
+4,34,2,27,27,41,39,32,5.5,,Galactic Cluster in Perseus
+5,45,3,33,48,23,22,41,1.6,Pleiades/Seven Sisters,Galactic cluster in Taurus
+6,38,5,12,41,36,11,51,7.4,,Galactic Cluster in Auriga
+7,1,5,20,2,21,45,27,8.6,Crab Nebula,Supernove Remnant in Taurus
+8,36,5,20,47,34,8,6,6.3,,Galactic Cluster in Auriga
+9,42,5,23,59,-5,34,6,4,Orion Nebula/Great Nebula,Diffuse Nebula in Orion
+10,43,5,24,12,-5,26,37,9,,Diffuse Nebula in Orion
+11,37,5,37,1,32,11,51,6.2,,Galactic cluster in Auriga
+12,35,5,54,41,24,33,30,5.3,,Galactic cluster in Gemini
+13,41,6,35,53,-20,33,0,4.6,,Galactic cluster in Cacnis Major
+14,50,6,51,50,-7,57,42,6.3,,Galactic cluster in Monoceros
+15,46,7,31,11,-14,19,7,6,,Galactic cluster in Puppis
+16,47,7,44,16,-14,50,8,5.2,,Galactic cluster in Puppis
+17,48,8,2,24,-1,16,42,5.5,,Galactic cluster in Hydra
+18,67,8,36,28,12,36,38,6.1,,Galactic cluster in Cancer
+19,65,11,7,24,14,16,8,9.3,,Galaxy in Leo
+20,66,11,8,47,14,12,21,8.9,,Galaxy in Leo
+21,40,12,11,2,59,23,50,8.4,,Double Star in Ursa Major
+22,49,12,17,48,9,16,9,8.4,,Galaxy in Virgo
+23,58,12,26,30,13,2,42,9.7,,Galaxy in Virgo
+24,68,12,27,38,-25,30,20,7.8,,Globular cluster in Hydra
+25,59,12,30,47,12,52,36,9.6,,Galaxy in Virgo
+26,60,12,32,28,12,46,2,8.8,,Galactic cluster in Monoceros
+27,64,12,45,51,22,52,31,8.5,Blackeye Galaxy/ Sleeping Beauty Galaxy,Galaxy in Coma Berenices
+28,63,13,4,22,43,12,37,8.6,Sunflower Galaxy,Galaxy in Canes Venatici
+29,51,13,20,23,48,24,24,8.4,Whirlpool Galaxy,Galaxy in Canes Venatici
+30,3,13,21,25,29,32,57,6.2,,Globular Cluster in Canes Venatici
+31,5,15,6,36,2,57,16,5.6,,Globular Cluster in Serpens
+32,44,8,27,22,20,31,38,3.7,Beehive Cluster/Praesepe,Galactic cluster in Cancer
+33,4,16,9,8,-25,55,40,5.6,,Globular Cluster in Scorpius
+34,13,16,33,15,-25,55,40,5.8,Hercules Cluster,Globular Cluster in Hercules
+35,12,16,34,53,-1,30,28,6.7,,Globular cluster in Ophiuchus
+36,10,16,44,48,-3,42,18,6.6,,Globular cluster in Ophiuchus
+37,62,16,47,14,-29,45,30,6.5,,Globular cluster in Ophiuchus
+38,19,16,48,7,-25,54,46,6.8,,Globular cluster in Ophiuchus
+39,9,17,5,22,-28,13,26,7.7,,Globular cluster in Ophiuchus
+40,6,17,14,42,-32,10,34,5.3,Butterfly Cluster,Galactic cluster in Scorpius
+41,14,17,25,14,-3,5,45,7.6,,Globular cluster in Ophiuchus
+42,7,17,38,2,-34,40,34,4.1,Ptolemy's Cluster,Galactic Cluster in Scorpius
+43,23,17,42,51,-18,45,55,6.9,,Galactic cluster in Sagittarius
+44,20,17,48,16,-22,59,10,9,Trifid Nebula,Diffuse Nebula in Sagitarius
+45,8,17,49,58,-24,21,10,6,Lagoon Nebula,Diffuse Nebula in Sagitarius
+46,21,17,50,7,-22,31,25,6.5,,Galactic cluster in Sagittarius
+47,24,18,1,44,-18,26,0,4.6,Sagittarius Star Cloud,Milky Way Patch in Sagittarius
+48,16,18,5,0,-13,51,44,6.4,Eagle Nebula/Star Queen Nebula,Cluster and Nebula in Serpens
+49,18,18,6,16,-17,13,14,7.5,,Galactic cluster in Sagittarius
+50,17,18,7,3,-16,14,44,7,Omega/Horseshoe/Swan/Lobster Nebula,Nebula and cluster in Sagittarius
+51,28,18,9,58,-24,57,11,6.8,,Globular cluster in Sagittarius
+52,69,18,16,47,-32,31,45,7.6,,Globular cluster in Sagittarius
+53,25,18,17,40,-19,5,0,6.5,,Galactic Cluster in Sagittarius
+54,22,18,21,55,-24,6,11,5.1,,Globular Cluster in Sagittarius
+55,70,18,28,53,-32,31,7,7.9,,Globular cluster in Sagittarius
+56,26,18,32,22,-9,38,14,8,,Galactic cluster in scutum
+57,11,18,38,23,-6,31,1,6.3,Wild Duck Cluster,Galactic cluster in scutum
+58,54,18,40,52,-30,44,1,7.6,,Globular cluster in Sagittarius
+59,57,18,45,21,32,46,3,8.8,Ring Nebula,Planetary Nebula in Lyra
+60,61,12,10,44,5,42,5,9.7,,Galaxy in Virgo
+61,56,19,8,0,29,48,14,8.3,,Globular cluster in Lyra
+62,55,19,26,2,-31,26,27,6.3,,Globular cluster in Sagittarius
+63,53,13,2,2,19,22,44,7.6,,Gobular cluster in Coma Berenices
+64,27,19,49,27,22,4,0,7.4,Dumbbell Nebula,Planetary nebula in Vulpecula
+65,29,20,15,38,37,11,57,7.1,,Galactic cluster in Cygnus
+66,15,21,18,41,10,40,3,6.2,,Globular Cluster in Pegasus
+67,2,21,21,8,-1,47,0,6.5,,Globular Cluster in Aquarius
+68,39,21,23,49,47,25,0,5.2,,Galactic cluster in Cygnus
+69,30,21,27,5,-24,19,4,7.2,,Globular cluster in Capricornus
+70,52,23,14,38,60,22,12,7.3,,Galactic cluster in Cassiopeia

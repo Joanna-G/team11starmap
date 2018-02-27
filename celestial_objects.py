@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 
 class BaseCelestialObject:
     __metaclass__ = ABCMeta
+
     def __init__(self):
         self.right_ascension = None
         self.declination = None
@@ -11,6 +12,7 @@ class BaseCelestialObject:
     # @abstractmethod
     # def example(self):
     #     pass
+
 
 class Planet(BaseCelestialObject):
     def __init__(self):
@@ -35,6 +37,7 @@ class Planet(BaseCelestialObject):
         self.long_asc_node = None
         self.mean_long = None
 
+
 class Star(BaseCelestialObject):
     def __init__(self):
         BaseCelestialObject.__init__(self)
@@ -43,10 +46,12 @@ class Star(BaseCelestialObject):
         self.magnitude = None
         self.hd_number = None
 
+
 class Moon(BaseCelestialObject):
     def __init__(self):
         BaseCelestialObject.__init__(self)
         self.phase = None
+
 
 class Constellation(BaseCelestialObject):
     def __init__(self):
@@ -56,9 +61,9 @@ class Constellation(BaseCelestialObject):
         self.number_lines = None
         self.stars = []
 
+
 class Messier_Objects(BaseCelestialObject):
     def __init__(self):
         BaseCelestialObject.__init__(self)
         # A type so that the GUI knows the correct "sprite" to display?
         self.type = None
-

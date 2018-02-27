@@ -79,6 +79,7 @@ def calculate_mst(year, month, day, hour, min, sec, lat, lon):
 
 
 # Conversions added by Joanna for moon, but may be applicable elsewhere.
+
 # Reduces an angle to between 0 and 360 degrees
 def rev(x):
     return x - math.floor(x / 360.0) * 360.0

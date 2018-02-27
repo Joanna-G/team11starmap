@@ -17,7 +17,7 @@ import math
 
 # Convert from alt, az to x,y,z
 # Stole this from the other file.
-def ra_dec_to_rect(alt, az, r):
+def alt_az_to_rect(alt, az, r):
     x = (r * math.cos(math.radians(az)) * math.cos(math.radians(alt)))
     y = (r * math.cos(math.radians(az)) * math.sin(math.radians(alt)))
     z = (r * math.sin(math.radians(az)))

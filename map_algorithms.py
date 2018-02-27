@@ -21,7 +21,16 @@ def alt_az_to_rect(alt, az, r):
     x = (r * math.cos(math.radians(az)) * math.cos(math.radians(alt)))
     y = (r * math.cos(math.radians(az)) * math.sin(math.radians(alt)))
     z = (r * math.sin(math.radians(az)))
+
     return x, y, z
+
+
+# Returns r and theta where r is distance from center (latitude or azimuth) and theta is angle in radians
+def rect_to_polar(x, y):
+    r = math.sqrt(x * x + y * y)
+    theta = math.atan(y / x)
+
+    return r, theta
 
 
 def azimuthal_equidistant(az, alt):

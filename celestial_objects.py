@@ -36,6 +36,8 @@ class Planet(BaseCelestialObject):
         self.arg_perihelion = None
         self.long_asc_node = None
         self.mean_long = None
+        self.mean_anomaly = None
+        self.true_anomaly = None
 
 
 class Star(BaseCelestialObject):

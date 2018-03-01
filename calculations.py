@@ -169,10 +169,10 @@ def calculate_long_asc_node(oscal, oprop, cy):
 # calculate mean longitude of a planet
 def calculate_mean_longitude(lscal, lprop, cy):
     # return mod2pi(math.radians(float(lscal) + float(lprop) * cy / 3600))
-    mean_long_rads = math.radians(float(lscal) + float(lprop) * cy / 3600)
+    mean_long = math.radians(float(lscal) + float(lprop) * cy / 3600)
     # mean_long = float(lscal) + float(lprop) * cy / 3600
-    mean_long_rads = mean_long_rads % (math.pi*2)
-    mean_long = math.degrees(mean_long_rads)
+    # mean_long_rads = mean_long_rads % (math.pi*2)
+    mean_long = mean_long % (2 * math.pi)
     return mean_long
 
 
@@ -220,10 +220,10 @@ def calculate_true_anomaly(mean_anomaly, eccentricity):
         if(abs(E - E1) > (1.0 * eccentricity - 12)):
             break
     V = 2 * math.atan(math.sqrt(1 + eccentricity) / (1 - eccentricity)) * math.tan(0.5 * E)
-    if(V < 0):
+    while(V < 0):
         V = V + (math.pi * 2)
-        V = math.degrees(V)
-        V = V % 360
+        # V = math.degrees(V)
+        # V = V % 360
     return V
 
 # need to figure this out
@@ -253,7 +253,7 @@ def calculate_ra_dec_planet(pl_name, pl_lscal, pl_lprop, pl_ascal, pl_aprop, pl_
                             e_iscal, e_iprop, e_wscal, e_wprop, e_oscal, e_oprop, cy, d):
 
     # calculate elements of planetary orbit of the planet
-    pl_mean_long = calculate_mean_longitude(pl_lscal, pl_lprop, cy)
+    # pl_mean_long = calculate_mean_longitude(pl_lscal, pl_lprop, cy)
     pl_axis = calculate_semi_axis(pl_ascal, pl_aprop, cy)
     pl_eccentricity = calculate_eccentricity(pl_escal, pl_eprop, cy)
     pl_inclination = calculate_inclination(pl_iscal, pl_iprop, cy)
@@ -261,17 +261,17 @@ def calculate_ra_dec_planet(pl_name, pl_lscal, pl_lprop, pl_ascal, pl_aprop, pl_
     pl_long_asc_node = calculate_long_asc_node(pl_oscal, pl_oprop, cy)
 
     # calculate elements of the planetary orbit of the Earth
-    e_mean_long = calculate_mean_longitude(e_lscal, e_lprop, cy)
+    # e_mean_long = calculate_mean_longitude(e_lscal, e_lprop, cy)
     e_axis = calculate_semi_axis(e_ascal, e_aprop, cy)
     e_eccentricity = calculate_eccentricity(e_escal, e_eprop, cy)
-    e_inclination = calculate_inclination(e_iscal, e_iprop, cy)
+    # e_inclination = calculate_inclination(e_iscal, e_iprop, cy)
     e_arg_perihelion = calculate_arg_perihelion(e_wscal, e_wprop, cy)
-    e_long_asc_node = calculate_long_asc_node(e_oscal, e_oprop, cy)
+    # e_long_asc_node = calculate_long_asc_node(e_oscal, e_oprop, cy)
 
     # calculate the position of the Earth in its orbit
-    e_m = mod2pi(e_mean_long - e_arg_perihelion)
+    # e_m = mod2pi(e_mean_long - e_arg_perihelion)
     e_mean_anomaly = calculate_mean_anomaly("Earth/Sun", d)
-    e_v = calculate_true_anomaly(e_mean_anomaly, math.radians(e_eccentricity))
+    e_v = calculate_true_anomaly(math.radians(e_mean_anomaly), math.radians(e_eccentricity))
     e_r = e_axis * (1 - math.pow(e_eccentricity, 2)) / (1 + e_eccentricity * math.cos(e_v))
 
     # calculate the heliocentric rectangular coordinates of Earth
@@ -280,9 +280,9 @@ def calculate_ra_dec_planet(pl_name, pl_lscal, pl_lprop, pl_ascal, pl_aprop, pl_
     e_z = 0.0
 
     # calculate the position of the planet in its' orbit
-    pl_m = mod2pi(pl_mean_long - pl_arg_perihelion)
+    # pl_m = mod2pi(pl_mean_long - pl_arg_perihelion)
     pl_mean_anomaly = calculate_mean_anomaly(pl_name, d)
-    pl_v = calculate_true_anomaly(pl_mean_anomaly, math.radians(pl_eccentricity))
+    pl_v = calculate_true_anomaly(math.radians(pl_mean_anomaly), math.radians(pl_eccentricity))
     pl_r = pl_axis * (1 - math.pow(pl_eccentricity, 2)) / (1 + pl_eccentricity * math.cos(pl_v))
 
     # calculate the heliocentric rectangular coordinates of the planet

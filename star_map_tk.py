@@ -218,20 +218,24 @@ class MenuFrame(ttk.Frame):
             star.altitude = star.calculate_alt(star.declination, self.time_calc.lat, star.ha_degrees)
             star.azimuth = star.calculate_az(star.declination, self.time_calc.lat, star.ha_degrees, star.altitude)
             star.get_xy_coords(star.altitude, star.azimuth)
-            print('hd id: ' + star.hd_id + ' altitude: ' + str(star.altitude) + '  azimuth: ' + str(star.azimuth))
+            # print('hd id: ' + star.hd_id + ' altitude: ' + str(star.altitude) + '  azimuth: ' + str(star.azimuth))
 
         i = 0
-        # for star in self.star_list:
-        #     if i < 5:
+        for star in self.star_list:
+            # if i < 5:
                 # self.parent.star_map_frame.draw_star(star.x, star.y)
-                # print('altitude: ' + str(star.altitude) + ' azimuth: ' + str(star.azimuth))
-                # print('x: ' + str(star.x) + ' y: ' + str(star.y) + '\n\n')
+            x = star.x * 1000
+            y = star.y * 1000
+            print('altitude: ' + str(star.altitude) + ' azimuth: ' + str(star.azimuth))
+            print('x: ' + str(x) + ' y: ' + str(y) + '\n\n')
+            # self.parent.star_map_frame.canvas.create_line(x,y,x+10,y)
+            self.parent.star_map_frame.draw_star(star, x, y)
                 # i += 1
-        self.parent.star_map_frame.canvas.create_line(-198,5,-188,5)
-        self.parent.star_map_frame.canvas.create_line(-198,10,-188,10)
-        self.parent.star_map_frame.canvas.create_line(-198,15,-188,15)
-            # else:
-            #     break
+        # self.parent.star_map_frame.canvas.create_line(-198,5,-188,5)
+        # self.parent.star_map_frame.canvas.create_line(-198,10,-188,10)
+        # self.parent.star_map_frame.canvas.create_line(-198,15,-188,15)
+        #     else:
+        #         break
 
     def clear_widget_text(self, event, tag):
         widget_value = event.widget.get()
@@ -375,22 +379,41 @@ class StarMapFrame(ttk.Frame):
         self.hsb_canvas = tk.Scrollbar(self.star_map_frame, orient=tk.HORIZONTAL)
         self.hsb_canvas.grid(column=0, row=1, sticky='ew')
         self.hsb_canvas.config(command=self.canvas.xview)
-        self.canvas.config(xscrollcommand=self.hsb_canvas.set, yscrollcommand=self.vsb_canvas.set, scrollregion=(-200,200,200,-200))
-        self.canvas.update()
+        self.canvas.config(xscrollcommand=self.hsb_canvas.set, yscrollcommand=self.vsb_canvas.set, scrollregion=(-1000,-1000,1000,1000))
+        # self.canvas.update()
 
-        # self.canvas.create_line(-198, 5, -180, 5)
-
-        # self.canvas.create_rectangle(0, 0, 1200, 200, fill='blue')
-        # self.canvas.create_image(200, 200, image=self.image)
-        # self.canvas.create_image(400, 200, image=self.image)
-        # self.canvas.create_image(1000, 200, image=self.image)
-        # self.canvas.create_image(1700, 200, image=self.image)
-        # self.canvas.create_image(600, 1400, image=self.image)
-
-    def draw_star(self, x, y):
+    def draw_star(self, star, x, y):
         # self.canvas.create_image(x, y, image=self.image)
-        self.canvas.create_line(x, y, x+10, y+10)
-        self.canvas.update()
+        # x = self.canvas.create_line(x, y, x+10, y)
+        r = 2
+        x = self.canvas.create_oval(x-r, y-r, x+r, y+r)
+        self.canvas.tag_bind(x, '<ButtonPress-1>', lambda e: self.display_info(e, star)) #<ButtonPress-1> <Enter>
+
+    def display_info(self, e, star):
+        print('star id: ' + str(star.star_id) + ' star altitude: ' + str(star.altitude))
+        x = self.parent.parent.winfo_pointerx()
+        y = self.parent.parent.winfo_pointery()
+        self.create_modal_dialog(star, x, y)
+
+    def create_modal_dialog(self, star, x, y):
+        modal_dlg = tk.Toplevel(master=self)
+        modal_dlg.columnconfigure(0, weight=1)
+        modal_dlg.columnconfigure(1, weight=1)
+        modal_dlg.columnconfigure(2, weight=1)
+        modal_dlg.resizable(False, False)
+
+        tk.Label(modal_dlg, text='Star ID: ' + str(star.star_id)).grid(column=0, row=0, columnspan=3, sticky='nsew')
+
+        modal_dlg.geometry('+%d+%d' % (x, y))
+        modal_dlg.transient(win)
+        modal_dlg.focus_set()
+        modal_dlg.grab_set()
+        # modal_dlg.protocol('WM_DELETE_WINDOW', lambda: self.on_modal_dlg_close(modal_dlg))
+        self.wait_window(modal_dlg)
+
+    def on_modal_dlg_close(self, modal_dlg):
+        modal_dlg.destroy()
+
 
     # def on_resize(self, event):
     #     canvas_items = self.canvas.find_all()
@@ -412,7 +435,7 @@ class StarMapFrame(ttk.Frame):
     def save_canvas(self):
         save_file = asksaveasfilename(filetypes=[('', '.pdf')])
         self.canvas.update()
-        self.canvas.postscript(file='canvas.ps', x=0, y=0, width=self.max_width+100, height=self.max_height+100)
+        self.canvas.postscript(file='canvas.ps', x=-1000, y=-1000, width=2000, height=2000)
         os.system('ps2pdf -dEPSCrop canvas.ps ' + save_file)
 
 

@@ -6,6 +6,9 @@ from PIL import ImageTk, Image, ImageDraw
 from tkinter.filedialog import asksaveasfilename
 import os
 import sys
+from Parsers import StarParser
+import celestial_objects
+import calculations
 
 
 class MainApplication(ttk.Frame):
@@ -63,6 +66,10 @@ class MenuFrame(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent)
         self.parent = parent
+        self.time_calc = None
+        self.sp = None
+        self.sp_list = []
+        self.star_list = []
 
         self.widgets_list = []
 
@@ -99,7 +106,7 @@ class MenuFrame(ttk.Frame):
         self.entryval_time = StringVar(self.parent)
         self.entryval_time.set('00:00 (24 Hour Clock Local Time)')
         self.entryval_utc_offset = StringVar(self.parent)
-        self.entryval_utc_offset.set('UTC Offset (-14-12)')
+        self.entryval_utc_offset.set('UTC Offset (-12-14)')
         self.optionval_timezone = StringVar(self.parent)
         self.optionval_timezone.set('Timezone')
         self.entryval_latitude = StringVar(self.parent)
@@ -123,77 +130,108 @@ class MenuFrame(ttk.Frame):
         self.entry_month.config(foreground='grey')
         self.entry_month.grid(column=0, row=2, sticky='nsew', padx=10)
         self.entry_month.bind('<FocusIn>', lambda e: self.clear_widget_text(e, 'Month'))
-        self.entry_month.bind('<FocusOut>', lambda e: self.check_widget_text(e, 'Month', 'Month (1-12)'))
+        self.entry_month.bind('<FocusOut>', lambda e: self.validate_widget_value(e, 'Month', 'Month (1-12)'))
         self.widgets_list.append(self.entry_month)
 
         self.entry_day = tk.Entry(self.menu_frame, textvariable=self.entryval_day)
         self.entry_day.config(foreground='grey')
         self.entry_day.grid(column=0, row=3, sticky='nsew', padx=10, pady=10)
         self.entry_day.bind('<FocusIn>', lambda e: self.clear_widget_text(e, 'Day'))
-        self.entry_day.bind('<FocusOut>', lambda e: self.check_widget_text(e, 'Day', 'Day (1-31)'))
+        self.entry_day.bind('<FocusOut>', lambda e: self.validate_widget_value(e, 'Day', 'Day (1-31)'))
         self.widgets_list.append(self.entry_day)
 
         self.entry_year = tk.Entry(self.menu_frame, textvariable=self.entryval_year)
         self.entry_year.config(foreground='grey')
         self.entry_year.grid(column=0, row=4, sticky='nsew', padx=10)
         self.entry_year.bind('<FocusIn>', lambda e: self.clear_widget_text(e, 'Year'))
-        self.entry_year.bind('<FocusOut>', lambda e: self.check_widget_text(e, 'Year', 'Year (1900-2100)'))
+        self.entry_year.bind('<FocusOut>', lambda e: self.validate_widget_value(e, 'Year', 'Year (1900-2100)'))
         self.widgets_list.append(self.entry_year)
 
         self.entry_time = tk.Entry(self.menu_frame, textvariable=self.entryval_time)
         self.entry_time.config(foreground='grey')
         self.entry_time.grid(column=0, row=5, sticky='nsew', padx=10, pady=10)
         self.entry_time.bind('<FocusIn>', lambda e: self.clear_widget_text(e, 'Time'))
-        self.entry_time.bind('<FocusOut>', lambda e: self.check_widget_text(e, 'Time', '00:00 (24 Hour Clock Local Time)'))
+        self.entry_time.bind('<FocusOut>', lambda e: self.validate_widget_value(e, 'Time', '00:00 (24 Hour Clock Local Time)'))
         self.widgets_list.append(self.entry_time)
 
         self.entry_utc_offset = tk.Entry(self.menu_frame, textvariable=self.entryval_utc_offset)
         self.entry_utc_offset.config(foreground='grey')
         self.entry_utc_offset.grid(column=0, row=6, sticky='nsew', padx=10, pady=10)
         self.entry_utc_offset.bind('<FocusIn>', lambda e: self.clear_widget_text(e, 'UTC Offset'))
-        self.entry_utc_offset.bind('<FocusOut>', lambda e: self.check_widget_text(e, 'UTC Offset', 'UTC Offset (-14-12)'))
+        self.entry_utc_offset.bind('<FocusOut>', lambda e: self.validate_widget_value(e, 'UTC Offset', 'UTC Offset (-12-14)'))
         self.widgets_list.append(self.entry_utc_offset)
-
-        # self.optionmenu_timezone = tk.OptionMenu(self.menu_frame, self.optionval_timezone, 'Timezone', 'Timezone One', 'Timezone Two', 'Timezone Three')
-        # self.optionmenu_timezone.grid(column=0, row=6, sticky='nsew', padx=10)
-        # self.combo_timezone = ttk.Combobox(self.menu_frame)
-        # self.combo_timezone.config(values=[-12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14])
-        # self.combo_timezone.set(0)
-        # self.combo_timezone.grid(column=0, row=6, sticky='nsew', padx=10)
 
         self.label_location = tk.Label(self.menu_frame, text='Location')
         self.label_location.grid(column=0, row=7, sticky='nsew', padx=10, pady=10)
-        # self.label_location.config(anchor='sw', background='green')
         self.label_location.config(anchor='sw')
 
         self.entry_latitude = tk.Entry(self.menu_frame, textvariable=self.entryval_latitude)
         self.entry_latitude.config(foreground='grey')
         self.entry_latitude.grid(column=0, row=8, sticky='nsew', padx=10)
         self.entry_latitude.bind('<FocusIn>', lambda e: self.clear_widget_text(e, 'Latitude'))
-        self.entry_latitude.bind('<FocusOut>', lambda e: self.check_widget_text(e, 'Latitude', 'Latitude (-90-90)'))
+        self.entry_latitude.bind('<FocusOut>', lambda e: self.validate_widget_value(e, 'Latitude', 'Latitude (-90-90)'))
         self.widgets_list.append(self.entry_year)
 
         self.entry_longitude = tk.Entry(self.menu_frame, textvariable=self.entryval_longitude)
         self.entry_longitude.config(foreground='grey')
         self.entry_longitude.grid(column=0, row=9, sticky='nsew', padx=10, pady=10)
         self.entry_longitude.bind('<FocusIn>', lambda e: self.clear_widget_text(e, 'Longitude'))
-        self.entry_longitude.bind('<FocusOut>', lambda e: self.check_widget_text(e, 'Longitude', 'Longitude (-180-180)'))
+        self.entry_longitude.bind('<FocusOut>', lambda e: self.validate_widget_value(e, 'Longitude', 'Longitude (-180-180)'))
         self.widgets_list.append(self.entry_year)
 
         self.button_generate_map = tk.Button(self.menu_frame, text='Generate Map')
         self.button_generate_map.grid(column=0, row=10, sticky='nsew', padx=10)
         self.button_generate_map.config(command=self.generate_map)
 
-        # self.label_or = tk.Label(self.menu_frame, text='OR')
-        # self.label_or.grid(column=0, row=10, sticky='nsew')
-        # # self.label_or.config(anchor='s', background='green')
-        # self.label_or.config(anchor='s')
-        #
-        # self.optionmenu_city = tk.OptionMenu(self.menu_frame, self.optionval_city, 'City', 'City One', 'City Two', 'City Three')
-        # self.optionmenu_city.grid(column=0, row=11, sticky='nsew', padx=10, pady=10)
+        self.init_celestial_list()
+
+    def init_celestial_list(self):
+        self.sp = StarParser.StarParser()
+        self.sp = self.sp.parse_file()
+        for sp_star in self.sp:
+            star = celestial_objects.Star(sp_star[0], sp_star[1], sp_star[2], float(sp_star[3]), float(sp_star[4]), float(sp_star[5]))
+            self.star_list.append(star)
 
     def generate_map(self):
-        pass
+        try:
+            year = int(self.entry_year.get())
+            month = int(self.entry_month.get())
+            day = int(self.entry_day.get())
+            time = self.entry_time.get().split(':')
+            hour = int(time[0])
+            minute = int(time[1])
+            utc_offset = int(self.entryval_utc_offset.get())
+            latitude = float(self.entry_latitude.get())
+            longitude = float(self.entry_longitude.get())
+        except ValueError:
+            print('wrong values')
+            return
+        except IndexError:
+            print('wrong values')
+            return
+
+        self.time_calc = calculations.TimeCalculations(year, month, day, hour, utc_offset, minute, latitude, longitude)
+
+        for star in self.star_list:
+            star.ha_time = star.calculate_ha_time(self.time_calc.lst, star.right_ascension)
+            star.ha_degrees = star.ha_time_to_degrees(star.ha_time)
+            star.altitude = star.calculate_alt(star.declination, self.time_calc.lat, star.ha_degrees)
+            star.azimuth = star.calculate_az(star.declination, self.time_calc.lat, star.ha_degrees, star.altitude)
+            star.get_xy_coords(star.altitude, star.azimuth)
+            print('hd id: ' + star.hd_id + ' altitude: ' + str(star.altitude) + '  azimuth: ' + str(star.azimuth))
+
+        i = 0
+        # for star in self.star_list:
+        #     if i < 5:
+                # self.parent.star_map_frame.draw_star(star.x, star.y)
+                # print('altitude: ' + str(star.altitude) + ' azimuth: ' + str(star.azimuth))
+                # print('x: ' + str(star.x) + ' y: ' + str(star.y) + '\n\n')
+                # i += 1
+        self.parent.star_map_frame.canvas.create_line(-198,5,-188,5)
+        self.parent.star_map_frame.canvas.create_line(-198,10,-188,10)
+        self.parent.star_map_frame.canvas.create_line(-198,15,-188,15)
+            # else:
+            #     break
 
     def clear_widget_text(self, event, tag):
         widget_value = event.widget.get()
@@ -214,7 +252,7 @@ class MenuFrame(ttk.Frame):
                 event.widget.delete(0, tk.END)
                 event.widget.config(foreground='black')
         elif tag == 'UTC Offset':
-            if widget_value == 'UTC Offset (-14-12)':
+            if widget_value == 'UTC Offset (-12-14)':
                 event.widget.delete(0, tk.END)
                 event.widget.config(foreground='black')
         elif tag == 'Latitude':
@@ -226,7 +264,7 @@ class MenuFrame(ttk.Frame):
                 event.widget.delete(0, tk.END)
                 event.widget.config(foreground='black')
 
-    def check_widget_text(self, event, tag, text):
+    def validate_widget_value(self, event, tag, text):
         widget_value = event.widget.get()
         if tag == 'Month':
             try:
@@ -262,7 +300,6 @@ class MenuFrame(ttk.Frame):
                 time = widget_value.split(':')
                 hour = int(time[0])
                 minute = int(time[1])
-                print(str(hour) + ':' + str(minute))
             except IndexError:
                 widget_value = ''
             except ValueError:
@@ -276,7 +313,7 @@ class MenuFrame(ttk.Frame):
                 widget_value = int(widget_value)
             except ValueError:
                 widget_value = ''
-            if widget_value == '' or widget_value < -14 or widget_value > 12:
+            if widget_value == '' or widget_value < -12 or widget_value > 14:
                 event.widget.delete(0, tk.END)
                 event.widget.config(foreground='grey')
                 event.widget.insert(0, text)
@@ -299,6 +336,9 @@ class MenuFrame(ttk.Frame):
                 event.widget.config(foreground='grey')
                 event.widget.insert(0, text)
 
+    def get_widget_values(self):
+        pass
+
 
 class StarMapFrame(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
@@ -313,7 +353,7 @@ class StarMapFrame(ttk.Frame):
         self.star_map_frame.grid(column=0, row=0, sticky='nsew')
         self.star_map_frame.columnconfigure(0, weight=1)
         self.star_map_frame.rowconfigure(0, weight=1)
-        self.star_map_frame.bind('<Configure>', self.on_resize)
+        # self.star_map_frame.bind('<Configure>', self.on_resize)
 
         self.max_width = 0
         self.max_height = 0
@@ -335,31 +375,39 @@ class StarMapFrame(ttk.Frame):
         self.hsb_canvas = tk.Scrollbar(self.star_map_frame, orient=tk.HORIZONTAL)
         self.hsb_canvas.grid(column=0, row=1, sticky='ew')
         self.hsb_canvas.config(command=self.canvas.xview)
-        self.canvas.config(xscrollcommand=self.hsb_canvas.set, yscrollcommand=self.vsb_canvas.set)
-
-        self.canvas.create_rectangle(0, 0, 1200, 200, fill='blue')
-        self.canvas.create_image(200, 200, image=self.image)
-        self.canvas.create_image(400, 200, image=self.image)
-        self.canvas.create_image(1000, 200, image=self.image)
-        self.canvas.create_image(1700, 200, image=self.image)
-        self.canvas.create_image(600, 1400, image=self.image)
-
-    def on_resize(self, event):
-        canvas_items = self.canvas.find_all()
-        self.max_width = 0
-        self.max_height = 0
-        for item in canvas_items:
-            last_index = len(self.canvas.coords(item))
-            width_index = last_index - 2
-            height_index = last_index - 1
-            temp_width = self.canvas.coords(item)[width_index]
-            temp_height = self.canvas.coords(item)[height_index]
-            if temp_width > self.max_width:
-                self.max_width = temp_width
-            if temp_height > self.max_height:
-                self.max_height = temp_height
-        self.canvas.config(scrollregion=(0,0,self.max_width+100,self.max_height+100))
+        self.canvas.config(xscrollcommand=self.hsb_canvas.set, yscrollcommand=self.vsb_canvas.set, scrollregion=(-200,200,200,-200))
         self.canvas.update()
+
+        # self.canvas.create_line(-198, 5, -180, 5)
+
+        # self.canvas.create_rectangle(0, 0, 1200, 200, fill='blue')
+        # self.canvas.create_image(200, 200, image=self.image)
+        # self.canvas.create_image(400, 200, image=self.image)
+        # self.canvas.create_image(1000, 200, image=self.image)
+        # self.canvas.create_image(1700, 200, image=self.image)
+        # self.canvas.create_image(600, 1400, image=self.image)
+
+    def draw_star(self, x, y):
+        # self.canvas.create_image(x, y, image=self.image)
+        self.canvas.create_line(x, y, x+10, y+10)
+        self.canvas.update()
+
+    # def on_resize(self, event):
+    #     canvas_items = self.canvas.find_all()
+    #     self.max_width = 0
+    #     self.max_height = 0
+    #     for item in canvas_items:
+    #         last_index = len(self.canvas.coords(item))
+    #         width_index = last_index - 2
+    #         height_index = last_index - 1
+    #         temp_width = self.canvas.coords(item)[width_index]
+    #         temp_height = self.canvas.coords(item)[height_index]
+    #         if temp_width > self.max_width:
+    #             self.max_width = temp_width
+    #         if temp_height > self.max_height:
+    #             self.max_height = temp_height
+    #     self.canvas.config(scrollregion=(0,0,self.max_width+100,self.max_height+100))
+    #     self.canvas.update()
 
     def save_canvas(self):
         save_file = asksaveasfilename(filetypes=[('', '.pdf')])

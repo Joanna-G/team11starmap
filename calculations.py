@@ -289,14 +289,30 @@ def calculate_ra_dec_planet(pl_lscal, pl_lprop, pl_ascal, pl_aprop, pl_escal, pl
 # start of calculations for the stars
 
 class TimeCalculations:
-    def __init__(self, year, month, day, hour, minute, lat, lon):
+    def __init__(self, year, month, day, hour, minute, utc_offset, lat, lon):
         self.year = year
         self.month = month
         self.day = day
         self.hour = hour
         self.minute = minute
+        self.utc_offset = utc_offset
         self.lat = lat
         self.lon = lon
+
+        self.julian_day = self.calculate_julian_day(self.year, self.month, self.day, self.hour, self.minute)
+        self.gmst = self.calculate_gmst(self.julian_day, self.year)
+        self.lst = self.calculate_lst(self.lon, self.gmst)
+
+
+    # def convert_to_ut(self, year, month, day, hour, minute, utc_offset):
+    #     hour = hour + utc_offset
+    #     if hour > 24:
+    #         day += 1
+    #         hour -= 24
+    #     elif hour < 0:
+    #         day -= 1
+    #         hour += 24
+
 
     def calculate_julian_day(self, year, month, day, hour, minute):
         converted_time = hour + (minute / 60)
@@ -328,8 +344,7 @@ class TimeCalculations:
         day_num = jd - 2451543.5
         return day_num
 
-    def calculate_gmst(self, year, month, day, hour, minute):
-        jd = self.calculate_julian_day(year, month, day, hour, minute)
+    def calculate_gmst(self, jd, year):
         midnight = math.floor(jd) + 0.5
         days_since_midnight = jd - midnight
         hours_since_midnight = days_since_midnight * 24
@@ -396,7 +411,6 @@ class TimeCalculations:
 
     def calculate_ha_time(self, lst, ra):
         ha_time = lst - ra
-        print('ha time before correction: ' + str(ha_time))
         if ha_time < 0:
             while ha_time < 0:
                 ha_time += 24
@@ -405,30 +419,31 @@ class TimeCalculations:
                 ha_time = ha_time - 24
         return ha_time
 
-    def calculate_az(self, dec, lat, ha_time):
-        ha_degrees = self.ha_time_to_degrees(ha_time)
-
-        az_rad = math.atan((-1 * math.sin(math.radians(ha_degrees)) * math.cos(math.radians(dec))) / (
-                (math.cos(math.radians(lat)) * math.sin(math.radians(dec))) - (
-                math.sin(math.radians(lat)) * math.cos(math.radians(dec)) * math.cos(math.radians(ha_degrees)))))
-        az_degrees = math.degrees(az_rad)
-
-        if az_degrees < 0:
-            while az_degrees < 0:
-                az_degrees += 360
-        elif az_degrees > 360:
-            while az_degrees > 360:
-                az_degrees = 360 - az_degrees
-
-        return az_degrees
-
-    def calculate_alt(self, dec, lat, ha_time):
-        ha_degrees = self.ha_time_to_degrees(ha_time)
-        print('ha degrees: ' + str(ha_degrees))
-        alt_rad = math.asin(math.sin(math.radians(lat)) * math.sin(math.radians(dec))) + (
-                math.cos(math.radians(lat)) * math.cos(math.radians(dec)) * math.cos(math.radians(ha_degrees)))
-        alt_degrees = math.degrees(alt_rad)
-        return alt_degrees
+    # not working
+    # def calculate_az(self, dec, lat, ha_time):
+    #     ha_degrees = self.ha_time_to_degrees(ha_time)
+    #
+    #     az_rad = math.atan((-1 * math.sin(math.radians(ha_degrees)) * math.cos(math.radians(dec))) / (
+    #             (math.cos(math.radians(lat)) * math.sin(math.radians(dec))) - (
+    #             math.sin(math.radians(lat)) * math.cos(math.radians(dec)) * math.cos(math.radians(ha_degrees)))))
+    #     az_degrees = math.degrees(az_rad)
+    #
+    #     if az_degrees < 0:
+    #         while az_degrees < 0:
+    #             az_degrees += 360
+    #     elif az_degrees > 360:
+    #         while az_degrees > 360:
+    #             az_degrees = 360 - az_degrees
+    #
+    #     return az_degrees
+    #
+    # def calculate_alt(self, dec, lat, ha_time):
+    #     ha_degrees = self.ha_time_to_degrees(ha_time)
+    #     print('ha degrees: ' + str(ha_degrees))
+    #     alt_rad = math.asin(math.sin(math.radians(lat)) * math.sin(math.radians(dec))) + (
+    #             math.cos(math.radians(lat)) * math.cos(math.radians(dec)) * math.cos(math.radians(ha_degrees)))
+    #     alt_degrees = math.degrees(alt_rad)
+    #     return alt_degrees
 
     def testing_alt(self, dec, lat, ha_time):
         ha_degrees = self.ha_time_to_degrees(ha_time)
@@ -440,7 +455,7 @@ class TimeCalculations:
 
     def testing_az(self, dec, lat, ha_time, alt):
         ha_degrees = self.ha_time_to_degrees(ha_time)
-        print('ha degrees dd: ' + str(ha_degrees))
+        # print('ha degrees dd: ' + str(ha_degrees))
         az_rad = (math.sin(math.radians(dec)) - (math.sin(math.radians(alt)) * math.sin(math.radians(lat)))) / \
                  (math.cos(math.radians(alt)) * math.cos(math.radians(lat)))
         az_rad = math.acos(az_rad)

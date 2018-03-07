@@ -1,11 +1,11 @@
 import math
 from datetime import datetime as dt
 import time
-import astropy.time
-from astropy.time import Time
-from astropy.coordinates import SkyCoord, EarthLocation, AltAz, Angle, Latitude, Longitude, ICRS, Galactic, FK4, FK5
-import astropy.units as u
-# import dateutil.parser
+# import astropy.time
+# from astropy.time import Time
+# from astropy.coordinates import SkyCoord, EarthLocation, AltAz, Angle, Latitude, Longitude, ICRS, Galactic, FK4, FK5
+# import astropy.units as u
+import dateutil.parser
 
 # placeholder
 cy = 0
@@ -394,6 +394,7 @@ class TimeCalculations:
         gmst_hours = math.floor(gmst) % 24
         gmst_minutes = math.floor(gmst_remainder * 60)
         gmst_minutes_decimal = gmst_remainder * 60
+        # division by zero
         gmst_minutes_decimal = gmst_minutes_decimal % int(gmst_minutes_decimal)
         gmst_seconds = math.floor(gmst_minutes_decimal * 60)
 

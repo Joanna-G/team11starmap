@@ -7,7 +7,7 @@ from tkinter.filedialog import asksaveasfilename
 import os
 import sys
 import locale
-from Parsers import StarParser
+from Parsers import StarParser, ConstellationParser
 import celestial_objects
 import calculations
 import ghostscript
@@ -73,6 +73,9 @@ class MenuFrame(ttk.Frame):
         self.sp = None
         self.sp_list = []
         self.star_list = []
+        self.cp = None
+        self.cp_list = []
+        self.constellation_list = []
 
         self.widgets_list = []
 
@@ -190,10 +193,20 @@ class MenuFrame(ttk.Frame):
 
     def init_celestial_list(self):
         self.sp = StarParser.StarParser()
-        self.sp = self.sp.parse_file()
-        for sp_star in self.sp:
+        self.sp_list = self.sp.parse_file()
+        self.cp = ConstellationParser.ConstellationParser()
+        self.cp_list = self.cp.parse_file()
+        for sp_star in self.sp_list:
             star = celestial_objects.Star(sp_star[0], sp_star[1], sp_star[2], float(sp_star[3]), float(sp_star[4]), float(sp_star[5]))
             self.star_list.append(star)
+
+        for cp_constellation in self.cp_list:
+            name = cp_constellation[0]
+            star_list = []
+            for index in cp_constellation[1:]:
+                star_list.append(index)
+            constellation = celestial_objects.Constellation(name, star_list)
+            self.constellation_list.append(constellation)
 
     def generate_map(self):
         self.parent.star_map_frame.canvas.delete('all')
@@ -221,12 +234,21 @@ class MenuFrame(ttk.Frame):
             star.ha_degrees = star.ha_time_to_degrees(star.ha_time)
             star.altitude = star.calculate_alt(star.declination, self.time_calc.lat, star.ha_degrees)
             star.azimuth = star.calculate_az(star.declination, self.time_calc.lat, star.ha_degrees, star.altitude)
-            star.get_xy_coords(star.altitude, star.azimuth)
+            star.get_xy_coords(star.altitude, star.azimuth, 2000)
+            self.parent.star_map_frame.draw_star(star, star.x, star.y)
 
-        for star in self.star_list:
-            x = star.x * 2000
-            y = star.y * 2000
-            self.parent.star_map_frame.draw_star(star, x, y)
+        for const in self.constellation_list:
+            print(const.name)
+            for index in const.star_list:
+                star1 = None
+                star2 = None
+                for star in self.star_list:
+                    if index[0] == star.hd_id:
+                        star1 = star
+                    elif index[1] == star.hd_id:
+                        star2 = star
+                if star1 is not None and star2 is not None:
+                    self.parent.star_map_frame.draw_constellation_line(star1, star2, const)
 
     def clear_widget_text(self, event, tag):
         widget_value = event.widget.get()
@@ -348,19 +370,6 @@ class StarMapFrame(ttk.Frame):
         self.star_map_frame.grid(column=0, row=0, sticky='nsew')
         self.star_map_frame.columnconfigure(0, weight=1)
         self.star_map_frame.rowconfigure(0, weight=1)
-        # self.star_map_frame.bind('<Configure>', self.on_resize)
-
-        self.max_width = 0
-        self.max_height = 0
-
-        directory = ''
-        if getattr(sys, 'frozen', False):
-            directory = os.path.dirname(sys.executable)
-        elif __file__:
-            directory = os.path.dirname(__file__)
-        filename = os.path.join(directory, 'resources', 'mars.png')
-        self.image = ImageTk.PhotoImage(Image.open(filename))
-        self.im = Image.open(filename)
 
         self.canvas = Canvas(self.star_map_frame)
         self.canvas.grid(column=0, row=0, sticky='nsew')
@@ -371,39 +380,46 @@ class StarMapFrame(ttk.Frame):
         self.hsb_canvas.grid(column=0, row=1, sticky='ew')
         self.hsb_canvas.config(command=self.canvas.xview)
         self.canvas.config(xscrollcommand=self.hsb_canvas.set, yscrollcommand=self.vsb_canvas.set, scrollregion=(-2000,-2000,2000,2000))
-        # self.canvas.update()
+
+        self.canvas.create_line(-1980, -1980, -1900, 0)
 
     def draw_star(self, star, x, y):
-        # self.canvas.create_image(x, y, image=self.image)
-        # x = self.canvas.create_line(x, y, x+10, y)
         r = 2
         x = self.canvas.create_oval(x-r, y-r, x+r, y+r)
-        self.canvas.tag_bind(x, '<ButtonPress-1>', lambda e: self.display_info(e, star)) #<ButtonPress-1> <Enter>
+        self.canvas.tag_bind(x, '<ButtonPress-1>', lambda e: self.display_star_info(e, star))
 
-    def display_info(self, e, star):
-        # print('star id: ' + str(star.star_id) + ' star altitude: ' + str(star.altitude))
+    def draw_constellation_line(self, star_1, star_2, constellation):
+        const = self.canvas.create_line(star_1.x, star_1.y, star_2.x, star_2.y)
+        self.canvas.tag_bind(const, '<ButtonPress-1>', lambda e: self.display_constellation_info(e, constellation))
+
+    def display_star_info(self, e, star):
         x = self.parent.parent.winfo_pointerx()
         y = self.parent.parent.winfo_pointery()
         self.create_modal_dialog(star, x, y)
 
-    def create_modal_dialog(self, star, x, y):
+    def display_constellation_info(self, e, constellation):
+        x = self.parent.parent.winfo_pointerx()
+        y = self.parent.parent.winfo_pointery()
+        self.create_modal_dialog(constellation, x, y)
+
+
+    def create_modal_dialog(self, object, x, y):
         modal_dlg = tk.Toplevel(master=self)
         modal_dlg.columnconfigure(0, weight=1)
         modal_dlg.columnconfigure(1, weight=1)
         modal_dlg.columnconfigure(2, weight=1)
         modal_dlg.resizable(False, False)
 
-        tk.Label(modal_dlg, text='Star ID: ' + str(star.star_id)).grid(column=0, row=0, columnspan=3, sticky='nsew')
+        if isinstance(object, celestial_objects.Star):
+            tk.Label(modal_dlg, text='Star HD ID: ' + str(object.hd_id)).grid(column=0, row=0, columnspan=3, sticky='nsew')
+        elif isinstance(object, celestial_objects.Constellation):
+            tk.Label(modal_dlg, text='Constellation Name: ' + str(object.name)).grid(column=0, row=0, columnspan=3, sticky='nsew')
 
         modal_dlg.geometry('+%d+%d' % (x, y))
         modal_dlg.transient(win)
         modal_dlg.focus_set()
         modal_dlg.grab_set()
-        # modal_dlg.protocol('WM_DELETE_WINDOW', lambda: self.on_modal_dlg_close(modal_dlg))
         self.wait_window(modal_dlg)
-
-    def on_modal_dlg_close(self, modal_dlg):
-        modal_dlg.destroy()
 
     def save_canvas(self):
         save_file = asksaveasfilename(filetypes=[('', '.jpeg')])
@@ -411,7 +427,7 @@ class StarMapFrame(ttk.Frame):
         self.canvas.postscript(file='canvas.ps', x=-2000, y=-2000, width=4000, height=4000)
 
         args = [
-            "ps2jpg",  # actual value doesn't matter
+            "ps2jpg",
             "-dSAFER", "-dBATCH", "-dNOPAUSE",
             "-sDEVICE=jpeg",
             "-dEPSCrop",

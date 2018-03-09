@@ -11,9 +11,9 @@ class BaseCelestialObject:
         self.x = None
         self.y = None
 
-    def get_xy_coords(self, alt, az):
-        self.x = math.sin(math.radians(alt)) * math.cos(math.radians(az))
-        self.y = math.sin(math.radians(alt)) * math.sin(math.radians(az))
+    def get_xy_coords(self, alt, az, r):
+        self.x = r * math.sin(math.radians(alt)) * math.cos(math.radians(az))
+        self.y = r * math.sin(math.radians(alt)) * math.sin(math.radians(az))
         return self.x, self.y
 
     def calculate_alt(self, dec, lat, ha_degrees):
@@ -108,12 +108,12 @@ class Moon(BaseCelestialObject):
 
 
 class Constellation(BaseCelestialObject):
-    def __init__(self):
+    def __init__(self, name, star_list):
         BaseCelestialObject.__init__(self)
-        self.name = None
+        self.name = name
+        self.star_list = star_list
         self.number_stars = None
         self.number_lines = None
-        self.stars = []
 
 
 class Messier_Objects(BaseCelestialObject):

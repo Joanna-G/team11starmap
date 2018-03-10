@@ -26,7 +26,6 @@ class ConstellationParser(Parser):
 
         # Remove the first empty element of the list
         self.ElementsList.pop(0)
-        print(self.ElementsList)
         return self.ElementsList
 
 def main():

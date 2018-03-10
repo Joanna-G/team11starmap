@@ -243,7 +243,7 @@ class MenuFrame(ttk.Frame):
             #star.azimuth = star.calculate_az(star.declination, self.time_calc.lat, star.ha_degrees, star.altitude)
             star.altitude, star.azimuth = star.calculate_alt_az(star.declination, self.time_calc.lat, star.ha_degrees, None, None, None)
             star.get_xy_coords(star.altitude, star.azimuth, 2000)
-            self.parent.star_map_frame.draw_star(star, star.x, star.y)
+            # self.parent.star_map_frame.draw_star(star, star.x, star.y)
 
         for const in self.constellation_list:
             print(const.name)
@@ -257,6 +257,9 @@ class MenuFrame(ttk.Frame):
                         star2 = star
                 if star1 is not None and star2 is not None:
                     self.parent.star_map_frame.draw_constellation_line(star1, star2, const)
+
+        for star in self.star_list:
+            self.parent.star_map_frame.draw_star(star, star.x, star.y)
 
     def clear_widget_text(self, event, tag):
         widget_value = event.widget.get()
@@ -388,8 +391,8 @@ class StarMapFrame(ttk.Frame):
         self.hsb_canvas.grid(column=0, row=1, sticky='ew')
         self.hsb_canvas.config(command=self.canvas.xview)
         self.canvas.config(xscrollcommand=self.hsb_canvas.set, yscrollcommand=self.vsb_canvas.set, scrollregion=(-2000,-2000,2000,2000))
-
-        self.canvas.create_line(-1980, -1980, -1900, 0)
+        self.canvas.bind('<MouseWheel>', lambda e: self.on_mouse_wheel_scrool(e))
+        self.canvas.bind('<Shift-MouseWheel>', lambda e: self.on_mouse_wheel_scrool(e))
 
     def draw_star(self, star, x, y):
         r = 2
@@ -418,10 +421,12 @@ class StarMapFrame(ttk.Frame):
         modal_dlg.columnconfigure(2, weight=1)
         modal_dlg.resizable(False, False)
 
-        #if isinstance(object, celestial_objects.Star):
         if isinstance(object, Star):
             tk.Label(modal_dlg, text='Star HD ID: ' + str(object.hd_id)).grid(column=0, row=0, columnspan=3, sticky='nsew')
-        #elif isinstance(object, celestial_objects.Constellation):
+            tk.Label(modal_dlg, text='Star Alt: ' + str(object.altitude)).grid(column=0, row=1, columnspan=3, sticky='nsew')
+            tk.Label(modal_dlg, text='Star Azi: ' + str(object.azimuth)).grid(column=0, row=2, columnspan=3, sticky='nsew')
+            tk.Label(modal_dlg, text='Star Hour Angle: ' + str(object.ha_time)).grid(column=0, row=4, columnspan=3, sticky='nsew')
+
         elif isinstance(object, Constellation):
             tk.Label(modal_dlg, text='Constellation Name: ' + str(object.name)).grid(column=0, row=0, columnspan=3, sticky='nsew')
 
@@ -448,6 +453,12 @@ class StarMapFrame(ttk.Frame):
         encoding = locale.getpreferredencoding()
         args = [a.encode(encoding) for a in args]
         ghostscript.Ghostscript(*args)
+
+    def on_mouse_wheel_scrool(self, e):
+        if e.state == 8:
+            self.canvas.yview_scroll(int(-1 * (e.delta / abs(e.delta))), 'units')
+        elif e.state == 9:
+            self.canvas.xview_scroll(int(-1 * (e.delta / abs(e.delta))), 'units')
 
 
 if __name__ == "__main__":

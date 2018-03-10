@@ -7,9 +7,11 @@ from tkinter.filedialog import asksaveasfilename
 import os
 import sys
 import locale
-from Parsers import StarParser, ConstellationParser
-import celestial_objects
-import calculations
+from Parsers import *
+#import celestial_objects
+import Time
+from Celestial_Objects import *
+#import calculations
 import ghostscript
 import time
 
@@ -192,12 +194,15 @@ class MenuFrame(ttk.Frame):
         self.init_celestial_list()
 
     def init_celestial_list(self):
-        self.sp = StarParser.StarParser()
+        #self.sp = StarParser.StarParser()
+        self.sp = StarParser()
         self.sp_list = self.sp.parse_file()
-        self.cp = ConstellationParser.ConstellationParser()
+        #self.cp = ConstellationParser.ConstellationParser()
+        self.cp = ConstellationParser()
         self.cp_list = self.cp.parse_file()
         for sp_star in self.sp_list:
-            star = celestial_objects.Star(sp_star[0], sp_star[1], sp_star[2], float(sp_star[3]), float(sp_star[4]), float(sp_star[5]))
+            #star = celestial_objects.Star(sp_star[0], sp_star[1], sp_star[2], float(sp_star[3]), float(sp_star[4]), float(sp_star[5]))
+            star = Star(sp_star[0], sp_star[1], sp_star[2], float(sp_star[3]), float(sp_star[4]), float(sp_star[5]))
             self.star_list.append(star)
 
         for cp_constellation in self.cp_list:
@@ -205,7 +210,8 @@ class MenuFrame(ttk.Frame):
             star_list = []
             for index in cp_constellation[1:]:
                 star_list.append(index)
-            constellation = celestial_objects.Constellation(name, star_list)
+            #constellation = celestial_objects.Constellation(name, star_list)
+            constellation = Constellation(name, star_list)
             self.constellation_list.append(constellation)
 
     def generate_map(self):
@@ -227,13 +233,15 @@ class MenuFrame(ttk.Frame):
             print('wrong values')
             return
 
-        self.time_calc = calculations.TimeCalculations(year, month, day, hour, utc_offset, minute, latitude, longitude)
+        #self.time_calc = calculations.TimeCalculations(year, month, day, hour, utc_offset, minute, latitude, longitude)
+        self.time_calc = Time.TimeCalculations(year, month, day, hour, utc_offset, minute, latitude, longitude)
 
         for star in self.star_list:
             star.ha_time = star.calculate_ha_time(self.time_calc.lst, star.right_ascension)
             star.ha_degrees = star.ha_time_to_degrees(star.ha_time)
-            star.altitude = star.calculate_alt(star.declination, self.time_calc.lat, star.ha_degrees)
-            star.azimuth = star.calculate_az(star.declination, self.time_calc.lat, star.ha_degrees, star.altitude)
+            #star.altitude = star.calculate_alt(star.declination, self.time_calc.lat, star.ha_degrees)
+            #star.azimuth = star.calculate_az(star.declination, self.time_calc.lat, star.ha_degrees, star.altitude)
+            star.altitude, star.azimuth = star.calculate_alt_az(star.declination, self.time_calc.lat, star.ha_degrees, None, None, None)
             star.get_xy_coords(star.altitude, star.azimuth, 2000)
             self.parent.star_map_frame.draw_star(star, star.x, star.y)
 
@@ -410,9 +418,11 @@ class StarMapFrame(ttk.Frame):
         modal_dlg.columnconfigure(2, weight=1)
         modal_dlg.resizable(False, False)
 
-        if isinstance(object, celestial_objects.Star):
+        #if isinstance(object, celestial_objects.Star):
+        if isinstance(object, Star):
             tk.Label(modal_dlg, text='Star HD ID: ' + str(object.hd_id)).grid(column=0, row=0, columnspan=3, sticky='nsew')
-        elif isinstance(object, celestial_objects.Constellation):
+        #elif isinstance(object, celestial_objects.Constellation):
+        elif isinstance(object, Constellation):
             tk.Label(modal_dlg, text='Constellation Name: ' + str(object.name)).grid(column=0, row=0, columnspan=3, sticky='nsew')
 
         modal_dlg.geometry('+%d+%d' % (x, y))

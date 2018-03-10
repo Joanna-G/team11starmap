@@ -1,14 +1,16 @@
+from Parsers import Parser
 import csv
 import os.path
 
-class StarParser():
+class StarParser(Parser):
     def __init__(self):
-        self.ElementsList = []
+        fileDir = os.path.dirname(os.path.realpath('__file__'))
+        Parser.__init__(self, os.path.join(fileDir, 'resources', 'Stars.csv'))
+
 
     # Parses the input File
     def parse_file(self):
-        path = os.path.join('resources', "hyg.csv")
-        file = csv.reader(open(path, newline=''), delimiter=',')
+        file = csv.reader(open(self.filepath, newline=''), delimiter=',')
         for row in file:
             element = []
             # Check if it is the header row, if it is, ignore it.

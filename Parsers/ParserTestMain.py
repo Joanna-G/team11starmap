@@ -1,7 +1,4 @@
-from Parsers.StarParser import StarParser
-from Parsers.PlanetParser import PlanetParser
-from Parsers.ConstellationParser import ConstellationParser
-
+from Parsers import *
 
 def main():
     stars = StarParser()
@@ -15,10 +12,14 @@ def main():
     print(planetList)
 
     constellations = ConstellationParser()
-    constellationsList = constellations.parse_file()
+    constellations.parse_file()
     print("\nConstellations: ")
-    print(constellationsList)
+    print(constellations.ElementsList)
 
+    messier = MessierParser()
+    messier.parse_file()
+    print("\nMessier Deep Space Objects: ")
+    print(messier.ElementsList)
 
 
 if __name__ == "__main__":

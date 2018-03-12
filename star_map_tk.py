@@ -8,10 +8,10 @@ import os
 import sys
 import locale
 from Parsers import *
-#import celestial_objects
+# import celestial_objects
 import Time
 from Celestial_Objects import *
-#import calculations
+# import calculations
 import ghostscript
 import time
 
@@ -134,6 +134,9 @@ class MenuFrame(ttk.Frame):
         # self.label_date_time.config(anchor='sw', background='green')
         self.label_date_time.config(anchor='sw')
 
+        # Months list to use for combobox
+        months = ('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October',
+                  'November', 'December')
         self.entry_month = tk.Entry(self.menu_frame, textvariable=self.entryval_month)
         self.entry_month.config(foreground='grey')
         self.entry_month.grid(column=0, row=2, sticky='nsew', padx=10)
@@ -141,6 +144,12 @@ class MenuFrame(ttk.Frame):
         self.entry_month.bind('<FocusOut>', lambda e: self.validate_widget_value(e, 'Month', 'Month (1-12)'))
         self.widgets_list.append(self.entry_month)
 
+        # Day list to use for combobox
+        days = ()
+        for i in 30:
+            days.append(str(i + 1))
+
+        # Loop to check how many days are in the current month so that you don't display more days than the month has?
         self.entry_day = tk.Entry(self.menu_frame, textvariable=self.entryval_day)
         self.entry_day.config(foreground='grey')
         self.entry_day.grid(column=0, row=3, sticky='nsew', padx=10, pady=10)
@@ -155,12 +164,30 @@ class MenuFrame(ttk.Frame):
         self.entry_year.bind('<FocusOut>', lambda e: self.validate_widget_value(e, 'Year', 'Year (1900-2100)'))
         self.widgets_list.append(self.entry_year)
 
+        # Split into hour/minute selectors instead?
+        hours = ()
+        for i in 23:
+            if i < 10:
+                hours.append('0' + str(i))
+            else:
+                hours.append(str(i))
+
+        minutes = ()
+        for i in 59:
+            if i < 10:
+                minutes.append('0' + str(i))
+            else:
+                minutes.append(str(i))
+
         self.entry_time = tk.Entry(self.menu_frame, textvariable=self.entryval_time)
         self.entry_time.config(foreground='grey')
         self.entry_time.grid(column=0, row=5, sticky='nsew', padx=10, pady=10)
         self.entry_time.bind('<FocusIn>', lambda e: self.clear_widget_text(e, 'Time'))
         self.entry_time.bind('<FocusOut>', lambda e: self.validate_widget_value(e, 'Time', '00:00 (24 Hour Clock Local Time)'))
         self.widgets_list.append(self.entry_time)
+
+        # UTC Offset List
+        offset = ()
 
         self.entry_utc_offset = tk.Entry(self.menu_frame, textvariable=self.entryval_utc_offset)
         self.entry_utc_offset.config(foreground='grey')

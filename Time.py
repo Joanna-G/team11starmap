@@ -1,5 +1,6 @@
 import math
 
+
 class TimeCalculations:
     def __init__(self, year, month, day, hour, minute, utc_offset, lat, lon):
         self.year = year
@@ -22,7 +23,6 @@ class TimeCalculations:
         self.new_moon_ref = self.calculate_julian_day(1900, 1, 1, 0, 0)
         self.t = self.calculate_T(self.jd_current)
 
-
     # def convert_to_ut(self, year, month, day, hour, minute, utc_offset):
     #     hour = hour + utc_offset
     #     if hour > 24:
@@ -34,7 +34,6 @@ class TimeCalculations:
 
     def calculate_cy(self):
         return self.julian_day/36525
-
 
     def calculate_julian_day(self, year, month, day, hour, minute):
         converted_time = hour + (minute / 60)
@@ -67,10 +66,11 @@ class TimeCalculations:
         return d
 
     # Added by Jo - May need this later
-    def calculate_day_number(self, year, month, day, hour, minute):
-        jd = self.calculate_julian_day(year, month, day, hour, minute)
-        day_num = jd - 2451543.5
-        return day_num
+    # Don't need. Can be removed unless anyone is using it.
+    # def calculate_day_number(self, year, month, day, hour, minute):
+    #    jd = self.calculate_julian_day(year, month, day, hour, minute)
+    #    day_num = jd - 2451543.5
+    #    return day_num
 
     def calculate_gmst(self, jd, year):
         midnight = math.floor(jd) + 0.5
@@ -155,7 +155,6 @@ class TimeCalculations:
     #     ha_degrees_seconds = ((((ha_time * 15) - ha_degrees_hours)) - ha_degrees_minutes)
     #     ha_degrees = ha_degrees_hours + ha_degrees_minutes + ha_degrees_seconds
     #     return ha_degrees
-
 
     def ra_degrees_to_time_decimal(self, ra):
         hours = int(ra / 15.0)

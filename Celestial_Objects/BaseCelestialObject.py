@@ -11,8 +11,11 @@ class BaseCelestialObject:
         self.y = None
 
     def get_xy_coords(self, alt, az, r):
-        self.x = r * math.sin(math.radians(alt)) * math.cos(math.radians(az))
-        self.y = r * math.sin(math.radians(alt)) * math.sin(math.radians(az))
+        # self.x = r * math.sin(math.radians(alt)) * math.cos(math.radians(az))
+        # self.y = r * math.sin(math.radians(alt)) * math.sin(math.radians(az))
+
+        self.x = 1000 * math.cos(math.radians(az)) * math.tan(math.radians(90 - alt) / 2)
+        self.y = 1000 * math.sin(math.radians(az)) * math.tan(math.radians(90 - alt) / 2)
         return self.x, self.y
 
     def calculate_ha_time(self, lst, ra):

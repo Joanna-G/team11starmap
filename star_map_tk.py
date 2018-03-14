@@ -242,7 +242,7 @@ class MenuFrame(ttk.Frame):
             #star.altitude = star.calculate_alt(star.declination, self.time_calc.lat, star.ha_degrees)
             #star.azimuth = star.calculate_az(star.declination, self.time_calc.lat, star.ha_degrees, star.altitude)
             star.altitude, star.azimuth = star.calculate_alt_az(star.declination, self.time_calc.lat, star.ha_degrees, None, None, None)
-            star.get_xy_coords(star.altitude, star.azimuth, 2000)
+            star.get_xy_coords(star.altitude, star.azimuth, 4000)
             # self.parent.star_map_frame.draw_star(star, star.x, star.y)
 
         for const in self.constellation_list:
@@ -390,7 +390,7 @@ class StarMapFrame(ttk.Frame):
         self.hsb_canvas = tk.Scrollbar(self.star_map_frame, orient=tk.HORIZONTAL)
         self.hsb_canvas.grid(column=0, row=1, sticky='ew')
         self.hsb_canvas.config(command=self.canvas.xview)
-        self.canvas.config(xscrollcommand=self.hsb_canvas.set, yscrollcommand=self.vsb_canvas.set, scrollregion=(-2000,-2000,2000,2000))
+        self.canvas.config(xscrollcommand=self.hsb_canvas.set, yscrollcommand=self.vsb_canvas.set, scrollregion=(-4000,-4000,4000,4000))
         self.canvas.bind('<MouseWheel>', lambda e: self.on_mouse_wheel_scrool(e))
         self.canvas.bind('<Shift-MouseWheel>', lambda e: self.on_mouse_wheel_scrool(e))
 
@@ -437,29 +437,30 @@ class StarMapFrame(ttk.Frame):
         self.wait_window(modal_dlg)
 
     def save_canvas(self):
-        save_file = asksaveasfilename(filetypes=[('', '.jpeg')])
+        save_file = asksaveasfilename(filetypes=[('', '.jpeg')], defaultextension='*.jpeg')
         self.canvas.update()
-        self.canvas.postscript(file='canvas.ps', x=-2000, y=-2000, width=4000, height=4000)
+        self.canvas.postscript(file='canvas.ps', x=-4000, y=-4000, width=8000, height=8000)
 
-        args = [
-            "ps2jpg",
-            "-dSAFER", "-dBATCH", "-dNOPAUSE",
-            "-sDEVICE=jpeg",
-            "-dEPSCrop",
-            "-r300",
-            "-sOutputFile=" + save_file,
-            "canvas.ps"
-        ]
-        encoding = locale.getpreferredencoding()
-        args = [a.encode(encoding) for a in args]
-        ghostscript.Ghostscript(*args)
+        if save_file != '':
+            args = [
+                "ps2jpg",
+                "-dSAFER", "-dBATCH", "-dNOPAUSE",
+                "-sDEVICE=jpeg",
+                "-dEPSCrop",
+                "-r300",
+                "-sOutputFile=" + save_file,
+                "canvas.ps"
+            ]
+            encoding = locale.getpreferredencoding()
+            args = [a.encode(encoding) for a in args]
+            ghostscript.Ghostscript(*args)
 
     def on_mouse_wheel_scrool(self, e):
         if e.state == 8:
             self.canvas.yview_scroll(int(-1 * (e.delta / abs(e.delta))), 'units')
         elif e.state == 9:
             self.canvas.xview_scroll(int(-1 * (e.delta / abs(e.delta))), 'units')
-
+        
 
 if __name__ == "__main__":
     win = tk.Tk()

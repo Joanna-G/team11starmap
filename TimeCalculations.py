@@ -1,6 +1,6 @@
 import math
 
-class TimeCalculations:
+class TimeCalculations():
     def __init__(self, year, month, day, hour, minute, utc_offset, lat, lon):
         self.year = year
         self.month = month
@@ -31,6 +31,27 @@ class TimeCalculations:
     #     elif hour < 0:
     #         day -= 1
     #         hour += 24
+
+    def update_times(self, year, month, day, hour, minute, utc_offset, lat, lon):
+        self.year = year
+        self.month = month
+        self.day = day
+        self.hour = hour
+        self.minute = minute
+        self.second = 0
+        self.utc_offset = utc_offset
+        self.lat = lat
+        self.lon = lon
+
+        self.julian_day = self.calculate_julian_day(self.year, self.month, self.day, self.hour, self.minute)
+        self.gmst = self.calculate_gmst(self.julian_day, self.year)
+        self.lst = self.calculate_lst(self.lon, self.gmst)
+        self.mst = self.calculate_mst(self.year, self.month, self.day, self.hour, self.minute, self.second, self.lon)
+        self.cy = self.calculate_cy()
+
+        self.jd_current = self.calculate_julian_day(year, month, day, hour, minute)
+        self.new_moon_ref = self.calculate_julian_day(1900, 1, 1, 0, 0)
+        self.t = self.calculate_T(self.jd_current)
 
     def calculate_cy(self):
         return self.julian_day/36525

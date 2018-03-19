@@ -12,7 +12,7 @@ from Parsers import *
 import TimeCalculations
 from Celestial_Objects import *
 #import calculations
-import ghostscript
+#import ghostscript
 import time
 
 

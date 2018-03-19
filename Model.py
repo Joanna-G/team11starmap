@@ -1,6 +1,7 @@
 from Parsers import *
 from Celestial_Objects import *
 import TimeCalculations
+import math
 
 class Model():
     def __init__(self, year, month, day, hour, minute, utc_offset, lat, lon):
@@ -51,7 +52,12 @@ class Model():
 
     # Create all Planets based on information from Planet Parser (p_parse) and append to planet_list
     def Create_Planets(self):
-        print("To Be implemented")
+        for pp_planet in self.p_parse:
+            planet = Planet(pp_planet[0].planet_name, pp_planet[1].lscal, pp_planet[2].lprop, pp_planet[3].ascal,
+                            pp_planet[4].aprop, pp_planet[5].escal, pp_planet[6].eprop, pp_planet[7].iscal,
+                            pp_planet[8].iprop, pp_planet[9].wscal, pp_planet[10].wprop, pp_planet[11].oscal,
+                            pp_planet[12].oprop)
+            self.planet_list.append(planet)
 
     # Calculate all stars positions based on user inputted date, time, and location values
     def Calculate_Star_Positions(self):
@@ -64,7 +70,29 @@ class Model():
 
     #
     def Calculate_Planet_Positions(self):
-        print("To Be implemented")
+        for planet in self.planet_list:
+            planet.semi_axis = planet.calculate_semi_axis(planet.ascal, planet.aprop, self.time_calc.cy)
+            planet.eccentricity = planet.calculate_eccentricity(planet.escal, planet.eprop, self.time_calc.cy)
+            planet.inclination = planet.calculate_inclination(planet.iscal, planet.iprop, self.time_calc.cy)
+            planet.arg_perihelion = planet.calculate_arg_perihelion(planet.wscal, planet.wprop, self.time_calc.cy)
+            planet.long_asc_node = planet.calculate_long_asc_node(planet.oscal, planet.oprop, self.time_calc.cy)
+            planet.mean_long = planet.calculate_mean_longitude(planet.lscal, planet.lprop, self.time_calc.cy)
+            planet.mean_anomaly = planet.calculate_mean_anomaly(planet.planet_name, self.time_calc.d)
+            planet.true_anomaly = planet.calculate_true_anomaly(math.radians(planet.mean_anomaly),
+                                                                math.radians(planet.eccentricity))
+            planet.right_ascension, planet.declination, planet.distance = planet.calculate_ra_dec_planet(
+                 planet.planet_name, planet.lscal, planet.lprop, planet.ascal, planet.aprop,
+                 planet.escal, planet.eprop, planet.iscal, planet.iprop, planet.wscal,
+                 planet.wprop, planet.oscal, planet.oprop, planet.lscal, planet.lprop,
+                 self.planet_list[2].ascal, self.planet_list[2].aprop, self.planet_list[2].escal,
+                 self.planet_list[2].eprop, self.planet_list[2].iscal,
+                 self.planet_list[2].iprop, self.planet_list[2].wscal, self.planet_list[2].wprop,
+                 self.planet_list[2].oscal, self.planet_list[2].oprop, self.time_calc.cy, self.time_calc.d)
+            ha_time = planet.calculate_ha_time(self.time_calc.lst, planet.right_ascension)
+            planet.ha = planet.ha_time_to_degrees(ha_time)
+            planet.alt, planet.az = planet.calculate_alt_az(self, planet.declination, self.time_calc.lat,
+                                                            planet.ha, self.time_calc.t, self.time_calc.lon,
+                                                            self.time_calc.mst)
 
     #
     def Calculate_Moon_Position(self):

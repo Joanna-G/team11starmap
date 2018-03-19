@@ -21,6 +21,7 @@ class TimeCalculations():
         self.jd_current = self.calculate_julian_day(year, month, day, hour, minute)
         self.new_moon_ref = self.calculate_julian_day(1900, 1, 1, 0, 0)
         self.t = self.calculate_T(self.jd_current)
+        self.d = self.calculate_day(self.year, self.month, self.day, self.utc_offset)
 
 
     # def convert_to_ut(self, year, month, day, hour, minute, utc_offset):
@@ -52,6 +53,7 @@ class TimeCalculations():
         self.jd_current = self.calculate_julian_day(year, month, day, hour, minute)
         self.new_moon_ref = self.calculate_julian_day(1900, 1, 1, 0, 0)
         self.t = self.calculate_T(self.jd_current)
+        self.d = self.calculate_day(self.year, self.month, self.day, self.utc_offset)
 
     def calculate_cy(self):
         return self.julian_day/36525
@@ -81,7 +83,7 @@ class TimeCalculations():
     def calculate_T(self, jd):
         return (jd - 2415020.0) / 36525
 
-    # added by Ben - not sure what this exactly does, but works for mean anomaly
+    # added by Ben - not sure what this exactly does, but works in mean anomaly calculation
     def calculate_day(self, year, month, day, UT):
         d = 367 * year - 7 * (year + (month + 9) / 12) / 4 + 275 * month / 9 + day - 730530
         d = d + UT / 24.0

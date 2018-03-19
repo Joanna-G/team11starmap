@@ -25,6 +25,10 @@ class Planet(BaseCelestialObject):
         self.mean_long = None
         self.mean_anomaly = None
         self.true_anomaly = None
+        self.alt = None
+        self.az = None
+        self.distance = None
+        self.ha = None
 
     def calculate_alt_az(self, dec, lat, ha_degrees, t, lon, mst):
         if lat < 0:

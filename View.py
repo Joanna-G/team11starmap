@@ -4,17 +4,9 @@ from tkinter import StringVar
 from tkinter import Canvas
 from PIL import ImageTk, Image, ImageDraw
 from tkinter.filedialog import asksaveasfilename
-import os
-import sys
 import locale
-from Parsers import *
-#import celestial_objects
-import TimeCalculations
 from Celestial_Objects import *
-# import calculations
-import ghostscript
-import time
-
+#import ghostscript
 
 class MainApplication(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
@@ -32,8 +24,6 @@ class MainApplication(ttk.Frame):
         self.header_frame.grid(column=0, row=0, columnspan=2)
         self.menu_frame.grid(column=0, row=1)
         self.star_map_frame.grid(column=1, row=1)
-
-        self.header_frame.button_save.configure(command=self.star_map_frame.save_canvas)
 
 
 class HeaderFrame(ttk.Frame):
@@ -71,14 +61,6 @@ class MenuFrame(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent)
         self.parent = parent
-        self.time_calc = None
-        self.sp = None
-        self.sp_list = []
-        self.star_list = []
-        self.cp = None
-        self.cp_list = []
-        self.constellation_list = []
-
         self.widgets_list = []
 
         self.grid(column=0, row=0, sticky='nsew')
@@ -134,9 +116,6 @@ class MenuFrame(ttk.Frame):
         # self.label_date_time.config(anchor='sw', background='green')
         self.label_date_time.config(anchor='sw')
 
-        # Months list to use for combobox
-        months = ('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October',
-                  'November', 'December')
         self.entry_month = tk.Entry(self.menu_frame, textvariable=self.entryval_month)
         self.entry_month.config(foreground='grey')
         self.entry_month.grid(column=0, row=2, sticky='nsew', padx=10)
@@ -144,12 +123,6 @@ class MenuFrame(ttk.Frame):
         self.entry_month.bind('<FocusOut>', lambda e: self.validate_widget_value(e, 'Month', 'Month (1-12)'))
         self.widgets_list.append(self.entry_month)
 
-        # Day list to use for combobox
-        days = ()
-        for i in 30:
-            days.append(str(i + 1))
-
-        # Loop to check how many days are in the current month so that you don't display more days than the month has?
         self.entry_day = tk.Entry(self.menu_frame, textvariable=self.entryval_day)
         self.entry_day.config(foreground='grey')
         self.entry_day.grid(column=0, row=3, sticky='nsew', padx=10, pady=10)
@@ -164,36 +137,20 @@ class MenuFrame(ttk.Frame):
         self.entry_year.bind('<FocusOut>', lambda e: self.validate_widget_value(e, 'Year', 'Year (1900-2100)'))
         self.widgets_list.append(self.entry_year)
 
-        # Split into hour/minute selectors instead?
-        hours = ()
-        for i in 23:
-            if i < 10:
-                hours.append('0' + str(i))
-            else:
-                hours.append(str(i))
-
-        minutes = ()
-        for i in 59:
-            if i < 10:
-                minutes.append('0' + str(i))
-            else:
-                minutes.append(str(i))
-
         self.entry_time = tk.Entry(self.menu_frame, textvariable=self.entryval_time)
         self.entry_time.config(foreground='grey')
         self.entry_time.grid(column=0, row=5, sticky='nsew', padx=10, pady=10)
         self.entry_time.bind('<FocusIn>', lambda e: self.clear_widget_text(e, 'Time'))
-        self.entry_time.bind('<FocusOut>', lambda e: self.validate_widget_value(e, 'Time', '00:00 (24 Hour Clock Local Time)'))
+        self.entry_time.bind('<FocusOut>',
+                             lambda e: self.validate_widget_value(e, 'Time', '00:00 (24 Hour Clock Local Time)'))
         self.widgets_list.append(self.entry_time)
-
-        # UTC Offset List
-        offset = ()
 
         self.entry_utc_offset = tk.Entry(self.menu_frame, textvariable=self.entryval_utc_offset)
         self.entry_utc_offset.config(foreground='grey')
         self.entry_utc_offset.grid(column=0, row=6, sticky='nsew', padx=10, pady=10)
         self.entry_utc_offset.bind('<FocusIn>', lambda e: self.clear_widget_text(e, 'UTC Offset'))
-        self.entry_utc_offset.bind('<FocusOut>', lambda e: self.validate_widget_value(e, 'UTC Offset', 'UTC Offset (-12-14)'))
+        self.entry_utc_offset.bind('<FocusOut>',
+                                   lambda e: self.validate_widget_value(e, 'UTC Offset', 'UTC Offset (-12-14)'))
         self.widgets_list.append(self.entry_utc_offset)
 
         self.label_location = tk.Label(self.menu_frame, text='Location')
@@ -211,82 +168,12 @@ class MenuFrame(ttk.Frame):
         self.entry_longitude.config(foreground='grey')
         self.entry_longitude.grid(column=0, row=9, sticky='nsew', padx=10, pady=10)
         self.entry_longitude.bind('<FocusIn>', lambda e: self.clear_widget_text(e, 'Longitude'))
-        self.entry_longitude.bind('<FocusOut>', lambda e: self.validate_widget_value(e, 'Longitude', 'Longitude (-180-180)'))
+        self.entry_longitude.bind('<FocusOut>',
+                                  lambda e: self.validate_widget_value(e, 'Longitude', 'Longitude (-180-180)'))
         self.widgets_list.append(self.entry_year)
 
         self.button_generate_map = tk.Button(self.menu_frame, text='Generate Map')
         self.button_generate_map.grid(column=0, row=10, sticky='nsew', padx=10)
-        self.button_generate_map.config(command=self.generate_map)
-
-        self.init_celestial_list()
-
-    def init_celestial_list(self):
-        #self.sp = StarParser.StarParser()
-        self.sp = StarParser()
-        self.sp_list = self.sp.parse_file()
-        #self.cp = ConstellationParser.ConstellationParser()
-        self.cp = ConstellationParser()
-        self.cp_list = self.cp.parse_file()
-        for sp_star in self.sp_list:
-            #star = celestial_objects.Star(sp_star[0], sp_star[1], sp_star[2], float(sp_star[3]), float(sp_star[4]), float(sp_star[5]))
-            star = Star(sp_star[0], sp_star[1], sp_star[2], float(sp_star[3]), float(sp_star[4]), float(sp_star[5]))
-            self.star_list.append(star)
-
-        for cp_constellation in self.cp_list:
-            name = cp_constellation[0]
-            star_list = []
-            for index in cp_constellation[1:]:
-                star_list.append(index)
-            #constellation = celestial_objects.Constellation(name, star_list)
-            constellation = Constellation(name, star_list)
-            self.constellation_list.append(constellation)
-
-    def generate_map(self):
-        self.parent.star_map_frame.canvas.delete('all')
-        try:
-            year = int(self.entry_year.get())
-            month = int(self.entry_month.get())
-            day = int(self.entry_day.get())
-            time = self.entry_time.get().split(':')
-            hour = int(time[0])
-            minute = int(time[1])
-            utc_offset = int(self.entryval_utc_offset.get())
-            latitude = float(self.entry_latitude.get())
-            longitude = float(self.entry_longitude.get())
-        except ValueError:
-            print('wrong values')
-            return
-        except IndexError:
-            print('wrong values')
-            return
-
-        #self.time_calc = calculations.TimeCalculations(year, month, day, hour, utc_offset, minute, latitude, longitude)
-        self.time_calc = TimeCalculations.TimeCalculations(year, month, day, hour, utc_offset, minute, latitude, longitude)
-
-        for star in self.star_list:
-            star.ha_time = star.calculate_ha_time(self.time_calc.lst, star.right_ascension)
-            star.ha_degrees = star.ha_time_to_degrees(star.ha_time)
-            #star.altitude = star.calculate_alt(star.declination, self.time_calc.lat, star.ha_degrees)
-            #star.azimuth = star.calculate_az(star.declination, self.time_calc.lat, star.ha_degrees, star.altitude)
-            star.altitude, star.azimuth = star.calculate_alt_az(star.declination, self.time_calc.lat, star.ha_degrees, None, None, None)
-            star.get_xy_coords(star.altitude, star.azimuth, 4000)
-            # self.parent.star_map_frame.draw_star(star, star.x, star.y)
-
-        for const in self.constellation_list:
-            print(const.name)
-            for index in const.star_list:
-                star1 = None
-                star2 = None
-                for star in self.star_list:
-                    if index[0] == star.hd_id:
-                        star1 = star
-                    elif index[1] == star.hd_id:
-                        star2 = star
-                if star1 is not None and star2 is not None:
-                    self.parent.star_map_frame.draw_constellation_line(star1, star2, const)
-
-        for star in self.star_list:
-            self.parent.star_map_frame.draw_star(star, star.x, star.y)
 
     def clear_widget_text(self, event, tag):
         widget_value = event.widget.get()
@@ -417,13 +304,14 @@ class StarMapFrame(ttk.Frame):
         self.hsb_canvas = tk.Scrollbar(self.star_map_frame, orient=tk.HORIZONTAL)
         self.hsb_canvas.grid(column=0, row=1, sticky='ew')
         self.hsb_canvas.config(command=self.canvas.xview)
-        self.canvas.config(xscrollcommand=self.hsb_canvas.set, yscrollcommand=self.vsb_canvas.set, scrollregion=(-4000,-4000,4000,4000))
+        self.canvas.config(xscrollcommand=self.hsb_canvas.set, yscrollcommand=self.vsb_canvas.set,
+                           scrollregion=(-4000, -4000, 4000, 4000))
         self.canvas.bind('<MouseWheel>', lambda e: self.on_mouse_wheel_scrool(e))
         self.canvas.bind('<Shift-MouseWheel>', lambda e: self.on_mouse_wheel_scrool(e))
 
     def draw_star(self, star, x, y):
         r = 2
-        x = self.canvas.create_oval(x-r, y-r, x+r, y+r)
+        x = self.canvas.create_oval(x - r, y - r, x + r, y + r)
         self.canvas.tag_bind(x, '<ButtonPress-1>', lambda e: self.display_star_info(e, star))
 
     def draw_constellation_line(self, star_1, star_2, constellation):
@@ -440,7 +328,6 @@ class StarMapFrame(ttk.Frame):
         y = self.parent.parent.winfo_pointery()
         self.create_modal_dialog(constellation, x, y)
 
-
     def create_modal_dialog(self, object, x, y):
         modal_dlg = tk.Toplevel(master=self)
         modal_dlg.columnconfigure(0, weight=1)
@@ -449,20 +336,26 @@ class StarMapFrame(ttk.Frame):
         modal_dlg.resizable(False, False)
 
         if isinstance(object, Star):
-            tk.Label(modal_dlg, text='Star HD ID: ' + str(object.hd_id)).grid(column=0, row=0, columnspan=3, sticky='nsew')
-            tk.Label(modal_dlg, text='Star Alt: ' + str(object.altitude)).grid(column=0, row=1, columnspan=3, sticky='nsew')
-            tk.Label(modal_dlg, text='Star Azi: ' + str(object.azimuth)).grid(column=0, row=2, columnspan=3, sticky='nsew')
-            tk.Label(modal_dlg, text='Star Hour Angle: ' + str(object.ha_time)).grid(column=0, row=4, columnspan=3, sticky='nsew')
+            tk.Label(modal_dlg, text='Star HD ID: ' + str(object.hd_id)).grid(column=0, row=0, columnspan=3,
+                                                                              sticky='nsew')
+            tk.Label(modal_dlg, text='Star Alt: ' + str(object.altitude)).grid(column=0, row=1, columnspan=3,
+                                                                               sticky='nsew')
+            tk.Label(modal_dlg, text='Star Azi: ' + str(object.azimuth)).grid(column=0, row=2, columnspan=3,
+                                                                              sticky='nsew')
+            tk.Label(modal_dlg, text='Star Hour Angle: ' + str(object.ha_time)).grid(column=0, row=4, columnspan=3,
+                                                                                     sticky='nsew')
 
         elif isinstance(object, Constellation):
-            tk.Label(modal_dlg, text='Constellation Name: ' + str(object.name)).grid(column=0, row=0, columnspan=3, sticky='nsew')
+            tk.Label(modal_dlg, text='Constellation Name: ' + str(object.name)).grid(column=0, row=0, columnspan=3,
+                                                                                     sticky='nsew')
 
         modal_dlg.geometry('+%d+%d' % (x, y))
-        modal_dlg.transient(win)
+        modal_dlg.transient(self.parent)
         modal_dlg.focus_set()
         modal_dlg.grab_set()
         self.wait_window(modal_dlg)
 
+    # Save the current canvas as a jpeg
     def save_canvas(self):
         save_file = asksaveasfilename(filetypes=[('', '.jpeg')], defaultextension='*.jpeg')
         self.canvas.update()
@@ -487,12 +380,8 @@ class StarMapFrame(ttk.Frame):
             self.canvas.yview_scroll(int(-1 * (e.delta / abs(e.delta))), 'units')
         elif e.state == 9:
             self.canvas.xview_scroll(int(-1 * (e.delta / abs(e.delta))), 'units')
-        
 
-if __name__ == "__main__":
-    win = tk.Tk()
-    m = MainApplication(parent=win)
-    m.pack(fill="both", expand=True)
-    win.title("Lumarium")
-    win.geometry("1100x700")
-    win.mainloop()
+
+
+
+

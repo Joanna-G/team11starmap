@@ -19,6 +19,8 @@ class ConstellationParser(Parser):
                 connection.append(row[0])
                 connection.append(row[1])
                 connectionList.append(connection)
+            elif row[0] == "ENDOFFILE":
+                self.ElementsList.append(connectionList[:])
             else:
                 self.ElementsList.append(connectionList[:])
                 connectionList.clear()

@@ -6,7 +6,9 @@ from PIL import ImageTk, Image, ImageDraw
 from tkinter.filedialog import asksaveasfilename
 import locale
 from Celestial_Objects import *
-#import ghostscript
+import ghostscript
+import os
+import sys
 
 class MainApplication(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
@@ -105,6 +107,13 @@ class MenuFrame(ttk.Frame):
         self.entryval_longitude.set('Longitude (-180-180)')
         self.optionval_city = StringVar(self.parent)
         self.optionval_city.set('City')
+
+        directory = ''
+        if getattr(sys, 'frozen', False):
+            directory = os.path.dirname(sys.executable)
+        elif __file__:
+            directory = os.path.dirname(__file__)
+        filename = os.path.join(directory, 'SOM', 'config', 'rcuRegisterMapping.txt')
 
         self.label_title = tk.Label(self.menu_frame, text='Lumarium')
         self.label_title.grid(column=0, row=0, sticky='nsew')

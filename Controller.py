@@ -89,6 +89,8 @@ class Controller():
         # Draw each star
         for star in self.model.star_list:
             self.view.star_map_frame.draw_star(star, star.x, star.y)
+            if star.proper_name is not None:
+                print(star.proper_name)
 
         self.toggle_constellations()
 

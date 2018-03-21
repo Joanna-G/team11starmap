@@ -43,6 +43,21 @@ class UserFrame(ttk.Frame):
         menu_style = ttk.Style()
         menu_style.configure('TFrame', background=self.background_color)
 
+        combostyle = ttk.Style()
+
+        combostyle.theme_create('combostyle', parent='alt',
+                                settings={'TCombobox':
+                                              {'configure':
+                                                   {'selectbackground': 'blue',
+                                                    'fieldbackground': self.background_color,
+                                                    'background': 'white',
+                                                    'bordercolor': 'white',
+                                                    'foreground': 'orange'
+                                                    }}}
+                                )
+        # ATTENTION: this applies the new style 'combostyle' to all ttk.Combobox
+        combostyle.theme_use('combostyle')
+
         self.menu_frame = ttk.Frame(self, style='TFrame')
         self.menu_frame.grid(column=0, row=0, sticky='nsew')
         self.menu_frame.columnconfigure(0, weight=1)

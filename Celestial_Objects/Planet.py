@@ -2,7 +2,7 @@ from Celestial_Objects import BaseCelestialObject
 import math
 
 class Planet(BaseCelestialObject):
-    def __init__(self, planet_name, ascal, aprop, escal, eprop, iscal, iprop, wscal, wprop, oscal, oprop, lscal, lprop):
+    def __init__(self, planet_name, lscal, lprop, ascal, aprop, escal, eprop, iscal, iprop, wscal, wprop, oscal, oprop):
         BaseCelestialObject.__init__(self, None, None)
         self.planet_name = planet_name
         self.ascal = ascal

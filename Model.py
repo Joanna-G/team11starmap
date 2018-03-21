@@ -53,10 +53,9 @@ class Model():
     # Create all Planets based on information from Planet Parser (p_parse) and append to planet_list
     def Create_Planets(self):
         for pp_planet in self.p_parse:
-            planet = Planet(pp_planet[0].planet_name, pp_planet[1].lscal, pp_planet[2].lprop, pp_planet[3].ascal,
-                            pp_planet[4].aprop, pp_planet[5].escal, pp_planet[6].eprop, pp_planet[7].iscal,
-                            pp_planet[8].iprop, pp_planet[9].wscal, pp_planet[10].wprop, pp_planet[11].oscal,
-                            pp_planet[12].oprop)
+            planet = Planet(pp_planet[0], pp_planet[1], pp_planet[2], pp_planet[3], pp_planet[4], pp_planet[5],
+                            pp_planet[6], pp_planet[7], pp_planet[8], pp_planet[9], pp_planet[10], pp_planet[11],
+                            pp_planet[12])
             self.planet_list.append(planet)
 
     # Calculate all stars positions based on user inputted date, time, and location values

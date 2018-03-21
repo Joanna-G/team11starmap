@@ -6,7 +6,7 @@ from PIL import ImageTk, Image, ImageDraw
 from tkinter.filedialog import asksaveasfilename
 import locale
 from Celestial_Objects import *
-import ghostscript
+#import ghostscript
 import os
 import sys
 

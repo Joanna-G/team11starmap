@@ -156,7 +156,7 @@ class UserFrame(ttk.Frame):
         # Generate map and reset buttons
         self.button_generate_map = tk.Button(self.menu_frame, text='Generate Map')
         self.button_generate_map.grid(column=0, row=10, sticky='nsw', padx=self.padx, pady=self.pady)
-        self.button_generate_map.config(background='#404040', foreground='#ccb144', highlightbackground='black', width=30)
+        self.button_generate_map.config(background='#404040', foreground='#ccb144', highlightbackground='black', width=20)
         self.button_reset = tk.Button(self.menu_frame, text='Reset')
         self.button_reset.grid(column=1, row=10, sticky='nsw', padx=self.padx, pady=self.pady)
         self.button_reset.config(background='#404040', foreground='#ccb144', highlightbackground='black', width=10)
@@ -208,7 +208,7 @@ class StarMapFrame(ttk.Frame):
         self.hsb_canvas.grid(column=0, row=1, sticky='ew')
         self.hsb_canvas.config(command=self.canvas.xview)
         self.canvas.config(xscrollcommand=self.hsb_canvas.set, yscrollcommand=self.vsb_canvas.set,
-                           scrollregion=(-4000, -4000, 4000, 4000), background='black', highlightcolor='yellow') # highlightthickness=10
+                           scrollregion=(-4000, -4000, 4000, 4000), background='black', highlightbackground='black') # highlightthickness=10
         self.canvas.bind('<MouseWheel>', lambda e: self.on_mouse_wheel_scrool(e))
         self.canvas.bind('<Shift-MouseWheel>', lambda e: self.on_mouse_wheel_scrool(e))
 

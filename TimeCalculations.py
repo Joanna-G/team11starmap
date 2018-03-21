@@ -88,13 +88,6 @@ class TimeCalculations:
         d = d + UT / 24.0
         return d
 
-    # Added by Jo - May need this later
-    # Don't need. Can be removed unless anyone is using it.
-    # def calculate_day_number(self, year, month, day, hour, minute):
-    #    jd = self.calculate_julian_day(year, month, day, hour, minute)
-    #    day_num = jd - 2451543.5
-    #    return day_num
-
     def calculate_gmst(self, jd, year):
         midnight = math.floor(jd) + 0.5
         days_since_midnight = jd - midnight

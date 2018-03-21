@@ -1,12 +1,12 @@
 from Celestial_Objects import BaseCelestialObject
 import math
 
+
 class Moon(BaseCelestialObject):
     def __init__(self):
         BaseCelestialObject.__init__(self, None, None)
         self.phase = None
 
-    #def lunar_phase(year, month, day, hour, minute, lat, lon):
     def lunar_phase(self, jd_current, new_moon_ref):
 
         # Moon Phases
@@ -18,16 +18,9 @@ class Moon(BaseCelestialObject):
         # Calculate the current Julian Date and the Julian Date of the first
         # new moon of 1900. Use the JD of first moon as reference for current
         # moon phase.
-
-        ## Pass appropriate
-        ##jd_current = jd_calc.calculate_julian_day(year, month, day, hour, minute)
-        #new_moon_ref = jd_calc.calculate_julian_day(1900, 1, 1, 0, 0)
         phase_jd = jd_current - new_moon_ref
         sc = 29.53059
         age_of_moon = phase_jd % sc
-
-        # Testing age of moon
-        # print("Age of moon: " + str(age_of_moon))
 
         # The age of the moon determines the phase, with the actual
         # date of the phase at the center of the range
@@ -45,17 +38,9 @@ class Moon(BaseCelestialObject):
         return self.phase
 
     # Calculate Lunar geocentric RA and Dec, which is close enough to the topocentric that it doesn't matter
-    #def lunar_location(self, year, month, day, hour, minute, lat, lon):
-    # Do the abstract method says declination, but here we need this fun unknown value t, so go ahead and pass it t instead of dec
+    # So the abstract method says declination, but here we need this fun unknown value t, so go ahead and pass it t
+    # instead of dec
     def calculate_alt_az(self, dec, lat, ha_degrees, t, lon, mst):
-
-        # Get current Julian Date
-        #jd_calc = TimeCalculations(year, month, day, hour, minute, lat, lon)
-        #jd = jd_calc.calculate_julian_day(year, month, day, hour, minute)
-
-
-        # No idea what this is, but I need it.
-        #t = jd_calc.calculate_T(jd)
 
         # Get moon mean longitude, sun mean anomaly, moon mean anomaly,
         # moon mean elongation, moon mean distance, sun's mean longitude, e
@@ -101,19 +86,12 @@ class Moon(BaseCelestialObject):
 
         # Normalize right ascension
         ra = self.rev(ra)
-
-        #ra = jd_calc.ra_degrees_to_time_decimal(ra)
         ra = self.ra_degrees_to_time_decimal(ra)
-        #gmst = jd_calc.calculate_gmst(year, month, day, hour, minute)
-        #lst = jd_calc.calculate_lst(lon, gmst)
-        #ha = jd_calc.calculate_ha_time(lst, ra)
-        #alt = jd_calc.testing_alt(dec, lat, ha)
+
         alt = self.testing_alt(dec, lat, ha_degrees)
-        #az = jd_calc.testing_az(dec, lat, ha, alt)
         az = self.testing_az(dec, lat, ha_degrees, alt)
 
         return alt, az
-
 
     # Convert from ra, dec or long, lat or alt, az to x,y,z
     def ra_dec_to_rect(self, ra, dec, r):
@@ -122,7 +100,6 @@ class Moon(BaseCelestialObject):
         z = (r * math.sin(math.radians(dec)))
 
         return x, y, z
-
 
     def rect_to_spherical(self, x, y, z):
         r = math.sqrt(x * x + y * y + z * z)
@@ -135,7 +112,6 @@ class Moon(BaseCelestialObject):
 
         return math.degrees(ra), math.degrees(dec)
 
-
     # Convert between ecliptic and equatorial coordinates.
     def ecliptic_to_equatorial(self, x_ecl, y_ecl, z_ecl):
         obl = math.radians(23.439281)
@@ -143,7 +119,6 @@ class Moon(BaseCelestialObject):
         y_eq = y_ecl * math.cos(obl) - z_ecl * math.sin(obl)
         z_eq = y_ecl * math.sin(obl) + z_ecl * math.cos(obl)
         return x_eq, y_eq, z_eq
-
 
     # Convert between equatorial and ecliptic
     def equatorial_to_ecliptic(self, x_eq, y_eq, z_eq):

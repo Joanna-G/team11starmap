@@ -107,7 +107,10 @@ class TimeCalculations():
         gmst_minutes = math.floor(gmst_remainder * 60)
         gmst_minutes_decimal = gmst_remainder * 60
         # division by zero
-        gmst_minutes_decimal = gmst_minutes_decimal % int(gmst_minutes_decimal)
+        try:
+            gmst_minutes_decimal = gmst_minutes_decimal % int(gmst_minutes_decimal)
+        except:
+            gmst_minutes_decimal = 0
         gmst_seconds = math.floor(gmst_minutes_decimal * 60)
 
         if year < 2000:

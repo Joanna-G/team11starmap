@@ -1,15 +1,40 @@
 import tkinter as tk
 import Model
 import View
+import New_View
 import datetime
 
 class Controller():
     def __init__(self):
         now = datetime.datetime.now()
         self.root = tk.Tk()
+
         self.model = Model.Model(now.year, now.month, now.day, now.hour, now.minute, 0, 0, 0)
-        self.view = View.MainApplication(parent=self.root)
-        self.view.menu_frame.button_generate_map.config(command=self.generate_map)
+        self.view = New_View.MainApplication(parent=self.root)
+        self.view.user_frame.button_generate_map.config(command=self.generate_map)
+
+        self.menubar = tk.Menu(self.root)
+        self.filemenu = tk.Menu(self.menubar, tearoff=0)
+        self.filemenu.add_command(label='Save Map', command=self.view.star_map_frame.save_canvas)
+        self.filemenu.add_command(label='Help')
+        self.filemenu.add_command(label='Exit')
+        self.menubar.add_cascade(label='File', menu=self.filemenu)
+        self.root.config(menu=self.menubar)
+
+        self.root.attributes("-fullscreen", True)
+        self.state = True
+        self.root.bind("<F11>", self.toggle_fullscreen)
+        self.root.bind("<Escape>", self.end_fullscreen)
+
+    def toggle_fullscreen(self, event=None):
+        self.state = not self.state
+        self.root.attributes("-fullscreen", self.state)
+        return
+
+    def end_fullscreen(self, event=None):
+        self.state = False
+        self.root.attributes("-fullscreen", False)
+        return
 
     def run(self):
         self.view.pack(fill="both", expand=True)
@@ -27,16 +52,23 @@ class Controller():
         # Clear Canvas
         self.view.star_map_frame.canvas.delete('all')
         try:
-            year = int(self.view.menu_frame.entry_year.get())
-            month = int(self.view.menu_frame.entry_month.get())
-            day = int(self.view.menu_frame.entry_day.get())
-            time = self.view.menu_frame.entry_time.get().split(':')
-            hour = int(time[0])
-            minute = int(time[1])
-            utc_offset = int(self.view.menu_frame.entryval_utc_offset.get())
-            latitude = float(self.view.menu_frame.entry_latitude.get())
-            longitude = float(self.view.menu_frame.entry_longitude.get())
-
+            # year = int(self.view.menu_frame.entry_year.get())
+            # month = int(self.view.menu_frame.entry_month.get())
+            # day = int(self.view.menu_frame.entry_day.get())
+            # time = self.view.menu_frame.entry_time.get().split(':')
+            # hour = int(time[0])
+            # minute = int(time[1])
+            # utc_offset = int(self.view.menu_frame.entryval_utc_offset.get())
+            # latitude = float(self.view.menu_frame.entry_latitude.get())
+            # longitude = float(self.view.menu_frame.entry_longitude.get())
+            month = int(self.view.user_frame.month_value.get())
+            day = int(self.view.user_frame.day_value.get())
+            year = int(self.view.user_frame.year_value.get())
+            hour = int(self.view.user_frame.hour_value.get())
+            minute = int(self.view.user_frame.minute_value.get())
+            utc_offset = int(self.view.user_frame.utc_value.get())
+            latitude = int(self.view.user_frame.latitude_value.get())
+            longitude = int(self.view.user_frame.longitude_value.get())
         except ValueError:
             print('wrong values')
             return

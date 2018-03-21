@@ -2,7 +2,7 @@ from Celestial_Objects import BaseCelestialObject
 import math
 
 class Planet(BaseCelestialObject):
-    def __init__(self, planet_name, ascal, aprop, escal, eprop, iscal, iprop, wscal, wprop, oscal, oprop, lscal, lprop):
+    def __init__(self, planet_name, lscal, lprop, ascal, aprop, escal, eprop, iscal, iprop, wscal, wprop, oscal, oprop):
         BaseCelestialObject.__init__(self, None, None)
         self.planet_name = planet_name
         self.ascal = ascal
@@ -25,6 +25,10 @@ class Planet(BaseCelestialObject):
         self.mean_long = None
         self.mean_anomaly = None
         self.true_anomaly = None
+        self.alt = None
+        self.az = None
+        self.distance = None
+        self.ha = None
 
     def calculate_alt_az(self, dec, lat, ha_degrees, t, lon, mst):
         if lat < 0:

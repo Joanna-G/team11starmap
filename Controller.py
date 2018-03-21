@@ -12,6 +12,7 @@ class Controller():
         self.model = Model.Model(now.year, now.month, now.day, now.hour, now.minute, 0, 0, 0)
         self.view = New_View.MainApplication(parent=self.root)
         self.view.user_frame.button_generate_map.config(command=self.generate_map)
+        self.view.user_frame.checkbox_show_constellations.config(command=self.toggle_constellations)
 
         self.menubar = tk.Menu(self.root)
         self.filemenu = tk.Menu(self.menubar, tearoff=0)
@@ -25,6 +26,8 @@ class Controller():
         self.state = True
         self.root.bind("<F11>", self.toggle_fullscreen)
         self.root.bind("<Escape>", self.end_fullscreen)
+
+        self.constellation_lines = []
 
     def toggle_fullscreen(self, event=None):
         self.state = not self.state
@@ -51,6 +54,7 @@ class Controller():
     def generate_map(self):
         # Clear Canvas
         self.view.star_map_frame.canvas.delete('all')
+        self.constellation_lines = []
         try:
             # year = int(self.view.menu_frame.entry_year.get())
             # month = int(self.view.menu_frame.entry_month.get())
@@ -86,19 +90,26 @@ class Controller():
         for star in self.model.star_list:
             self.view.star_map_frame.draw_star(star, star.x, star.y)
 
-        # Draw each constellation line
-        for const in self.model.constellation_list:
-            print(const.name)
-            for index in const.star_list:
-                star1 = None
-                star2 = None
-                for star in self.model.star_list:
-                    if index[0] == star.hd_id:
-                        star1 = star
-                    elif index[1] == star.hd_id:
-                        star2 = star
-                if star1 is not None and star2 is not None:
-                    self.view.star_map_frame.draw_constellation_line(star1, star2, const)
+        self.toggle_constellations()
+
+    def toggle_constellations(self):
+        if self.view.user_frame.constellations_value.get() == 1:
+            for const in self.model.constellation_list:
+                print(const.name)
+                for index in const.star_list:
+                    star1 = None
+                    star2 = None
+                    for star in self.model.star_list:
+                        if index[0] == star.hd_id:
+                            star1 = star
+                        elif index[1] == star.hd_id:
+                            star2 = star
+                    if star1 is not None and star2 is not None:
+                        self.constellation_lines.append(self.view.star_map_frame.draw_constellation_line(star1, star2, const))
+        elif self.view.user_frame.constellations_value.get() == 0:
+            for line in self.constellation_lines:
+                self.view.star_map_frame.canvas.delete(line)
+            self.constellation_lines = []
 
 
 if __name__ == "__main__":

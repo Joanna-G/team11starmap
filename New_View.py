@@ -71,10 +71,13 @@ class UserFrame(ttk.Frame):
         self.minute_value.set('Minute')
         self.utc_value = StringVar()
         self.utc_value.set('UTC')
+        self.daylight_savings_value = tk.IntVar()
         self.latitude_value = StringVar()
         self.latitude_value.set('Lat')
         self.longitude_value = StringVar()
         self.longitude_value.set('Long')
+        self.constellations_value = tk.IntVar()
+        self.labels_value = tk.IntVar()
 
         directory = ''
         if getattr(sys, 'frozen', False):
@@ -111,7 +114,7 @@ class UserFrame(ttk.Frame):
         self.combobox_minute.grid(column=1, row=4, sticky='nsew', padx=(self.padx,0), pady=self.pady)
         self.combobox_utc = ttk.Combobox(self.menu_frame, textvariable=self.utc_value, state='readonly')
         self.combobox_utc.grid(column=2, row=4, sticky='nsew', padx=self.padx, pady=self.pady)
-        self.checkbox_daylight_savings = tk.Checkbutton(self.menu_frame, text='Daylight Savings', background=self.background_color)
+        self.checkbox_daylight_savings = tk.Checkbutton(self.menu_frame, text='Daylight Savings', background=self.background_color, variable=self.daylight_savings_value)
         self.checkbox_daylight_savings.grid(column=0, row=5, sticky='nsw', padx=self.padx, pady=self.pady)
 
         # Location label and lat/lon comboboxes
@@ -123,9 +126,9 @@ class UserFrame(ttk.Frame):
         self.combobox_longitude.grid(column=1, row=7, sticky='nsew', padx=self.padx, pady=self.pady)
 
         # Show/Hide checkboxes and labels
-        self.checkbox_show_constellations = tk.Checkbutton(self.menu_frame, text='Show Constellations', background=self.background_color)
+        self.checkbox_show_constellations = tk.Checkbutton(self.menu_frame, text='Show Constellations', background=self.background_color, variable=self.constellations_value)
         self.checkbox_show_constellations.grid(column=0, row=8, sticky='nsw', padx=self.padx, pady=self.pady)
-        self.checkbox_show_labels = tk.Checkbutton(self.menu_frame, text='Show Labels', background=self.background_color)
+        self.checkbox_show_labels = tk.Checkbutton(self.menu_frame, text='Show Labels', background=self.background_color, variable=self.labels_value)
         self.checkbox_show_labels.grid(column=0, row=9, sticky='nsw', padx=self.padx, pady=self.pady)
 
         # Generate map and reset buttons
@@ -193,6 +196,7 @@ class StarMapFrame(ttk.Frame):
     def draw_constellation_line(self, star_1, star_2, constellation):
         const = self.canvas.create_line(star_1.x, star_1.y, star_2.x, star_2.y)
         self.canvas.tag_bind(const, '<ButtonPress-1>', lambda e: self.display_constellation_info(e, constellation))
+        return const
 
     def display_star_info(self, e, star):
         x = self.parent.parent.winfo_pointerx()

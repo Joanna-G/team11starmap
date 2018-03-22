@@ -64,7 +64,7 @@ class UserFrame(ttk.Frame):
 
         self.menu_frame = ttk.Frame(self, style='TFrame')
         self.menu_frame.grid(column=0, row=0, sticky='nsew')
-        self.grid_propagate(False)
+        self.menu_frame.grid_propagate(False)
         self.menu_frame.columnconfigure(0, weight=1)
         self.menu_frame.columnconfigure(1, weight=1)
         self.menu_frame.columnconfigure(2, weight=1)
@@ -271,7 +271,20 @@ class StarMapFrame(ttk.Frame):
         self.canvas.bind('<Shift-MouseWheel>', lambda e: self.on_mouse_wheel_scrool(e))
 
     def draw_star(self, star, x, y):
-        r = 2
+        if star.magnitude <= 1.0:
+            r = 4
+        elif star.magnitude <= 2.0:
+            r = 3.5
+        elif star.magnitude <= 3.0:
+            r = 3
+        elif star.magnitude <= 4.0:
+            r = 2.5
+        elif star.magnitude <= 5.0:
+            r = 2
+        elif star.magnitude <= 6.0:
+            r = 1.5
+        else:
+            r = 1
         x = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='#ccb144', outline='#ccb144')
         self.canvas.tag_bind(x, '<ButtonPress-1>', lambda e: self.display_star_info(e, star))
 
@@ -304,7 +317,7 @@ class StarMapFrame(ttk.Frame):
                                                                                sticky='nsew')
             tk.Label(modal_dlg, text='Star Azi: ' + str(object.azimuth)).grid(column=0, row=2, columnspan=3,
                                                                               sticky='nsew')
-            tk.Label(modal_dlg, text='Star Hour Angle: ' + str(object.ha_time)).grid(column=0, row=4, columnspan=3,
+            tk.Label(modal_dlg, text='Star Magnitude: ' + str(object.magnitude)).grid(column=0, row=4, columnspan=3,
                                                                                      sticky='nsew')
 
         elif isinstance(object, Constellation):

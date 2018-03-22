@@ -13,6 +13,7 @@ class Controller():
         self.view = New_View.MainApplication(parent=self.root)
         self.view.user_frame.button_generate_map.config(command=self.generate_map)
         self.view.user_frame.checkbox_show_constellations.config(command=self.toggle_constellations)
+        self.view.user_frame.button_reset.config(command=self.reset_app)
 
         self.menubar = tk.Menu(self.root)
         self.filemenu = tk.Menu(self.menubar, tearoff=0)
@@ -28,6 +29,7 @@ class Controller():
         self.root.bind("<Escape>", self.end_fullscreen)
 
         self.constellation_lines = []
+        self.empty_map = True
 
     def toggle_fullscreen(self, event=None):
         self.state = not self.state
@@ -52,33 +54,30 @@ class Controller():
     # Has Model calculate celestial objects locations
     # Tells View to draw objects
     def generate_map(self):
+        ready = True
+        for widget in self.view.user_frame.validation_widgets:
+            ready =  self.view.user_frame.validate_combobox(widget)
+            if ready is False:
+                print('validate_widget: wrong values')
+                return
+
         # Clear Canvas
         self.view.star_map_frame.canvas.delete('all')
         self.constellation_lines = []
         try:
-            # year = int(self.view.menu_frame.entry_year.get())
-            # month = int(self.view.menu_frame.entry_month.get())
-            # day = int(self.view.menu_frame.entry_day.get())
-            # time = self.view.menu_frame.entry_time.get().split(':')
-            # hour = int(time[0])
-            # minute = int(time[1])
-            # utc_offset = int(self.view.menu_frame.entryval_utc_offset.get())
-            # latitude = float(self.view.menu_frame.entry_latitude.get())
-            # longitude = float(self.view.menu_frame.entry_longitude.get())
             month = int(self.view.user_frame.month_value.get())
             day = int(self.view.user_frame.day_value.get())
             year = int(self.view.user_frame.year_value.get())
             hour = int(self.view.user_frame.hour_value.get())
             minute = int(self.view.user_frame.minute_value.get())
             utc_offset = int(self.view.user_frame.utc_value.get())
-            latitude = int(self.view.user_frame.latitude_value.get())
-            longitude = int(self.view.user_frame.longitude_value.get())
+            latitude = float(self.view.user_frame.latitude_value.get())
+            longitude = float(self.view.user_frame.longitude_value.get())
         except ValueError:
             print('wrong values')
             return
-        except IndexError:
-            print('wrong values')
-            return
+
+        self.empty_map = False
 
         # Update the Model's TimeCalculations class with the newly inputted times
         self.model.time_calc.update_times(year, month, day, hour, minute, utc_offset, latitude, longitude)
@@ -95,23 +94,34 @@ class Controller():
         self.toggle_constellations()
 
     def toggle_constellations(self):
-        if self.view.user_frame.constellations_value.get() == 1:
-            for const in self.model.constellation_list:
-                print(const.name)
-                for index in const.star_list:
-                    star1 = None
-                    star2 = None
-                    for star in self.model.star_list:
-                        if index[0] == star.hd_id:
-                            star1 = star
-                        elif index[1] == star.hd_id:
-                            star2 = star
-                    if star1 is not None and star2 is not None:
-                        self.constellation_lines.append(self.view.star_map_frame.draw_constellation_line(star1, star2, const))
-        elif self.view.user_frame.constellations_value.get() == 0:
-            for line in self.constellation_lines:
-                self.view.star_map_frame.canvas.delete(line)
-            self.constellation_lines = []
+        if self.empty_map is False:
+            if self.view.user_frame.constellations_value.get() == 1:
+                for const in self.model.constellation_list:
+                    for index in const.star_list:
+                        star1 = None
+                        star2 = None
+                        for star in self.model.star_list:
+                            if index[0] == star.hd_id:
+                                star1 = star
+                            elif index[1] == star.hd_id:
+                                star2 = star
+                        if star1 is not None and star2 is not None:
+                            self.constellation_lines.append(self.view.star_map_frame.draw_constellation_line(star1, star2, const))
+            elif self.view.user_frame.constellations_value.get() == 0:
+                for line in self.constellation_lines:
+                    self.view.star_map_frame.canvas.delete(line)
+                self.constellation_lines = []
+
+    def reset_app(self):
+        self.constellation_lines = []
+        self.empty_map = True
+        self.view.star_map_frame.canvas.delete('all')
+        for widget in self.view.user_frame.validation_widgets:
+            widget.set(widget.values[0])
+        self.view.user_frame.daylight_savings_value.set(0)
+        self.view.user_frame.constellations_value.set(0)
+        self.view.user_frame.labels_value.set(0)
+
 
 
 if __name__ == "__main__":

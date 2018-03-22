@@ -30,7 +30,7 @@ class UserFrame(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent)
         self.parent = parent
-        self.widgets_list = []
+        self.validation_widgets = []
 
         self.grid(column=0, row=0, sticky='nsew')
         self.columnconfigure(0, weight=1)
@@ -117,24 +117,54 @@ class UserFrame(ttk.Frame):
         self.label_date = tk.Label(self.menu_frame, text='Date:', background=self.menu_color, foreground=self.text_color)
         self.label_date.grid(column=0, row=1, padx=self.padx, pady=self.pady, sticky='nsw')
         self.label_date.config(font=('Magneto', 18))
-        self.combobox_month = ttk.Combobox(self.menu_frame, textvariable=self.month_value, state='readonly')
+        self.combobox_month = ttk.Combobox(self.menu_frame, textvariable=self.month_value, state='normal')
         self.combobox_month.grid(column=0, row=2, sticky='nsew', padx=(self.padx,0), pady=self.pady)
-        # self.combobox_month.bind('<Leave>', lambda e: self.validate_combobox(e, 'Month', 1, 12))
-        self.combobox_day = ttk.Combobox(self.menu_frame, textvariable=self.day_value, state='readonly')
+        self.combobox_month.bind('<FocusIn>', lambda e: self.validate_combobox(self.combobox_month, e))
+        self.combobox_month.bind('<FocusOut>', lambda e: self.validate_combobox(self.combobox_month, e))
+        self.combobox_month.var = self.month_value
+        self.combobox_month.range = (1, 12)
+        self.validation_widgets.append(self.combobox_month)
+        self.combobox_day = ttk.Combobox(self.menu_frame, textvariable=self.day_value, state='normal')
         self.combobox_day.grid(column=1, row=2, sticky='nsew', padx=(self.padx,0), pady=self.pady)
-        self.combobox_year = ttk.Combobox(self.menu_frame, textvariable=self.year_value, state='readonly')
+        self.combobox_day.bind('<FocusIn>', lambda e: self.validate_combobox(self.combobox_day, e))
+        self.combobox_day.bind('<FocusOut>', lambda e: self.validate_combobox(self.combobox_day, e))
+        self.combobox_day.var = self.day_value
+        self.combobox_day.range = (1, 31)
+        self.validation_widgets.append(self.combobox_day)
+        self.combobox_year = ttk.Combobox(self.menu_frame, textvariable=self.year_value, state='normal')
         self.combobox_year.grid(column=2, row=2, sticky='nsew', padx=self.padx, pady=self.pady)
+        self.combobox_year.bind('<FocusIn>', lambda e: self.validate_combobox(self.combobox_year, e))
+        self.combobox_year.bind('<FocusOut>', lambda e: self.validate_combobox(self.combobox_year, e))
+        self.combobox_year.var = self.year_value
+        self.combobox_year.range = (1900, 2100)
+        self.validation_widgets.append(self.combobox_year)
 
         # Time label and comboboxes
         self.label_time = tk.Label(self.menu_frame, text='Time:', background=self.menu_color, foreground=self.text_color)
         self.label_time.grid(column=0, row=3, sticky='nsw', padx=self.padx, pady=self.pady)
         self.label_time.config(font=('Magneto', 18))
-        self.combobox_hour = ttk.Combobox(self.menu_frame, textvariable=self.hour_value, state='readonly')
+        self.combobox_hour = ttk.Combobox(self.menu_frame, textvariable=self.hour_value, state='normal')
         self.combobox_hour.grid(column=0, row=4, sticky='nsew', padx=(self.padx,0), pady=self.pady)
-        self.combobox_minute = ttk.Combobox(self.menu_frame, textvariable=self.minute_value, state='readonly')
+        self.combobox_hour.bind('<FocusIn>', lambda e: self.validate_combobox(self.combobox_hour, e))
+        self.combobox_hour.bind('<FocusOut>', lambda e: self.validate_combobox(self.combobox_hour, e))
+        self.combobox_hour.var = self.hour_value
+        self.combobox_hour.range = (0, 23)
+        self.validation_widgets.append(self.combobox_hour)
+        self.combobox_minute = ttk.Combobox(self.menu_frame, textvariable=self.minute_value, state='normal')
         self.combobox_minute.grid(column=1, row=4, sticky='nsew', padx=(self.padx,0), pady=self.pady)
-        self.combobox_utc = ttk.Combobox(self.menu_frame, textvariable=self.utc_value, state='readonly')
+        self.combobox_minute.bind('<FocusIn>', lambda e: self.validate_combobox(self.combobox_minute, e))
+        self.combobox_minute.bind('<FocusOut>', lambda e: self.validate_combobox(self.combobox_minute, e))
+        self.combobox_minute.var = self.minute_value
+        self.combobox_minute.range = (0, 59)
+        self.validation_widgets.append(self.combobox_minute)
+        self.combobox_utc = ttk.Combobox(self.menu_frame, textvariable=self.utc_value, state='normal')
         self.combobox_utc.grid(column=2, row=4, sticky='nsew', padx=self.padx, pady=self.pady)
+        self.combobox_utc.bind('<FocusIn>', lambda e: self.validate_combobox(self.combobox_utc, e))
+        self.combobox_utc.bind('<FocusOut>', lambda e: self.validate_combobox(self.combobox_utc, e))
+        self.combobox_utc.var = self.utc_value
+        self.combobox_utc.range = (-12, 14)
+        self.validation_widgets.append(self.combobox_utc)
+
         self.checkbox_daylight_savings = tk.Checkbutton(self.menu_frame, text='Daylight Savings', background=self.menu_color, foreground=self.text_color, variable=self.daylight_savings_value)
         self.checkbox_daylight_savings.grid(column=0, row=5, sticky='nsw', padx=self.padx, pady=self.pady)
 
@@ -142,10 +172,20 @@ class UserFrame(ttk.Frame):
         self.label_location = tk.Label(self.menu_frame, text='Location:', background=self.menu_color, foreground=self.text_color)
         self.label_location.grid(column=0, row=6, sticky='nsw', padx=self.padx, pady=self.pady)
         self.label_location.config(font=('Magneto', 18))
-        self.combobox_latitude = ttk.Combobox(self.menu_frame, textvariable=self.latitude_value, state='readonly')
+        self.combobox_latitude = ttk.Combobox(self.menu_frame, textvariable=self.latitude_value, state='normal')
         self.combobox_latitude.grid(column=0, row=7, sticky='nsew', padx=(self.padx,0), pady=self.pady)
-        self.combobox_longitude = ttk.Combobox(self.menu_frame, textvariable=self.longitude_value, state='readonly')
+        self.combobox_latitude.bind('<FocusIn>', lambda e: self.validate_combobox(self.combobox_latitude, e))
+        self.combobox_latitude.bind('<FocusOut>', lambda e: self.validate_combobox(self.combobox_latitude, e))
+        self.combobox_latitude.var = self.latitude_value
+        self.combobox_latitude.range = (-90, 90)
+        self.validation_widgets.append(self.combobox_latitude)
+        self.combobox_longitude = ttk.Combobox(self.menu_frame, textvariable=self.longitude_value, state='normal')
         self.combobox_longitude.grid(column=1, row=7, sticky='nsew', padx=self.padx, pady=self.pady)
+        self.combobox_longitude.bind('<FocusIn>', lambda e: self.validate_combobox(self.combobox_longitude, e))
+        self.combobox_longitude.bind('<FocusOut>', lambda e: self.validate_combobox(self.combobox_longitude, e))
+        self.combobox_longitude.var = self.longitude_value
+        self.combobox_longitude.range = (-180, 180)
+        self.validation_widgets.append(self.combobox_longitude)
 
         # Show/Hide checkboxes and labels
         self.checkbox_show_constellations = tk.Checkbutton(self.menu_frame, text='Show Constellations', background=self.menu_color, variable=self.constellations_value, foreground=self.text_color)
@@ -161,25 +201,40 @@ class UserFrame(ttk.Frame):
         self.button_reset.grid(column=1, row=10, sticky='nsw', padx=self.padx, pady=self.pady)
         self.button_reset.config(background='#404040', foreground='#ccb144', highlightbackground='black', width=10)
 
-        self.set_combobox_values(self.combobox_month, 1, 13)
-        self.set_combobox_values(self.combobox_day, 1, 32)
-        self.set_combobox_values(self.combobox_year, 1900, 2101)
-        self.set_combobox_values(self.combobox_hour, 0, 25)
-        self.set_combobox_values(self.combobox_minute, 0, 60)
-        self.set_combobox_values(self.combobox_utc, -12, 15)
-        self.set_combobox_values(self.combobox_latitude, -90, 91)
-        self.set_combobox_values(self.combobox_longitude, -180, 181)
+        self.set_combobox_values(self.combobox_month, 'Month', 1, 13)
+        self.set_combobox_values(self.combobox_day, 'Day', 1, 32)
+        self.set_combobox_values(self.combobox_year, 'Year', 1900, 2101)
+        self.set_combobox_values(self.combobox_hour, 'Hour', 0, 25)
+        self.set_combobox_values(self.combobox_minute, 'Minute', 0, 60)
+        self.set_combobox_values(self.combobox_utc, 'UTC Offset', -12, 15)
+        self.set_combobox_values(self.combobox_latitude, 'Lat', -90, 91)
+        self.set_combobox_values(self.combobox_longitude, 'Long', -180, 181)
 
 
-    def set_combobox_values(self, combobox, first, last):
+    def set_combobox_values(self, combobox, default, first, last):
+        combobox.set(default)
         values = []
+        values.append(default)
         for i in range(first, last):
             values.append(i)
         combobox['values'] = values
+        combobox.values = values
 
-    # def validate_combobox(self, e, tag, lower_bound, upper_bound):
-    #     pass
-
+    def validate_combobox(self, combobox, e=None):
+        try:
+            value = float(combobox.var.get())
+        except ValueError:
+            value = combobox.var.get()
+            if value == combobox.values[0]:
+                combobox.set('')
+            else:
+                combobox.set(combobox.values[0])
+            return False
+        if combobox.range[0] <= value <= combobox.range[1]:
+            return True
+        else:
+            combobox.set(combobox.values[0])
+            return False
 
 class StarMapFrame(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):

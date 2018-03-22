@@ -6,7 +6,7 @@ from PIL import ImageTk, Image, ImageDraw
 from tkinter.filedialog import asksaveasfilename
 import locale
 from Celestial_Objects import *
-#import ghostscript
+import ghostscript
 import os
 import sys
 
@@ -16,13 +16,13 @@ class MainApplication(ttk.Frame):
         self.parent = parent
 
         self.grid(column=0, row=0, sticky='nsew')
-        self.columnconfigure(0, weight=1)
-        self.columnconfigure(1, weight=1000000)
+        self.columnconfigure(0, weight=2)
+        self.columnconfigure(1, weight=3)
         self.rowconfigure(0, weight=1)
 
         self.user_frame = UserFrame(self)
         self.star_map_frame = StarMapFrame(self)
-        self.user_frame.grid(column=0, row=0, sticky='nsw')
+        self.user_frame.grid(column=0, row=0, sticky='nsew')
         self.star_map_frame.grid(column=1, row=0, sticky='nsew')
 
 
@@ -64,7 +64,10 @@ class UserFrame(ttk.Frame):
 
         self.menu_frame = ttk.Frame(self, style='TFrame')
         self.menu_frame.grid(column=0, row=0, sticky='nsew')
+        self.grid_propagate(False)
         self.menu_frame.columnconfigure(0, weight=1)
+        self.menu_frame.columnconfigure(1, weight=1)
+        self.menu_frame.columnconfigure(2, weight=1)
         self.menu_frame.rowconfigure(0, weight=1)
         self.menu_frame.rowconfigure(1, weight=1)
         self.menu_frame.rowconfigure(2, weight=1)

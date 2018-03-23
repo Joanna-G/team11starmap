@@ -16,8 +16,8 @@ class MainApplication(ttk.Frame):
         self.parent = parent
 
         self.grid(column=0, row=0, sticky='nsew')
-        self.columnconfigure(0, weight=2)
-        self.columnconfigure(1, weight=3)
+        self.columnconfigure(0, weight=1, minsize=360)
+        self.columnconfigure(1, weight=2000)
         self.rowconfigure(0, weight=1)
 
         self.user_frame = UserFrame(self)
@@ -55,7 +55,7 @@ class UserFrame(ttk.Frame):
                                                     'background': 'grey',
                                                     'bordercolor': 'black',
                                                     'foreground': self.text_color,
-                                                    'padding': 8,
+                                                    'padding': (8, 1),
                                                     }}}
                                 )
 
@@ -65,9 +65,9 @@ class UserFrame(ttk.Frame):
         self.menu_frame = ttk.Frame(self, style='TFrame', border=3, relief='groove')
         self.menu_frame.grid(column=0, row=0, sticky='nsew')
         self.menu_frame.grid_propagate(False)
-        self.menu_frame.columnconfigure(0, weight=1)
-        self.menu_frame.columnconfigure(1, weight=1)
-        self.menu_frame.columnconfigure(2, weight=1)
+        self.menu_frame.columnconfigure(0, weight=1, minsize=125)
+        self.menu_frame.columnconfigure(1, weight=1, minsize=90)
+        self.menu_frame.columnconfigure(2, weight=1, minsize=125)
         self.menu_frame.rowconfigure(0, weight=1)
         self.menu_frame.rowconfigure(1, weight=1)
         self.menu_frame.rowconfigure(2, weight=1)

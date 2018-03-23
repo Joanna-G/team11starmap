@@ -47,7 +47,6 @@ class UserFrame(ttk.Frame):
         menu_style.configure('TFrame', background=self.background_color)
 
         combostyle = ttk.Style()
-
         combostyle.theme_create('combostyle', parent='alt',
                                 settings={'TCombobox':
                                               {'configure':
@@ -59,10 +58,11 @@ class UserFrame(ttk.Frame):
                                                     'padding': 8,
                                                     }}}
                                 )
+
         # ATTENTION: this applies the new style 'combostyle' to all ttk.Combobox
         combostyle.theme_use('combostyle')
 
-        self.menu_frame = ttk.Frame(self, style='TFrame')
+        self.menu_frame = ttk.Frame(self, style='TFrame', border=3, relief='groove')
         self.menu_frame.grid(column=0, row=0, sticky='nsew')
         self.menu_frame.grid_propagate(False)
         self.menu_frame.columnconfigure(0, weight=1)
@@ -106,19 +106,19 @@ class UserFrame(ttk.Frame):
             directory = os.path.dirname(sys.executable)
         elif __file__:
             directory = os.path.dirname(__file__)
-        filename = os.path.join(directory, 'resources', 'Logo_100x100.png')
+        filename = os.path.join(directory, 'resources', 'Logo_L2.jpg')
         logo = ImageTk.PhotoImage(Image.open(filename))
         self.label_logo = tk.Label(self.menu_frame, image=logo, background=self.menu_color)
-        self.label_logo.grid(column=0, row=0, sticky='w')
+        self.label_logo.grid(column=0, row=0, sticky='w', columnspan=3)
         self.label_logo = logo
 
-        self.label_title = tk.Label(self.menu_frame, text='Lumarium', background=self.menu_color, foreground=self.text_color)
-        self.label_title.grid(column=1, row=0, sticky='w')
-        self.label_title.config(font=('Magneto', 22))
+        #self.label_title = tk.Label(self.menu_frame, text='Lumarium', background=self.menu_color, foreground=self.text_color)
+        #self.label_title.grid(column=1, row=0, sticky='w')
+        #self.label_title.config(font=('Magneto', 22))
 
         # Date label, comboboxes, and daylight savings checkbox
         self.label_date = tk.Label(self.menu_frame, text='Date:', background=self.menu_color, foreground=self.text_color)
-        self.label_date.grid(column=0, row=1, padx=self.padx, pady=self.pady, sticky='nsw')
+        self.label_date.grid(column=0, row=1, columnspan=3, padx=self.padx, pady=self.pady, sticky='nsw')
         self.label_date.config(font=('Magneto', 18))
         self.combobox_month = ttk.Combobox(self.menu_frame, textvariable=self.month_value, state='normal')
         self.combobox_month.grid(column=0, row=2, sticky='nsew', padx=(self.padx,0), pady=self.pady)
@@ -144,7 +144,7 @@ class UserFrame(ttk.Frame):
 
         # Time label and comboboxes
         self.label_time = tk.Label(self.menu_frame, text='Time:', background=self.menu_color, foreground=self.text_color)
-        self.label_time.grid(column=0, row=3, sticky='nsw', padx=self.padx, pady=self.pady)
+        self.label_time.grid(column=0, row=3, columnspan=3, sticky='nsw', padx=self.padx, pady=self.pady)
         self.label_time.config(font=('Magneto', 18))
         self.combobox_hour = ttk.Combobox(self.menu_frame, textvariable=self.hour_value, state='normal')
         self.combobox_hour.grid(column=0, row=4, sticky='nsew', padx=(self.padx,0), pady=self.pady)
@@ -169,11 +169,11 @@ class UserFrame(ttk.Frame):
         self.validation_widgets.append(self.combobox_utc)
 
         self.checkbox_daylight_savings = tk.Checkbutton(self.menu_frame, text='Daylight Savings', background=self.menu_color, foreground=self.text_color, variable=self.daylight_savings_value)
-        self.checkbox_daylight_savings.grid(column=0, row=5, sticky='nsw', padx=self.padx, pady=self.pady)
+        self.checkbox_daylight_savings.grid(column=0, row=5, sticky='nsw', columnspan=3, padx=self.padx, pady=self.pady)
 
         # Location label and lat/lon comboboxes
         self.label_location = tk.Label(self.menu_frame, text='Location:', background=self.menu_color, foreground=self.text_color)
-        self.label_location.grid(column=0, row=6, sticky='nsw', padx=self.padx, pady=self.pady)
+        self.label_location.grid(column=0, row=6, columnspan=3, sticky='nsw', padx=self.padx, pady=self.pady)
         self.label_location.config(font=('Magneto', 18))
         self.combobox_latitude = ttk.Combobox(self.menu_frame, textvariable=self.latitude_value, state='normal')
         self.combobox_latitude.grid(column=0, row=7, sticky='nsew', padx=(self.padx,0), pady=self.pady)
@@ -192,17 +192,17 @@ class UserFrame(ttk.Frame):
 
         # Show/Hide checkboxes and labels
         self.checkbox_show_constellations = tk.Checkbutton(self.menu_frame, text='Show Constellations', background=self.menu_color, variable=self.constellations_value, foreground=self.text_color)
-        self.checkbox_show_constellations.grid(column=0, row=8, sticky='nsw', padx=self.padx, pady=self.pady)
+        self.checkbox_show_constellations.grid(column=0, row=8, sticky='nsw', columnspan=3, padx=self.padx, pady=self.pady)
         self.checkbox_show_labels = tk.Checkbutton(self.menu_frame, text='Show Labels', background=self.menu_color, variable=self.labels_value, foreground=self.text_color)
-        self.checkbox_show_labels.grid(column=0, row=9, sticky='nsw', padx=self.padx, pady=self.pady)
+        self.checkbox_show_labels.grid(column=0, row=9, sticky='nsw', columnspan=3, padx=self.padx, pady=self.pady)
 
         # Generate map and reset buttons
         self.button_generate_map = tk.Button(self.menu_frame, text='Generate Map')
         self.button_generate_map.grid(column=0, row=10, sticky='nsw', padx=self.padx, pady=self.pady)
-        self.button_generate_map.config(background='#404040', foreground='#ccb144', highlightbackground='black', width=20)
+        self.button_generate_map.config(background='white', foreground='black', highlightbackground='#262626', width=20)
         self.button_reset = tk.Button(self.menu_frame, text='Reset')
         self.button_reset.grid(column=1, row=10, sticky='nsw', padx=self.padx, pady=self.pady)
-        self.button_reset.config(background='#404040', foreground='#ccb144', highlightbackground='black', width=10)
+        self.button_reset.config(background='white', foreground='black', highlightbackground='#262626', width=10)
 
         self.set_combobox_values(self.combobox_month, 'Month', 1, 13)
         self.set_combobox_values(self.combobox_day, 'Day', 1, 32)

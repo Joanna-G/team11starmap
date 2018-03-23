@@ -91,6 +91,12 @@ class Controller():
             if star.proper_name is not None:
                 print(star.proper_name)
 
+        # Calculate Moon Position and Phase
+        self.model.Calculate_Moon_Position()
+
+        # Draw Moon
+        self.view.star_map_frame.draw_moon(self.model.moon, self.model.moon.phase, self.model.moon.x, self.model.moon.y)
+
         self.toggle_constellations()
 
     def toggle_constellations(self):

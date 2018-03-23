@@ -95,7 +95,14 @@ class Model():
 
     #
     def Calculate_Moon_Position(self):
-        print("to be implemented")
+        print("Moons are stupid.")
+        self.moon.right_ascension, self.moon.declination = self.moon.calculate_alt_az(self.time_calc.t,
+                    self.time_calc.lat, self.time_calc.t, self.time_calc.t, self.time_calc.lon, self.time_calc.gmst)
+        ha_time = self.moon.calculate_ha_time(self.time_calc.lst, self.moon.right_ascension)
+        self.moon.alt = self.moon.testing_alt(self.moon.declination, self.time_calc.lat, ha_time)
+        self.moon.az = self.moon.testing_az(self.moon.declination, self.time_calc.lat, ha_time, self.moon.alt)
+        self.moon.phase = self.moon.lunar_phase(self.time_calc.jd_current, self.time_calc.new_moon_ref)
+        self.moon.get_xy_coords(self.moon.alt, self.moon.az, 1000)
 
     #
     def Calculate_Messier_Positions(self):

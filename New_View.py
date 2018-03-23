@@ -230,6 +230,7 @@ class UserFrame(ttk.Frame):
         self.button_reset.grid(column=1, row=10, sticky='nsw', padx=self.padx, pady=self.pady)
         self.button_reset.config(background='white', foreground='black', highlightbackground='#262626', width=10)
 
+        # The real deal
         # self.set_combobox_values(self.combobox_month, 'Month', 1, 13)
         # self.set_combobox_values(self.combobox_day, 'Day', 1, 32)
         # self.set_combobox_values(self.combobox_year, 'Year', 1900, 2101)
@@ -243,7 +244,7 @@ class UserFrame(ttk.Frame):
         self.set_combobox_values(self.combobox_month, 4, 1, 13)
         self.set_combobox_values(self.combobox_day, 22, 1, 32)
         self.set_combobox_values(self.combobox_year, 1985, 1900, 2101)
-        self.set_combobox_values(self.combobox_hour, 11, 0, 25)
+        self.set_combobox_values(self.combobox_hour, 18, 0, 25)
         self.set_combobox_values(self.combobox_minute, 30, 0, 60)
         self.set_combobox_values(self.combobox_utc, -6, -12, 15)
         self.set_combobox_values(self.combobox_latitude, 35, -90, 91)
@@ -328,6 +329,27 @@ class StarMapFrame(ttk.Frame):
         self.canvas.tag_bind(const, '<ButtonPress-1>', lambda e: self.display_constellation_info(e, constellation))
         return const
 
+    def draw_moon(self, moon, phase, x, y):
+        r = 50
+        # If moon.phase is new, draw black circle with white outline
+        if phase == 'New':
+            self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='#FFFFFF', outline='#FFFFFF')
+            print("Moon is new.")
+        # If moon.phase is first, somehow draw a circle with the left half black, right half white, white outline
+        elif phase == 'First':
+            self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='#FFFFFF', outline='#FFFFFF')
+            print("Moon is First Quarter.")
+        # If moon.phase is full, draw a white circle with white outline
+        elif phase == 'Full':
+            self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='#FFFFFF', outline='#FFFFFF')
+            print("Moon is Full.")
+        # If moon.phase is last, somehow draw a circle with the left half white, right half black, white outline
+        else:
+            self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='#FFFFFF', outline='#FFFFFF')
+            print("Moon is Last Quarter.")
+
+        #self.canvas.tag_bind(x, '<ButtonPress-1>', lambda e: self.display_moon_info(e, moon))
+
     def display_star_info(self, e, star):
         x = self.parent.parent.winfo_pointerx()
         y = self.parent.parent.winfo_pointery()
@@ -337,6 +359,11 @@ class StarMapFrame(ttk.Frame):
         x = self.parent.parent.winfo_pointerx()
         y = self.parent.parent.winfo_pointery()
         self.create_modal_dialog(constellation, x, y)
+
+    def display_moon_info(self, e, moon):
+        x = self.parent.parent.winfo_pointerx()
+        y = self.parent.parent.winfo_pointery()
+        self.create_modal_dialog(moon, x, y)
 
     def create_modal_dialog(self, object, x, y):
         modal_dlg = tk.Toplevel(master=self)
@@ -358,6 +385,13 @@ class StarMapFrame(ttk.Frame):
         elif isinstance(object, Constellation):
             tk.Label(modal_dlg, text='Constellation Name: ' + str(object.name)).grid(column=0, row=0, columnspan=3,
                                                                                      sticky='nsew')
+        elif isinstance(object, Moon):
+            tk.Label(modal_dlg, text='Moon').grid(column=0, row=0, columnspan=3, sticky='nsew')
+            tk.Label(modal_dlg, text="Moon's Alt: " + str(object.alt)).grid(column=0, row=1, columnspan=3, sticky='nsew')
+            tk.Label(modal_dlg, text='Moon\'s Azi: ' + str(object.az)).grid(column=0, row=2, columnspan=3,
+                                                                              sticky='nsew')
+            tk.Label(modal_dlg, text='Moon\'s Phase: ' + str(object.phase)).grid(column=0, row=4, columnspan=3,
+                                                                                      sticky='nsew')
 
         modal_dlg.geometry('+%d+%d' % (x, y))
         modal_dlg.transient(self.parent)

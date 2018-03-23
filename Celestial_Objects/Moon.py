@@ -5,15 +5,11 @@ import math
 class Moon(BaseCelestialObject):
     def __init__(self):
         BaseCelestialObject.__init__(self, None, None)
-        self.phase = None
+        self.phase = ''
+        self.alt = None
+        self.az = None
 
     def lunar_phase(self, jd_current, new_moon_ref):
-
-        # Moon Phases
-        NEW = 0
-        FIRST = 1
-        FULL = 2
-        LAST = 3
 
         # Calculate the current Julian Date and the Julian Date of the first
         # new moon of 1900. Use the JD of first moon as reference for current
@@ -25,17 +21,15 @@ class Moon(BaseCelestialObject):
         # The age of the moon determines the phase, with the actual
         # date of the phase at the center of the range
         if 0 <= age_of_moon < 3.69:
-            self.phase = NEW
+            self.phase = 'New'
         elif 3.69 <= age_of_moon < 11.07:
-            self.phase = FIRST
+            self.phase = 'First'
         elif 11.07 <= age_of_moon < 18.45:
-            self.phase = FULL
+            self.phase = 'Full'
         elif 18.45 <= age_of_moon < 25.84:
-            self.phase = LAST
+            self.phase = 'Last'
         elif 25.84 <= age_of_moon <= sc:
-            self.phase = NEW
-
-        return self.phase
+            self.phase = 'New'
 
     # Calculate Lunar geocentric RA and Dec, which is close enough to the topocentric that it doesn't matter
     # So the abstract method says declination, but here we need this fun unknown value t, so go ahead and pass it t
@@ -82,16 +76,15 @@ class Moon(BaseCelestialObject):
         x2, y2, z2 = self.ecliptic_to_equatorial(x, y, z)
 
         # Convert back to spherical
-        ra, dec = self.rect_to_spherical(x2, y2, z2)
+        self.right_ascension, self.declination = self.rect_to_spherical(x2, y2, z2)
 
         # Normalize right ascension
-        ra = self.rev(ra)
-        ra = self.ra_degrees_to_time_decimal(ra)
-
-        alt = self.testing_alt(dec, lat, ha_degrees)
-        az = self.testing_az(dec, lat, ha_degrees, alt)
-
-        return alt, az
+        self.right_ascension = self.rev(self.right_ascension)
+        self.right_ascension = self.ra_degrees_to_time_decimal(self.right_ascension)
+        # self.calculate_ha_time(lst, self.right_ascension)
+        # self.moon.alt = self.moon.testing_alt(self.moon.declination, lat, ha_time)
+        # self.moon.az = self.moon.testing_az(self.moon.declination, lat, ha_time, self.moon.alt)
+        return self.right_ascension, self.declination
 
     # Convert from ra, dec or long, lat or alt, az to x,y,z
     def ra_dec_to_rect(self, ra, dec, r):

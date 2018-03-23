@@ -123,7 +123,6 @@ class Controller():
         self.view.user_frame.labels_value.set(0)
 
 
-
 if __name__ == "__main__":
     c = Controller()
     c.run()

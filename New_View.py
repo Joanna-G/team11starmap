@@ -10,6 +10,7 @@ import ghostscript
 import os
 import sys
 
+
 class MainApplication(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent)
@@ -31,17 +32,14 @@ class UserFrame(ttk.Frame):
         ttk.Frame.__init__(self, parent)
         self.parent = parent
         self.validation_widgets = []
-
         self.grid(column=0, row=0, sticky='nsew')
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
-
         self.menu_color = '#262626'
         self.text_color = '#ccb144'
-
         self.background_color = '#404040'
-        self.padx = 10
-        self.pady = 10
+        self.padx = 8
+        self.pady = 8
 
         menu_style = ttk.Style()
         menu_style.configure('TFrame', background=self.background_color)
@@ -68,17 +66,17 @@ class UserFrame(ttk.Frame):
         self.menu_frame.columnconfigure(0, weight=1, minsize=125)
         self.menu_frame.columnconfigure(1, weight=1, minsize=90)
         self.menu_frame.columnconfigure(2, weight=1, minsize=125)
-        self.menu_frame.rowconfigure(0, weight=1)
-        self.menu_frame.rowconfigure(1, weight=1)
-        self.menu_frame.rowconfigure(2, weight=1)
-        self.menu_frame.rowconfigure(3, weight=1)
-        self.menu_frame.rowconfigure(4, weight=1)
-        self.menu_frame.rowconfigure(5, weight=1)
-        self.menu_frame.rowconfigure(6, weight=1)
-        self.menu_frame.rowconfigure(7, weight=1)
-        self.menu_frame.rowconfigure(8, weight=1)
-        self.menu_frame.rowconfigure(9, weight=1)
-        self.menu_frame.rowconfigure(10, weight=1)
+        self.menu_frame.rowconfigure(0, weight=0)               # Logo
+        self.menu_frame.rowconfigure(1, weight=4)               # Date Label
+        self.menu_frame.rowconfigure(2, weight=8, minsize=50)   # Date Comboboxes
+        self.menu_frame.rowconfigure(3, weight=4)               # Time Label
+        self.menu_frame.rowconfigure(4, weight=8, minsize=50)   # Time Comboboxes
+        self.menu_frame.rowconfigure(5, weight=1, minsize=40)   # Daylight Savings Checkbox
+        self.menu_frame.rowconfigure(6, weight=4)               # Location Label
+        self.menu_frame.rowconfigure(7, weight=8, minsize=50)   # Location Comboboxes
+        self.menu_frame.rowconfigure(8, weight=1, minsize=40)   # Show Constellations Checkbox
+        self.menu_frame.rowconfigure(9, weight=1, minsize=40)   # Show Labels Checkbox
+        self.menu_frame.rowconfigure(10, weight=8, minsize=40)  # Generate/Reset Buttons
         self.menu_frame.rowconfigure(11, weight=1)
 
         self.month_value = StringVar()
@@ -112,14 +110,20 @@ class UserFrame(ttk.Frame):
         self.label_logo.grid(column=0, row=0, sticky='w', columnspan=3)
         self.label_logo = logo
 
-        #self.label_title = tk.Label(self.menu_frame, text='Lumarium', background=self.menu_color, foreground=self.text_color)
-        #self.label_title.grid(column=1, row=0, sticky='w')
-        #self.label_title.config(font=('Magneto', 22))
-
         # Date label, comboboxes, and daylight savings checkbox
         self.label_date = tk.Label(self.menu_frame, text='Date:', background=self.menu_color, foreground=self.text_color)
         self.label_date.grid(column=0, row=1, columnspan=3, padx=self.padx, pady=self.pady, sticky='nsw')
-        self.label_date.config(font=('Magneto', 18))
+
+        # Set Label font based on platform
+        if sys.platform == "win32":
+            self.label_date.config(font=('Magneto', 18))
+        elif sys.platform == "win64":
+            self.label_date.config(font=('Magneto', 18))
+        elif sys.platform == "darwin":
+            self.label_date.config(font=('Brush Script MT', 36))
+        elif sys.platform == "linux" or sys.platform == "linux2":
+            self.label_date.config(font=('URW Chancery L', 18))
+
         self.combobox_month = ttk.Combobox(self.menu_frame, textvariable=self.month_value, state='normal')
         self.combobox_month.grid(column=0, row=2, sticky='nsew', padx=(self.padx,0), pady=self.pady)
         self.combobox_month.bind('<FocusIn>', lambda e: self.validate_combobox(self.combobox_month, e))
@@ -127,6 +131,7 @@ class UserFrame(ttk.Frame):
         self.combobox_month.var = self.month_value
         self.combobox_month.range = (1, 12)
         self.validation_widgets.append(self.combobox_month)
+
         self.combobox_day = ttk.Combobox(self.menu_frame, textvariable=self.day_value, state='normal')
         self.combobox_day.grid(column=1, row=2, sticky='nsew', padx=(self.padx,0), pady=self.pady)
         self.combobox_day.bind('<FocusIn>', lambda e: self.validate_combobox(self.combobox_day, e))
@@ -134,6 +139,7 @@ class UserFrame(ttk.Frame):
         self.combobox_day.var = self.day_value
         self.combobox_day.range = (1, 31)
         self.validation_widgets.append(self.combobox_day)
+
         self.combobox_year = ttk.Combobox(self.menu_frame, textvariable=self.year_value, state='normal')
         self.combobox_year.grid(column=2, row=2, sticky='nsew', padx=self.padx, pady=self.pady)
         self.combobox_year.bind('<FocusIn>', lambda e: self.validate_combobox(self.combobox_year, e))
@@ -145,7 +151,17 @@ class UserFrame(ttk.Frame):
         # Time label and comboboxes
         self.label_time = tk.Label(self.menu_frame, text='Time:', background=self.menu_color, foreground=self.text_color)
         self.label_time.grid(column=0, row=3, columnspan=3, sticky='nsw', padx=self.padx, pady=self.pady)
-        self.label_time.config(font=('Magneto', 18))
+
+        # Set Label font based on platform
+        if sys.platform == "win32":
+            self.label_time.config(font=('Magneto', 18))
+        elif sys.platform == "win64":
+            self.label_time.config(font=('Magneto', 18))
+        elif sys.platform == "darwin":
+            self.label_time.config(font=('Brush Script MT', 36))
+        elif sys.platform == "linux" or sys.platform == "linux2":
+            self.label_time.config(font=('URW Chancery L', 18))
+
         self.combobox_hour = ttk.Combobox(self.menu_frame, textvariable=self.hour_value, state='normal')
         self.combobox_hour.grid(column=0, row=4, sticky='nsew', padx=(self.padx,0), pady=self.pady)
         self.combobox_hour.bind('<FocusIn>', lambda e: self.validate_combobox(self.combobox_hour, e))
@@ -174,7 +190,17 @@ class UserFrame(ttk.Frame):
         # Location label and lat/lon comboboxes
         self.label_location = tk.Label(self.menu_frame, text='Location:', background=self.menu_color, foreground=self.text_color)
         self.label_location.grid(column=0, row=6, columnspan=3, sticky='nsw', padx=self.padx, pady=self.pady)
-        self.label_location.config(font=('Magneto', 18))
+
+        # Set Label font based on platform
+        if sys.platform == "win32":
+            self.label_location.config(font=('Magneto', 18))
+        elif sys.platform == "win64":
+            self.label_location.config(font=('Magneto', 18))
+        elif sys.platform == "darwin":
+            self.label_location.config(font=('Brush Script MT', 36))
+        elif sys.platform == "linux" or sys.platform == "linux2":
+            self.label_location.config(font=('URW Chancery L', 18))
+
         self.combobox_latitude = ttk.Combobox(self.menu_frame, textvariable=self.latitude_value, state='normal')
         self.combobox_latitude.grid(column=0, row=7, sticky='nsew', padx=(self.padx,0), pady=self.pady)
         self.combobox_latitude.bind('<FocusIn>', lambda e: self.validate_combobox(self.combobox_latitude, e))
@@ -204,15 +230,24 @@ class UserFrame(ttk.Frame):
         self.button_reset.grid(column=1, row=10, sticky='nsw', padx=self.padx, pady=self.pady)
         self.button_reset.config(background='white', foreground='black', highlightbackground='#262626', width=10)
 
-        self.set_combobox_values(self.combobox_month, 'Month', 1, 13)
-        self.set_combobox_values(self.combobox_day, 'Day', 1, 32)
-        self.set_combobox_values(self.combobox_year, 'Year', 1900, 2101)
-        self.set_combobox_values(self.combobox_hour, 'Hour', 0, 25)
-        self.set_combobox_values(self.combobox_minute, 'Minute', 0, 60)
-        self.set_combobox_values(self.combobox_utc, 'UTC Offset', -12, 15)
-        self.set_combobox_values(self.combobox_latitude, 'Lat', -90, 91)
-        self.set_combobox_values(self.combobox_longitude, 'Long', -180, 181)
+        # self.set_combobox_values(self.combobox_month, 'Month', 1, 13)
+        # self.set_combobox_values(self.combobox_day, 'Day', 1, 32)
+        # self.set_combobox_values(self.combobox_year, 'Year', 1900, 2101)
+        # self.set_combobox_values(self.combobox_hour, 'Hour', 0, 25)
+        # self.set_combobox_values(self.combobox_minute, 'Minute', 0, 60)
+        # self.set_combobox_values(self.combobox_utc, 'UTC Offset', -12, 15)
+        # self.set_combobox_values(self.combobox_latitude, 'Lat', -90, 91)
+        # self.set_combobox_values(self.combobox_longitude, 'Long', -180, 181)
 
+        # Default values for testing purpose. Jo's birthday and location. Yes, I'm conceited. LOL
+        self.set_combobox_values(self.combobox_month, 4, 1, 13)
+        self.set_combobox_values(self.combobox_day, 22, 1, 32)
+        self.set_combobox_values(self.combobox_year, 1985, 1900, 2101)
+        self.set_combobox_values(self.combobox_hour, 11, 0, 25)
+        self.set_combobox_values(self.combobox_minute, 30, 0, 60)
+        self.set_combobox_values(self.combobox_utc, -6, -12, 15)
+        self.set_combobox_values(self.combobox_latitude, 35, -90, 91)
+        self.set_combobox_values(self.combobox_longitude, 87, -180, 181)
 
     def set_combobox_values(self, combobox, default, first, last):
         combobox.set(default)
@@ -267,25 +302,25 @@ class StarMapFrame(ttk.Frame):
         self.hsb_canvas.config(command=self.canvas.xview)
         self.canvas.config(xscrollcommand=self.hsb_canvas.set, yscrollcommand=self.vsb_canvas.set,
                            scrollregion=(-4000, -4000, 4000, 4000), background='black', highlightbackground='black') # highlightthickness=10
-        self.canvas.bind('<MouseWheel>', lambda e: self.on_mouse_wheel_scrool(e))
-        self.canvas.bind('<Shift-MouseWheel>', lambda e: self.on_mouse_wheel_scrool(e))
+        self.canvas.bind('<MouseWheel>', lambda e: self.on_mouse_wheel_scroll(e))
+        self.canvas.bind('<Shift-MouseWheel>', lambda e: self.on_mouse_wheel_scroll(e))
 
     def draw_star(self, star, x, y):
         if star.magnitude <= 1.0:
-            r = 4
+            r = 5.5
         elif star.magnitude <= 2.0:
-            r = 3.5
+            r = 4.5
         elif star.magnitude <= 3.0:
-            r = 3
+            r = 3.5
         elif star.magnitude <= 4.0:
             r = 2.5
         elif star.magnitude <= 5.0:
-            r = 2
-        elif star.magnitude <= 6.0:
             r = 1.5
+        elif star.magnitude <= 6.0:
+            r = 0.5
         else:
-            r = 1
-        x = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='#ccb144', outline='#ccb144')
+            r = 0
+        x = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='#F6DC83', outline='#F6DC83')
         self.canvas.tag_bind(x, '<ButtonPress-1>', lambda e: self.display_star_info(e, star))
 
     def draw_constellation_line(self, star_1, star_2, constellation):
@@ -350,7 +385,7 @@ class StarMapFrame(ttk.Frame):
             args = [a.encode(encoding) for a in args]
             ghostscript.Ghostscript(*args)
 
-    def on_mouse_wheel_scrool(self, e):
+    def on_mouse_wheel_scroll(self, e):
         if e.state == 8:
             self.canvas.yview_scroll(int(-1 * (e.delta / abs(e.delta))), 'units')
         elif e.state == 9:

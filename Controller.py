@@ -97,6 +97,21 @@ class Controller():
         # Draw Moon
         self.view.star_map_frame.draw_moon(self.model.moon, self.model.moon.phase, self.model.moon.x, self.model.moon.y)
 
+        # Calculate Planets' Positions
+        self.model.Calculate_Planet_Positions()
+
+        # Draw Each Planet
+        for planet in self.model.planet_list:
+            self.view.star_map_frame.draw_planet(planet, planet.x, planet.y)
+
+        # Calculate Messier Object's Positions
+        self.model.Calculate_Messier_Positions()
+
+        # Draw Each Messier Objects
+        for messier in self.model.messier_list:
+            self.view.star_map_frame.draw_messier_object()
+
+
         self.toggle_constellations()
 
     def toggle_constellations(self):

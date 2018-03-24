@@ -6,7 +6,7 @@ from PIL import ImageTk, Image, ImageDraw
 from tkinter.filedialog import asksaveasfilename
 import locale
 from Celestial_Objects import *
-#import ghostscript
+import ghostscript
 import os
 import sys
 
@@ -308,10 +308,12 @@ class StarMapFrame(ttk.Frame):
         self.canvas.scan_dragto(event.x, event.y, gain=1)
 
     def wheel(self, event):
+        true_x = self.canvas.canvasx(event.x)
+        true_y = self.canvas.canvasy(event.y)
         if (event.delta > 0):
-            self.canvas.scale("all", event.x, event.y, 1.1, 1.1)
+            self.canvas.scale("all", true_x, true_y, 1.1, 1.1)
         elif (event.delta < 0):
-            self.canvas.scale("all", event.x, event.y, 0.9, 0.9)
+            self.canvas.scale("all", true_x, true_y, 0.9, 0.9)
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
     # linux zoom
@@ -367,6 +369,27 @@ class StarMapFrame(ttk.Frame):
 
         self.canvas.tag_bind(x, '<ButtonPress-1>', lambda e: self.display_moon_info(e, moon))
 
+    def draw_planet(self, planet, x, y):
+        pass
+
+    def draw_messier_object(self, messier, x, y):
+        if messier.magnitude <= 1.0:
+            r = 5.5
+        elif messier.magnitude <= 2.0:
+            r = 4.5
+        elif messier.magnitude <= 3.0:
+            r = 3.5
+        elif messier.magnitude <= 4.0:
+            r = 2.5
+        elif messier.magnitude <= 5.0:
+            r = 1.5
+        elif messier.magnitude <= 6.0:
+            r = 0.5
+        else:
+            r = 0
+        x = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='#F6DC83', outline='#F6DC83')
+        self.canvas.tag_bind(x, '<ButtonPress-1>', lambda e: self.display_smessier_info(e, messier))
+
     def display_star_info(self, e, star):
         x = self.parent.parent.winfo_pointerx()
         y = self.parent.parent.winfo_pointery()
@@ -380,7 +403,15 @@ class StarMapFrame(ttk.Frame):
     def display_moon_info(self, e, moon):
         x = self.parent.parent.winfo_pointerx()
         y = self.parent.parent.winfo_pointery()
-        self.create_modal_dialog(moon, x, y)
+        self.create_modal_dialog(moon, moon.x + 20, moon.y + 20)
+
+    def display_planet_inf0(self, e, planet):
+        pass
+
+    def display_messier_info(self, e, messier):
+        x = self.parent.parent.winfo_pointerx()
+        y = self.parent.parent.winfo_pointery()
+        self.create_modal_dialog(messier, x, y)
 
     def create_modal_dialog(self, object, x, y):
         modal_dlg = tk.Toplevel(master=self)
@@ -406,9 +437,27 @@ class StarMapFrame(ttk.Frame):
             tk.Label(modal_dlg, text='Moon').grid(column=0, row=0, columnspan=3, sticky='nsew')
             tk.Label(modal_dlg, text="Moon's Alt: " + str(object.alt)).grid(column=0, row=1, columnspan=3, sticky='nsew')
             tk.Label(modal_dlg, text='Moon\'s Azi: ' + str(object.az)).grid(column=0, row=2, columnspan=3,
-                                                                              sticky='nsew')
+                                                                            sticky='nsew')
             tk.Label(modal_dlg, text='Moon\'s Phase: ' + str(object.phase)).grid(column=0, row=4, columnspan=3,
-                                                                                      sticky='nsew')
+                                                                            sticky='nsew')
+        elif isinstance(object, Planet):
+            tk.Label(modal_dlg, text='Planet Name: ' + str(object.planet_name)).grid(column=0, row=0, columnspan=3,
+                                                                            sticky='nsew')
+            tk.Label(modal_dlg, text="Planet's Altitude: " + str(object.alt)).grid(column=0, row=1, columnspan=3,
+                                                                            sticky='nsew')
+            tk.Label(modal_dlg, text="Planet's Azimuth: " + str(object.az)).grid(column=0, row=2, columnspan=3,
+                                                                            sticky='nsew')
+        elif isinstance(object, MessierObject):
+            tk.Label(modal_dlg, text='Messier Object Name: ' + str(object.proper_name)).grid(column=0, row=0,
+                                                                                columnspan=3, ticky='nsew')
+            tk.Label(modal_dlg, text='Messier Object Type: ' + str(object.type)).grid(column=0, row=1,
+                                                                                columnspan=3, sticky='nsew')
+            tk.Label(modal_dlg, text='Messier Object Altitude: ' + str(object.altitude)).grid(column=0, row=2,
+                                                                                columnspan=3, sticky='nsew')
+            tk.Label(modal_dlg, text='Messier Object Azimuth: ' + str(object.azimuth)).grid(column=0, row=3,
+                                                                                columnspan=3, sticky='nsew')
+            tk.Label(modal_dlg, text='Messier Object Magnitude: ' + str(object.magnitude)).grid(column=0, row=4,
+                                                                                columnspan=3, sticky='nsew')
 
         modal_dlg.geometry('+%d+%d' % (x, y))
         modal_dlg.transient(self.parent)

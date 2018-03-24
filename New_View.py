@@ -330,25 +330,25 @@ class StarMapFrame(ttk.Frame):
         return const
 
     def draw_moon(self, moon, phase, x, y):
-        r = 50
+        r = 12
         # If moon.phase is new, draw black circle with white outline
         if phase == 'New':
-            self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='#FFFFFF', outline='#FFFFFF')
-            print("Moon is new.")
+            x = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='black', outline='white')
         # If moon.phase is first, somehow draw a circle with the left half black, right half white, white outline
-        elif phase == 'First':
-            self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='#FFFFFF', outline='#FFFFFF')
-            print("Moon is First Quarter.")
+        elif phase == 'First Quarter':
+            self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='black', outline='white')
+            x = self.canvas.create_arc(x - r, y - r, x + r, y + r, start=270, extent=180, fill='white', outline='white',
+                                   style=tk.CHORD)
         # If moon.phase is full, draw a white circle with white outline
         elif phase == 'Full':
-            self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='#FFFFFF', outline='#FFFFFF')
-            print("Moon is Full.")
+            x = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='white', outline='white')
         # If moon.phase is last, somehow draw a circle with the left half white, right half black, white outline
         else:
-            self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='#FFFFFF', outline='#FFFFFF')
-            print("Moon is Last Quarter.")
+            self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='black', outline='white')
+            x = self.canvas.create_arc(x - r, y - r, x + r, y + r, start=90.0, extent=180.0, style=tk.CHORD,
+                                       fill='white', outline='white')
 
-        #self.canvas.tag_bind(x, '<ButtonPress-1>', lambda e: self.display_moon_info(e, moon))
+        self.canvas.tag_bind(x, '<ButtonPress-1>', lambda e: self.display_moon_info(e, moon))
 
     def display_star_info(self, e, star):
         x = self.parent.parent.winfo_pointerx()

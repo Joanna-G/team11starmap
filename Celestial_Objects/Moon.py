@@ -5,7 +5,7 @@ import math
 class Moon(BaseCelestialObject):
     def __init__(self):
         BaseCelestialObject.__init__(self, None, None)
-        self.phase = ''
+        self.phase = None
         self.alt = None
         self.az = None
 
@@ -23,13 +23,15 @@ class Moon(BaseCelestialObject):
         if 0 <= age_of_moon < 3.69:
             self.phase = 'New'
         elif 3.69 <= age_of_moon < 11.07:
-            self.phase = 'First'
+            self.phase = 'First Quarter'
         elif 11.07 <= age_of_moon < 18.45:
             self.phase = 'Full'
         elif 18.45 <= age_of_moon < 25.84:
-            self.phase = 'Last'
+            self.phase = 'Last Quarter'
         elif 25.84 <= age_of_moon <= sc:
             self.phase = 'New'
+
+        return self.phase
 
     # Calculate Lunar geocentric RA and Dec, which is close enough to the topocentric that it doesn't matter
     # So the abstract method says declination, but here we need this fun unknown value t, so go ahead and pass it t

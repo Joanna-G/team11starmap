@@ -50,7 +50,7 @@ class TimeCalculations:
         self.mst = self.calculate_mst(self.year, self.month, self.day, self.hour, self.minute, self.second, self.lon)
         self.cy = self.calculate_cy()
 
-        self.jd_current = self.calculate_julian_day(year, month, day, hour, minute)
+        self.jd_current = self.calculate_julian_day(self.year, self.month, self.day, self.hour, self.minute)
         self.new_moon_ref = self.calculate_julian_day(1900, 1, 1, 0, 0)
         self.t = self.calculate_T(self.jd_current)
         self.d = self.calculate_day(self.year, self.month, self.day, self.utc_offset)

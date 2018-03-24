@@ -3,6 +3,7 @@ from Celestial_Objects import *
 import TimeCalculations
 import math
 
+
 class Model():
     def __init__(self, year, month, day, hour, minute, utc_offset, lat, lon):
         # Create Parser objects, and parse files
@@ -102,7 +103,8 @@ class Model():
         self.moon.alt = self.moon.testing_alt(self.moon.declination, self.time_calc.lat, ha_time)
         self.moon.az = self.moon.testing_az(self.moon.declination, self.time_calc.lat, ha_time, self.moon.alt)
         self.moon.phase = self.moon.lunar_phase(self.time_calc.jd_current, self.time_calc.new_moon_ref)
-        self.moon.get_xy_coords(self.moon.alt, self.moon.az, 1000)
+        print("Moon phase is " + str(self.moon.phase))
+        self.moon.get_xy_coords(self.moon.alt, self.moon.az, 4000)
 
     #
     def Calculate_Messier_Positions(self):

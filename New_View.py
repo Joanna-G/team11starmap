@@ -271,6 +271,8 @@ class StarMapFrame(ttk.Frame):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
+        self.label_widgets = []
+
         self.background_color = '#262626'
         frame_style = ttk.Style()
         frame_style.configure('TFrame', background=self.background_color)
@@ -315,6 +317,9 @@ class StarMapFrame(ttk.Frame):
         elif (event.delta < 0):
             self.canvas.scale("all", true_x, true_y, 0.9, 0.9)
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+        # Update canvas so labels appear in the correct locations
+        self.canvas.update()
 
     # linux zoom
     def wheelup(self, event):
@@ -388,7 +393,7 @@ class StarMapFrame(ttk.Frame):
         else:
             r = 0
         x = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='#F6DC83', outline='#F6DC83')
-        self.canvas.tag_bind(x, '<ButtonPress-1>', lambda e: self.display_smessier_info(e, messier))
+        self.canvas.tag_bind(x, '<ButtonPress-1>', lambda e: self.display_messier_info(e, messier))
 
     def display_star_info(self, e, star):
         x = self.parent.parent.winfo_pointerx()
@@ -412,6 +417,12 @@ class StarMapFrame(ttk.Frame):
         x = self.parent.parent.winfo_pointerx()
         y = self.parent.parent.winfo_pointery()
         self.create_modal_dialog(messier, x, y)
+
+    def display_star_label(self, object):
+        #name_label = tk.Label(self.canvas, text = str(object.hd_id) + " : " + str(object.proper_name))
+        #name_label.config()
+        #self.label_widgets.append((self.canvas.create_window(object.x, object.y, window=name_label)))
+        self.label_widgets.append((self.canvas.create_text(object.x, object.y, text = str(object.proper_name), fill='white')))
 
     def create_modal_dialog(self, object, x, y):
         modal_dlg = tk.Toplevel(master=self)

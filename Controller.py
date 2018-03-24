@@ -13,6 +13,7 @@ class Controller():
         self.view = New_View.MainApplication(parent=self.root)
         self.view.user_frame.button_generate_map.config(command=self.generate_map)
         self.view.user_frame.checkbox_show_constellations.config(command=self.toggle_constellations)
+        self.view.user_frame.checkbox_show_labels.config(command=self.toggle_labels)
         self.view.user_frame.button_reset.config(command=self.reset_app)
 
         self.menubar = tk.Menu(self.root)
@@ -133,6 +134,16 @@ class Controller():
                     self.view.star_map_frame.canvas.delete(line)
                 self.constellation_lines = []
 
+    def toggle_labels(self):
+        if(self.view.user_frame.labels_value.get() == 1):
+            for star in self.model.star_list:
+                if star.proper_name != '':
+                    print(star.proper_name)
+                    self.view.star_map_frame.display_star_label(star)
+        else:
+            for label in self.view.star_map_frame.label_widgets:
+                self.view.star_map_frame.canvas.delete(label)
+
     def reset_app(self):
         self.constellation_lines = []
         self.empty_map = True
@@ -142,6 +153,8 @@ class Controller():
         self.view.user_frame.daylight_savings_value.set(0)
         self.view.user_frame.constellations_value.set(0)
         self.view.user_frame.labels_value.set(0)
+
+        # FIX: Reset -> Show Labels ==> Labels still appear
 
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@ from PIL import ImageTk, Image, ImageDraw
 from tkinter.filedialog import asksaveasfilename
 import locale
 from Celestial_Objects import *
-import ghostscript
+#import ghostscript
 import os
 import sys
 
@@ -40,6 +40,17 @@ class UserFrame(ttk.Frame):
         self.background_color = '#404040'
         self.padx = 8
         self.pady = 8
+
+        # Set Label font based on platform
+        if sys.platform == "win32" or sys.platform == "win64":
+            self.font = 'Magneto'
+            self.size = 18
+        elif sys.platform == "darwin":
+            self.font = 'Brush Script MT'
+            self.size = 36
+        elif sys.platform == "linux" or sys.platform == "linux2":
+            self.font = 'URW Chancery L'
+            self.size = 18
 
         menu_style = ttk.Style()
         menu_style.configure('TFrame', background=self.background_color)
@@ -113,16 +124,8 @@ class UserFrame(ttk.Frame):
         # Date label, comboboxes, and daylight savings checkbox
         self.label_date = tk.Label(self.menu_frame, text='Date:', background=self.menu_color, foreground=self.text_color)
         self.label_date.grid(column=0, row=1, columnspan=3, padx=self.padx, pady=self.pady, sticky='nsw')
+        self.label_date.config(font=(self.font, self.size))
 
-        # Set Label font based on platform
-        if sys.platform == "win32":
-            self.label_date.config(font=('Magneto', 18))
-        elif sys.platform == "win64":
-            self.label_date.config(font=('Magneto', 18))
-        elif sys.platform == "darwin":
-            self.label_date.config(font=('Brush Script MT', 36))
-        elif sys.platform == "linux" or sys.platform == "linux2":
-            self.label_date.config(font=('URW Chancery L', 18))
 
         self.combobox_month = ttk.Combobox(self.menu_frame, textvariable=self.month_value, state='normal')
         self.combobox_month.grid(column=0, row=2, sticky='nsew', padx=(self.padx,0), pady=self.pady)
@@ -151,16 +154,8 @@ class UserFrame(ttk.Frame):
         # Time label and comboboxes
         self.label_time = tk.Label(self.menu_frame, text='Time:', background=self.menu_color, foreground=self.text_color)
         self.label_time.grid(column=0, row=3, columnspan=3, sticky='nsw', padx=self.padx, pady=self.pady)
+        self.label_time.config(font=(self.font, self.size))
 
-        # Set Label font based on platform
-        if sys.platform == "win32":
-            self.label_time.config(font=('Magneto', 18))
-        elif sys.platform == "win64":
-            self.label_time.config(font=('Magneto', 18))
-        elif sys.platform == "darwin":
-            self.label_time.config(font=('Brush Script MT', 36))
-        elif sys.platform == "linux" or sys.platform == "linux2":
-            self.label_time.config(font=('URW Chancery L', 18))
 
         self.combobox_hour = ttk.Combobox(self.menu_frame, textvariable=self.hour_value, state='normal')
         self.combobox_hour.grid(column=0, row=4, sticky='nsew', padx=(self.padx,0), pady=self.pady)
@@ -190,16 +185,8 @@ class UserFrame(ttk.Frame):
         # Location label and lat/lon comboboxes
         self.label_location = tk.Label(self.menu_frame, text='Location:', background=self.menu_color, foreground=self.text_color)
         self.label_location.grid(column=0, row=6, columnspan=3, sticky='nsw', padx=self.padx, pady=self.pady)
+        self.label_location.config(font=(self.font, self.size))
 
-        # Set Label font based on platform
-        if sys.platform == "win32":
-            self.label_location.config(font=('Magneto', 18))
-        elif sys.platform == "win64":
-            self.label_location.config(font=('Magneto', 18))
-        elif sys.platform == "darwin":
-            self.label_location.config(font=('Brush Script MT', 36))
-        elif sys.platform == "linux" or sys.platform == "linux2":
-            self.label_location.config(font=('URW Chancery L', 18))
 
         self.combobox_latitude = ttk.Combobox(self.menu_frame, textvariable=self.latitude_value, state='normal')
         self.combobox_latitude.grid(column=0, row=7, sticky='nsew', padx=(self.padx,0), pady=self.pady)
@@ -303,8 +290,38 @@ class StarMapFrame(ttk.Frame):
         self.hsb_canvas.config(command=self.canvas.xview)
         self.canvas.config(xscrollcommand=self.hsb_canvas.set, yscrollcommand=self.vsb_canvas.set,
                            scrollregion=(-4000, -4000, 4000, 4000), background='black', highlightbackground='black') # highlightthickness=10
-        self.canvas.bind('<MouseWheel>', lambda e: self.on_mouse_wheel_scroll(e))
-        self.canvas.bind('<Shift-MouseWheel>', lambda e: self.on_mouse_wheel_scroll(e))
+        #self.canvas.bind('<MouseWheel>', lambda e: self.on_mouse_wheel_scroll(e))
+        #self.canvas.bind('<Shift-MouseWheel>', lambda e: self.on_mouse_wheel_scroll(e))
+
+        # Click map, and move mouse to scroll
+        self.canvas.bind("<ButtonPress-1>", self.scroll_start)
+        self.canvas.bind("<B1-Motion>", self.scroll_move)
+        self.canvas.bind('<MouseWheel>', self.wheel)  # with Windows and MacOS, but not Linux
+        self.canvas.bind('<Button-5>', self.wheelup)  # only with Linux, wheel scroll down
+        self.canvas.bind('<Button-4>', self.wheeldown)  # only with Linux, wheel scroll up
+
+    # Canvas Movement Functions
+    def scroll_start(self, event):
+        self.canvas.scan_mark(event.x, event.y)
+
+    def scroll_move(self, event):
+        self.canvas.scan_dragto(event.x, event.y, gain=1)
+
+    def wheel(self, event):
+        if (event.delta > 0):
+            self.canvas.scale("all", event.x, event.y, 1.1, 1.1)
+        elif (event.delta < 0):
+            self.canvas.scale("all", event.x, event.y, 0.9, 0.9)
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+    # linux zoom
+    def wheelup(self, event):
+        self.canvas.scale("all", event.x, event.y, 1.1, 1.1)
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+    def wheeldown(self, event):
+        self.canvas.scale("all", event.x, event.y, 0.9, 0.9)
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
     def draw_star(self, star, x, y):
         if star.magnitude <= 1.0:
@@ -424,8 +441,3 @@ class StarMapFrame(ttk.Frame):
             self.canvas.yview_scroll(int(-1 * (e.delta / abs(e.delta))), 'units')
         elif e.state == 9:
             self.canvas.xview_scroll(int(-1 * (e.delta / abs(e.delta))), 'units')
-
-
-
-
-

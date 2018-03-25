@@ -6,7 +6,7 @@ from PIL import ImageTk, Image, ImageDraw
 from tkinter.filedialog import asksaveasfilename
 import locale
 from Celestial_Objects import *
-import ghostscript
+#import ghostscript
 import os
 import sys
 
@@ -419,10 +419,14 @@ class StarMapFrame(ttk.Frame):
         self.create_modal_dialog(messier, x, y)
 
     def display_star_label(self, object):
-        #name_label = tk.Label(self.canvas, text = str(object.hd_id) + " : " + str(object.proper_name))
-        #name_label.config()
-        #self.label_widgets.append((self.canvas.create_window(object.x, object.y, window=name_label)))
-        self.label_widgets.append((self.canvas.create_text(object.x, object.y, text = str(object.proper_name), fill='white')))
+
+        if object.magnitude <= 2:
+            offset = 11
+        elif object.magnitude <= 6 and object.magnitude > 2:
+            offset = 7
+        else:
+            offset = 2
+        self.label_widgets.append((self.canvas.create_text(object.x, object.y+offset, text = str(object.proper_name), fill='white', tag='label')))
 
     def create_modal_dialog(self, object, x, y):
         modal_dlg = tk.Toplevel(master=self)

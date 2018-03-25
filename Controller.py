@@ -135,14 +135,14 @@ class Controller():
                 self.constellation_lines = []
 
     def toggle_labels(self):
-        if(self.view.user_frame.labels_value.get() == 1):
-            for star in self.model.star_list:
-                if star.proper_name != '':
-                    print(star.proper_name)
-                    self.view.star_map_frame.display_star_label(star)
-        else:
-            for label in self.view.star_map_frame.label_widgets:
-                self.view.star_map_frame.canvas.delete(label)
+        if self.empty_map is False:
+            if(self.view.user_frame.labels_value.get() == 1):
+                for star in self.model.star_list:
+                    if star.proper_name != '':
+                        print(star.proper_name)
+                        self.view.star_map_frame.display_star_label(star)
+            else:
+                self.view.star_map_frame.canvas.delete('label')
 
     def reset_app(self):
         self.constellation_lines = []
@@ -154,7 +154,9 @@ class Controller():
         self.view.user_frame.constellations_value.set(0)
         self.view.user_frame.labels_value.set(0)
 
-        # FIX: Reset -> Show Labels ==> Labels still appear
+        # Clear Label stuff
+        self.view.star_map_frame.canvas.delete('label')
+        self.view.star_map_frame.label_widgets.clear()
 
 
 if __name__ == "__main__":

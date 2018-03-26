@@ -8,6 +8,7 @@ class Moon(BaseCelestialObject):
         self.phase = None
         self.alt = None
         self.az = None
+        self.proper_name = 'Moon'
 
     def lunar_phase(self, jd_current, new_moon_ref):
 

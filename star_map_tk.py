@@ -455,7 +455,7 @@ class StarMapFrame(ttk.Frame):
             tk.Label(modal_dlg, text='Star Hour Angle: ' + str(object.ha_time)).grid(column=0, row=4, columnspan=3, sticky='nsew')
 
         elif isinstance(object, Constellation):
-            tk.Label(modal_dlg, text='Constellation Name: ' + str(object.name)).grid(column=0, row=0, columnspan=3, sticky='nsew')
+            tk.Label(modal_dlg, text='Constellation Name: ' + str(object.proper_name)).grid(column=0, row=0, columnspan=3, sticky='nsew')
 
         modal_dlg.geometry('+%d+%d' % (x, y))
         modal_dlg.transient(win)

@@ -45,6 +45,11 @@ class Model():
             for index in cp_constellation[1:]:
                 star_list.append(index)
             constellation = Constellation(name, star_list)
+
+            # Working out a way to find the center of a constellation for labels.
+            # Ignore this for now.
+            # constellation.set_center()
+
             self.constellation_list.append(constellation)
 
     # Create all Messier Deep Space objects based on infromation from Messier Parser (m_parse) and append to messier_list

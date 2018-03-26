@@ -68,7 +68,8 @@ class Planet(BaseCelestialObject):
 
     # calculate semimajor axis of the orbit
     def calculate_semi_axis(self, ascal, aprop, cy):
-        return float(ascal) + float(aprop) * cy
+        return float(ascal) + float(aprop) * cy  # ValueError: could not convert string to float: 'Ascal'
+
 
 
     # calculate eccentricity of the orbit

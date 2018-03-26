@@ -112,7 +112,6 @@ class Controller():
         for messier in self.model.messier_list:
             self.view.star_map_frame.draw_messier_object()
 
-
         self.toggle_constellations()
 
     def toggle_constellations(self):
@@ -128,7 +127,8 @@ class Controller():
                             elif index[1] == star.hd_id:
                                 star2 = star
                         if star1 is not None and star2 is not None:
-                            self.constellation_lines.append(self.view.star_map_frame.draw_constellation_line(star1, star2, const))
+                            self.constellation_lines.append(self.view.star_map_frame.draw_constellation_line(star1,
+                                                                                            star2, const))
             elif self.view.user_frame.constellations_value.get() == 0:
                 for line in self.constellation_lines:
                     self.view.star_map_frame.canvas.delete(line)
@@ -136,11 +136,14 @@ class Controller():
 
     def toggle_labels(self):
         if self.empty_map is False:
-            if(self.view.user_frame.labels_value.get() == 1):
+            if self.view.user_frame.labels_value.get() == 1:
                 for star in self.model.star_list:
                     if star.proper_name != '':
                         print(star.proper_name)
-                        self.view.star_map_frame.display_star_label(star)
+                        self.view.star_map_frame.display_object_label(star)
+                self.view.star_map_frame.display_object_label(self.model.moon)
+                for const in self.model.constellation_list:
+                    self.view.star_map_frame.display_object_label(const)
             else:
                 self.view.star_map_frame.canvas.delete('label')
 

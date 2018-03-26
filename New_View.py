@@ -6,7 +6,7 @@ from PIL import ImageTk, Image, ImageDraw
 from tkinter.filedialog import asksaveasfilename
 import locale
 from Celestial_Objects import *
-#import ghostscript
+import ghostscript
 import os
 import sys
 
@@ -126,7 +126,6 @@ class UserFrame(ttk.Frame):
         self.label_date.grid(column=0, row=1, columnspan=3, padx=self.padx, pady=self.pady, sticky='nsw')
         self.label_date.config(font=(self.font, self.size))
 
-
         self.combobox_month = ttk.Combobox(self.menu_frame, textvariable=self.month_value, state='normal')
         self.combobox_month.grid(column=0, row=2, sticky='nsew', padx=(self.padx,0), pady=self.pady)
         self.combobox_month.bind('<FocusIn>', lambda e: self.validate_combobox(self.combobox_month, e))
@@ -155,7 +154,6 @@ class UserFrame(ttk.Frame):
         self.label_time = tk.Label(self.menu_frame, text='Time:', background=self.menu_color, foreground=self.text_color)
         self.label_time.grid(column=0, row=3, columnspan=3, sticky='nsw', padx=self.padx, pady=self.pady)
         self.label_time.config(font=(self.font, self.size))
-
 
         self.combobox_hour = ttk.Combobox(self.menu_frame, textvariable=self.hour_value, state='normal')
         self.combobox_hour.grid(column=0, row=4, sticky='nsew', padx=(self.padx,0), pady=self.pady)
@@ -186,7 +184,6 @@ class UserFrame(ttk.Frame):
         self.label_location = tk.Label(self.menu_frame, text='Location:', background=self.menu_color, foreground=self.text_color)
         self.label_location.grid(column=0, row=6, columnspan=3, sticky='nsw', padx=self.padx, pady=self.pady)
         self.label_location.config(font=(self.font, self.size))
-
 
         self.combobox_latitude = ttk.Combobox(self.menu_frame, textvariable=self.latitude_value, state='normal')
         self.combobox_latitude.grid(column=0, row=7, sticky='nsew', padx=(self.padx,0), pady=self.pady)
@@ -418,15 +415,22 @@ class StarMapFrame(ttk.Frame):
         y = self.parent.parent.winfo_pointery()
         self.create_modal_dialog(messier, x, y)
 
-    def display_star_label(self, object):
-
-        if object.magnitude <= 2:
-            offset = 11
-        elif object.magnitude <= 6 and object.magnitude > 2:
-            offset = 7
+    def display_object_label(self, object):
+        if isinstance(object, Star) or isinstance(object, MessierObject):
+            if object.magnitude <= 2:
+                offset = 11
+            elif 2 < object.magnitude <= 6:
+                offset = 7
+            else:
+                offset = 5
+        elif isinstance(object, Moon):
+            offset = 30
+        elif isinstance(object, Planet):
+            offset = 30
         else:
-            offset = 2
-        self.label_widgets.append((self.canvas.create_text(object.x, object.y+offset, text = str(object.proper_name), fill='white', tag='label')))
+            offset = 0
+        self.label_widgets.append((self.canvas.create_text(object.x, object.y+offset, text=str(object.proper_name),
+                                                           fill='white', tag='label')))
 
     def create_modal_dialog(self, object, x, y):
         modal_dlg = tk.Toplevel(master=self)
@@ -446,8 +450,8 @@ class StarMapFrame(ttk.Frame):
                                                                                      sticky='nsew')
 
         elif isinstance(object, Constellation):
-            tk.Label(modal_dlg, text='Constellation Name: ' + str(object.name)).grid(column=0, row=0, columnspan=3,
-                                                                                     sticky='nsew')
+            tk.Label(modal_dlg, text='Constellation Name: ' + str(object.proper_name)).grid(column=0, row=0, columnspan=3,
+                                                                                            sticky='nsew')
         elif isinstance(object, Moon):
             tk.Label(modal_dlg, text='Moon').grid(column=0, row=0, columnspan=3, sticky='nsew')
             tk.Label(modal_dlg, text="Moon's Alt: " + str(object.alt)).grid(column=0, row=1, columnspan=3, sticky='nsew')

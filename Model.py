@@ -82,11 +82,11 @@ class Model():
             planet.arg_perihelion = planet.calculate_arg_perihelion(planet.wscal, planet.wprop, self.time_calc.cy)
             planet.long_asc_node = planet.calculate_long_asc_node(planet.oscal, planet.oprop, self.time_calc.cy)
             planet.mean_long = planet.calculate_mean_longitude(planet.lscal, planet.lprop, self.time_calc.cy)
-            planet.mean_anomaly = planet.calculate_mean_anomaly(planet.planet_name, self.time_calc.d)
+            planet.mean_anomaly = planet.calculate_mean_anomaly(planet.proper_name, self.time_calc.d)
             planet.true_anomaly = planet.calculate_true_anomaly(math.radians(planet.mean_anomaly),
                                                                 math.radians(planet.eccentricity))
             planet.right_ascension, planet.declination, planet.distance = planet.calculate_ra_dec_planet(
-                 planet.planet_name, planet.lscal, planet.lprop, planet.ascal, planet.aprop,
+                 planet.proper_name, planet.lscal, planet.lprop, planet.ascal, planet.aprop,
                  planet.escal, planet.eprop, planet.iscal, planet.iprop, planet.wscal,
                  planet.wprop, planet.oscal, planet.oprop, planet.lscal, planet.lprop,
                  self.planet_list[2].ascal, self.planet_list[2].aprop, self.planet_list[2].escal,
@@ -95,20 +95,19 @@ class Model():
                  self.planet_list[2].oscal, self.planet_list[2].oprop, self.time_calc.cy, self.time_calc.d)
             ha_time = planet.calculate_ha_time(self.time_calc.lst, planet.right_ascension)
             planet.ha = planet.ha_time_to_degrees(ha_time)
-            planet.alt, planet.az = planet.calculate_alt_az(self, planet.declination, self.time_calc.lat,
+            planet.alt, planet.az = planet.calculate_alt_az(planet.declination, self.time_calc.lat,
                                                             planet.ha, self.time_calc.t, self.time_calc.lon,
                                                             self.time_calc.mst)
+            planet.get_xy_coords(planet.alt, planet.az, 4000)
 
     #
     def Calculate_Moon_Position(self):
-        print("Moons are stupid.")
         self.moon.right_ascension, self.moon.declination = self.moon.calculate_alt_az(self.time_calc.t,
                     self.time_calc.lat, self.time_calc.t, self.time_calc.t, self.time_calc.lon, self.time_calc.gmst)
         ha_time = self.moon.calculate_ha_time(self.time_calc.lst, self.moon.right_ascension)
         self.moon.alt = self.moon.testing_alt(self.moon.declination, self.time_calc.lat, ha_time)
         self.moon.az = self.moon.testing_az(self.moon.declination, self.time_calc.lat, ha_time, self.moon.alt)
         self.moon.phase = self.moon.lunar_phase(self.time_calc.jd_current, self.time_calc.new_moon_ref)
-        print("Moon phase is " + str(self.moon.phase))
         self.moon.get_xy_coords(self.moon.alt, self.moon.az, 4000)
 
     #

@@ -4,7 +4,7 @@ import math
 class Planet(BaseCelestialObject):
     def __init__(self, planet_name, lscal, lprop, ascal, aprop, escal, eprop, iscal, iprop, wscal, wprop, oscal, oprop):
         BaseCelestialObject.__init__(self, None, None)
-        self.planet_name = planet_name
+        self.proper_name = planet_name
         self.ascal = ascal
         self.aprop = aprop
         self.escal = escal
@@ -68,9 +68,7 @@ class Planet(BaseCelestialObject):
 
     # calculate semimajor axis of the orbit
     def calculate_semi_axis(self, ascal, aprop, cy):
-        return float(ascal) + float(aprop) * cy  # ValueError: could not convert string to float: 'Ascal'
-
-
+        return float(ascal) + float(aprop) * cy
 
     # calculate eccentricity of the orbit
     def calculate_eccentricity(self, escal, eprop, cy):
@@ -81,17 +79,13 @@ class Planet(BaseCelestialObject):
         # return math.radians(float(iscal) - float(iprop) * cy / 3600)
         return math.radians(float(iscal) - float(iprop) * cy / 3600)
 
-
     # calculate argument of perihelion
     def calculate_arg_perihelion(self, wscal, wprop, cy):
         return math.radians(float(wscal) + float(wprop) * cy / 3600)
 
-
     # calculate longitude of ascending node
     def calculate_long_asc_node(self, oscal, oprop, cy):
         return math.radians(float(oscal) - float(oprop) * cy / 3600)
-
-
 
     # calculate mean longitude of a planet
     def calculate_mean_longitude(self, lscal, lprop, cy):
@@ -101,7 +95,6 @@ class Planet(BaseCelestialObject):
         # mean_long_rads = mean_long_rads % (math.pi*2)
         mean_long = mean_long % (2 * math.pi)
         return mean_long
-
 
     # calculate mean anomaly of a planet
     def calculate_mean_anomaly(self, planet_name, d):
@@ -128,7 +121,6 @@ class Planet(BaseCelestialObject):
             return (260.2471 + 0.005995147 * d) % 360
         else:
             return 1
-
 
     # need to figure this out
 

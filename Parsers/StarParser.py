@@ -2,11 +2,11 @@ from Parsers import Parser
 import csv
 import os.path
 
+
 class StarParser(Parser):
     def __init__(self):
         fileDir = os.path.dirname(os.path.realpath('__file__'))
         Parser.__init__(self, os.path.join(fileDir, 'resources', 'Stars.csv'))
-
 
     # Parses the input File
     def parse_file(self):

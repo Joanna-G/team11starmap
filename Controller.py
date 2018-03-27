@@ -89,8 +89,8 @@ class Controller():
         # Draw each star
         for star in self.model.star_list:
             self.view.star_map_frame.draw_star(star, star.x, star.y)
-            if star.proper_name is not None:
-                print(star.proper_name)
+            # if star.proper_name is not None:
+            #     print(star.proper_name)
 
         # Calculate Moon Position and Phase
         self.model.Calculate_Moon_Position()
@@ -103,7 +103,8 @@ class Controller():
 
         # Draw Each Planet
         for planet in self.model.planet_list:
-            self.view.star_map_frame.draw_planet(planet, planet.x, planet.y)
+            if planet.proper_name != 'Earth/Sun':
+                self.view.star_map_frame.draw_planet(planet, planet.x, planet.y)
 
         # Calculate Messier Object's Positions
         self.model.Calculate_Messier_Positions()
@@ -139,8 +140,11 @@ class Controller():
             if self.view.user_frame.labels_value.get() == 1:
                 for star in self.model.star_list:
                     if star.proper_name != '':
-                        print(star.proper_name)
+                        # print(star.proper_name)
                         self.view.star_map_frame.display_object_label(star)
+                for planet in self.model.planet_list:
+                    if planet.proper_name != 'Earth/Sun':
+                        self.view.star_map_frame.display_object_label(planet)
                 self.view.star_map_frame.display_object_label(self.model.moon)
                 for const in self.model.constellation_list:
                     self.view.star_map_frame.display_object_label(const)

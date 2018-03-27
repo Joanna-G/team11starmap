@@ -12,21 +12,22 @@ class PlanetParser(Parser):
         file = csv.reader(open(self.filepath, newline=''), delimiter=',')
         for row in file:
             element = []
+
             # Check if it is the header row, if it is, ignore it.
-            if row[0] == "ï»¿PlanetName":
+            if row[1] == "Lscal":
                 continue
-            if row[0] in (None, ""):
+            elif row[0] in (None, ""):
                 break
             else:
                 for i in range(0, 13, 1):
                     element.append(row[i])
             self.ElementsList.append(element)
 
-        print(self.ElementsList)
+       # print(self.ElementsList)
         return self.ElementsList
 
 
-def main():
-    planet = PlanetParser()
-    element = planet.parse_file()
-    print(element)
+# def main():
+#     planet = PlanetParser()
+#     element = planet.parse_file()
+#     print(element)

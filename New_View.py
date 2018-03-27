@@ -9,6 +9,7 @@ from Celestial_Objects import *
 import ghostscript
 import os
 import sys
+import random
 
 
 class MainApplication(ttk.Frame):
@@ -372,7 +373,9 @@ class StarMapFrame(ttk.Frame):
         self.canvas.tag_bind(x, '<ButtonPress-1>', lambda e: self.display_moon_info(e, moon))
 
     def draw_planet(self, planet, x, y):
-        pass
+        r = 7
+        x = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='blue', outline='blue')
+        self.canvas.tag_bind(x, '<ButtonPress-1>', lambda e: self.display_planet_info(e, planet))
 
     def draw_messier_object(self, messier, x, y):
         if messier.magnitude <= 1.0:
@@ -407,8 +410,10 @@ class StarMapFrame(ttk.Frame):
         y = self.parent.parent.winfo_pointery()
         self.create_modal_dialog(moon, moon.x + 20, moon.y + 20)
 
-    def display_planet_inf0(self, e, planet):
-        pass
+    def display_planet_info(self, e, planet):
+        x = self.parent.parent.winfo_pointerx()
+        y = self.parent.parent.winfo_pointery()
+        self.create_modal_dialog(planet, planet.x, planet.y)
 
     def display_messier_info(self, e, messier):
         x = self.parent.parent.winfo_pointerx()
@@ -460,7 +465,7 @@ class StarMapFrame(ttk.Frame):
             tk.Label(modal_dlg, text='Moon\'s Phase: ' + str(object.phase)).grid(column=0, row=4, columnspan=3,
                                                                             sticky='nsew')
         elif isinstance(object, Planet):
-            tk.Label(modal_dlg, text='Planet Name: ' + str(object.planet_name)).grid(column=0, row=0, columnspan=3,
+            tk.Label(modal_dlg, text='Planet Name: ' + str(object.proper_name)).grid(column=0, row=0, columnspan=3,
                                                                             sticky='nsew')
             tk.Label(modal_dlg, text="Planet's Altitude: " + str(object.alt)).grid(column=0, row=1, columnspan=3,
                                                                             sticky='nsew')

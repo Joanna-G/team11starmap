@@ -4,6 +4,7 @@ import View
 import New_View
 import datetime
 
+
 class Controller():
     def __init__(self):
         now = datetime.datetime.now()
@@ -29,7 +30,6 @@ class Controller():
         self.root.bind("<F11>", self.toggle_fullscreen)
         self.root.bind("<Escape>", self.end_fullscreen)
 
-        self.constellation_lines = []
         self.empty_map = True
 
     def toggle_fullscreen(self, event=None):
@@ -111,48 +111,49 @@ class Controller():
 
         # Draw Each Messier Objects
         for messier in self.model.messier_list:
-            self.view.star_map_frame.draw_messier_object()
+            self.view.star_map_frame.draw_messier_object(messier, messier.x, messier.y)
 
+        # Toggle Constellations
         self.toggle_constellations()
 
     def toggle_constellations(self):
         if self.empty_map is False:
             if self.view.user_frame.constellations_value.get() == 1:
                 for const in self.model.constellation_list:
-                    for index in const.star_list:
-                        star1 = None
-                        star2 = None
-                        for star in self.model.star_list:
-                            if index[0] == star.hd_id:
-                                star1 = star
-                            elif index[1] == star.hd_id:
-                                star2 = star
-                        if star1 is not None and star2 is not None:
-                            self.constellation_lines.append(self.view.star_map_frame.draw_constellation_line(star1,
-                                                                                            star2, const))
+                    const.set_center()
+                    self.view.star_map_frame.draw_constellation(const, self.model.star_list)
+                    if self.view.user_frame.labels_value.get() == 1:
+                        self.view.star_map_frame.display_object_label(const)
             elif self.view.user_frame.constellations_value.get() == 0:
-                for line in self.constellation_lines:
+                for line in self.view.star_map_frame.constellation_lines:
                     self.view.star_map_frame.canvas.delete(line)
-                self.constellation_lines = []
+                    self.view.star_map_frame.constellation_lines = []
+                self.view.star_map_frame.canvas.delete('const_label')
 
     def toggle_labels(self):
         if self.empty_map is False:
             if self.view.user_frame.labels_value.get() == 1:
                 for star in self.model.star_list:
                     if star.proper_name != '':
-                        # print(star.proper_name)
                         self.view.star_map_frame.display_object_label(star)
                 for planet in self.model.planet_list:
-                    if planet.proper_name != 'Earth/Sun':
+                    if planet.proper_name != 'Earth/Sun':       # Don't need a label to show up for Earth
                         self.view.star_map_frame.display_object_label(planet)
                 self.view.star_map_frame.display_object_label(self.model.moon)
+
+                # Constellation labels need special treatment because they're divas.
                 for const in self.model.constellation_list:
-                    self.view.star_map_frame.display_object_label(const)
+                    if self.view.user_frame.constellations_value.get() == 1:
+                        self.view.star_map_frame.display_object_label(const)
+
+                for messier in self.model.messier_list:
+                    self.view.star_map_frame.display_object_label(messier)
             else:
                 self.view.star_map_frame.canvas.delete('label')
+                self.view.star_map_frame.canvas.delete('const_label')
 
     def reset_app(self):
-        self.constellation_lines = []
+        self.view.star_map_frame.constellation_lines = []
         self.empty_map = True
         self.view.star_map_frame.canvas.delete('all')
         for widget in self.view.user_frame.validation_widgets:
@@ -163,6 +164,7 @@ class Controller():
 
         # Clear Label stuff
         self.view.star_map_frame.canvas.delete('label')
+        self.view.star_map_frame.canvas.delete('const_label')
         self.view.star_map_frame.label_widgets.clear()
 
 

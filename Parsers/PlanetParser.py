@@ -2,6 +2,7 @@ from Parsers import Parser
 import csv
 import os.path
 
+
 class PlanetParser(Parser):
     def __init__(self):
         fileDir = os.path.dirname(os.path.realpath('__file__'))
@@ -23,7 +24,7 @@ class PlanetParser(Parser):
                     element.append(row[i])
             self.ElementsList.append(element)
 
-       # print(self.ElementsList)
+        # print(self.ElementsList)
         return self.ElementsList
 
 

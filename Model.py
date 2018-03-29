@@ -39,22 +39,37 @@ class Model():
 
     # Create all constellations based on infromation from Constellation Parser (c_parse) and append to constellation_list
     def Create_Constellations(self):
+
+        # for cp_constellation in self.c_parse:
+        #     name = cp_constellation[0]
+        #     star_list = []
+        #     for index in cp_constellation[1:]:
+        #         star_list.append(index)
+        #     constellation = Constellation(name, star_list)
+
+        # Jo is breaking things, but I promise I'll fix it.
         for cp_constellation in self.c_parse:
             name = cp_constellation[0]
-            star_list = []
+            stars = []
             for index in cp_constellation[1:]:
-                star_list.append(index)
-            constellation = Constellation(name, star_list)
+                stars.append(index)
+            # print(stars)
 
             # Working out a way to find the center of a constellation for labels.
             # Ignore this for now.
-            # constellation.set_center()
-
+            constellation = Constellation(name, stars, self.star_list)
+            constellation.set_const_stars()
+            # print(constellation.const_stars[0])
+            constellation.set_num_stars()
+            # print(str(constellation.number_stars))
             self.constellation_list.append(constellation)
 
     # Create all Messier Deep Space objects based on infromation from Messier Parser (m_parse) and append to messier_list
     def Create_Messier_Obj(self):
-        print("To be implemented")
+        for mm_messier in self.m_parse:
+            messier = MessierObject(mm_messier[0], mm_messier[1], mm_messier[2], mm_messier[3], mm_messier[4],
+                                    mm_messier[5], mm_messier[6], mm_messier[7], mm_messier[8], mm_messier[9])
+            self.messier_list.append(messier)
 
     # Create all Planets based on information from Planet Parser (p_parse) and append to planet_list
     def Create_Planets(self):
@@ -73,7 +88,7 @@ class Model():
                                                                 None, None, None)
             star.get_xy_coords(star.altitude, star.azimuth, 4000)
 
-    #
+    # Calculate the position of each planet
     def Calculate_Planet_Positions(self):
         for planet in self.planet_list:
             planet.semi_axis = planet.calculate_semi_axis(planet.ascal, planet.aprop, self.time_calc.cy)
@@ -100,7 +115,7 @@ class Model():
                                                             self.time_calc.mst)
             planet.get_xy_coords(planet.alt, planet.az, 4000)
 
-    #
+    # Calculate the position of the Moon
     def Calculate_Moon_Position(self):
         self.moon.right_ascension, self.moon.declination = self.moon.calculate_alt_az(self.time_calc.t,
                     self.time_calc.lat, self.time_calc.t, self.time_calc.t, self.time_calc.lon, self.time_calc.gmst)
@@ -110,7 +125,12 @@ class Model():
         self.moon.phase = self.moon.lunar_phase(self.time_calc.jd_current, self.time_calc.new_moon_ref)
         self.moon.get_xy_coords(self.moon.alt, self.moon.az, 4000)
 
-    #
+    # Calculate the position of each messier object
     def Calculate_Messier_Positions(self):
-        print("to be implemented")
+        for messier in self.messier_list:
+            messier.ha_time = messier.calculate_ha_time(self.time_calc.lst, messier.right_ascension)
+            messier.ha_degrees = messier.ha_time_to_degrees(messier.ha_time)
+            messier.altitude, messier.azimuth = messier.calculate_alt_az(messier.declination, self.time_calc.lat,
+                                                                         messier.ha_degrees, None, None, None)
+            messier.get_xy_coords(messier.altitude, messier.azimuth, 4000)
 

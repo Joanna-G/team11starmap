@@ -270,6 +270,7 @@ class StarMapFrame(ttk.Frame):
         self.rowconfigure(0, weight=1)
 
         self.label_widgets = []
+        self.constellation_lines = []
 
         self.background_color = '#262626'
         frame_style = ttk.Style()
@@ -347,9 +348,21 @@ class StarMapFrame(ttk.Frame):
         self.canvas.tag_bind(x, '<ButtonPress-1>', lambda e: self.display_star_info(e, star))
 
     def draw_constellation_line(self, star_1, star_2, constellation):
-        const = self.canvas.create_line(star_1.x, star_1.y, star_2.x, star_2.y, fill='#ccb144')
+        const = self.canvas.create_line(star_1.x, star_1.y, star_2.x, star_2.y, fill='pink')
         self.canvas.tag_bind(const, '<ButtonPress-1>', lambda e: self.display_constellation_info(e, constellation))
         return const
+
+    def draw_constellation(self, const, star_list):
+        for index in const.line_stars:
+            star1 = None
+            star2 = None
+            for star in star_list:
+                if index[0] == star.hd_id:
+                    star1 = star
+                elif index[1] == star.hd_id:
+                    star2 = star
+            if star1 is not None and star2 is not None:
+                self.constellation_lines.append(self.draw_constellation_line(star1, star2, const))
 
     def draw_moon(self, moon, phase, x, y):
         r = 12
@@ -392,7 +405,7 @@ class StarMapFrame(ttk.Frame):
             r = 0.5
         else:
             r = 0
-        x = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='#F6DC83', outline='#F6DC83')
+        x = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='red', outline='red')
         self.canvas.tag_bind(x, '<ButtonPress-1>', lambda e: self.display_messier_info(e, messier))
 
     def display_star_info(self, e, star):
@@ -421,21 +434,41 @@ class StarMapFrame(ttk.Frame):
         self.create_modal_dialog(messier, x, y)
 
     def display_object_label(self, object):
-        if isinstance(object, Star) or isinstance(object, MessierObject):
+        if isinstance(object, Star):
             if object.magnitude <= 2:
-                offset = 11
+                offset = 13
             elif 2 < object.magnitude <= 6:
-                offset = 7
+                offset = 10
             else:
                 offset = 5
+            fill = '#F6DC83'
+            tag = 'label'
+        elif isinstance(object, MessierObject):
+            if object.magnitude <= 2:
+                offset = 13
+            elif 2 < object.magnitude <= 6:
+                offset = 10
+            else:
+                offset = 5
+            fill = 'red'
+            tag = 'label'
         elif isinstance(object, Moon):
             offset = 30
+            fill = 'white'
+            tag = 'label'
         elif isinstance(object, Planet):
             offset = 30
+            fill = 'blue'
+            tag = 'label'
+        elif isinstance(object, Constellation):
+            offset = 0
+            fill = 'pink'
+            tag = 'const_label'
         else:
             offset = 0
+            fill = 'pink'
         self.label_widgets.append((self.canvas.create_text(object.x, object.y+offset, text=str(object.proper_name),
-                                                           fill='white', tag='label')))
+                                                           fill=fill, tag=tag)))
 
     def create_modal_dialog(self, object, x, y):
         modal_dlg = tk.Toplevel(master=self)
@@ -445,7 +478,11 @@ class StarMapFrame(ttk.Frame):
         modal_dlg.resizable(False, False)
 
         if isinstance(object, Star):
-            tk.Label(modal_dlg, text='Star HD ID: ' + str(object.hd_id)).grid(column=0, row=0, columnspan=3,
+            if object.proper_name != '':
+                tk.Label(modal_dlg, text='Star Name: ') + str(object.proper_name).grid(column=0, row=0, columnspan=3,
+                                                                              sticky='nsew')
+            else:
+                tk.Label(modal_dlg, text='Star HD ID: ' + str(object.hd_id)).grid(column=0, row=0, columnspan=3,
                                                                               sticky='nsew')
             tk.Label(modal_dlg, text='Star Alt: ' + str(object.altitude)).grid(column=0, row=1, columnspan=3,
                                                                                sticky='nsew')
@@ -472,9 +509,13 @@ class StarMapFrame(ttk.Frame):
             tk.Label(modal_dlg, text="Planet's Azimuth: " + str(object.az)).grid(column=0, row=2, columnspan=3,
                                                                             sticky='nsew')
         elif isinstance(object, MessierObject):
-            tk.Label(modal_dlg, text='Messier Object Name: ' + str(object.proper_name)).grid(column=0, row=0,
-                                                                                columnspan=3, ticky='nsew')
-            tk.Label(modal_dlg, text='Messier Object Type: ' + str(object.type)).grid(column=0, row=1,
+            if object.proper_name != '':
+                tk.Label(modal_dlg, text='Messier Object Name: ' + str(object.proper_name)).grid(column=0, row=0,
+                                                                                columnspan=3, sticky='nsew')
+            else:
+                tk.Label(modal_dlg, text='Messier Catalog ID: ' + str(object.messier_cat)).grid(column=0, row=0, columnspan=3,
+                                                                                  sticky='nsew')
+            tk.Label(modal_dlg, text='Messier Object Description: ' + str(object.description)).grid(column=0, row=1,
                                                                                 columnspan=3, sticky='nsew')
             tk.Label(modal_dlg, text='Messier Object Altitude: ' + str(object.altitude)).grid(column=0, row=2,
                                                                                 columnspan=3, sticky='nsew')

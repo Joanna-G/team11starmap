@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 import math
 
+
 class BaseCelestialObject:
     __metaclass__ = ABCMeta
 
@@ -28,7 +29,6 @@ class BaseCelestialObject:
                 ha_time = ha_time - 24
         return ha_time
 
-
     def ra_degrees_to_time_decimal(self, ra):
         hours = int(ra / 15.0)
         minutes = int(((ra / 15.0) - hours) * 60)
@@ -49,15 +49,14 @@ class BaseCelestialObject:
         hours = int(ra / 15.0)
         minutes = int(((ra / 15.0) - hours) * 60.0)
         seconds = ((((ra / 15.0) - hours) * 60.0) - minutes) * 60.0
-        return (hours, minutes, seconds)
+        return hours, minutes, seconds
 
     # Converts Declination (dec) in degress to Degrees:Minutes:Seconds
     def convert_dec_dms(self, dec):
         degrees = int(dec)
         minutes = int((dec - degrees) * 60.0)
         seconds = (((dec - degrees) * 60.0) - minutes) * 60.0
-        return (degrees, minutes, seconds)
-
+        return degrees, minutes, seconds
 
     def rev(self, x):
         return x - math.floor(x / 360.0) * 360.0
@@ -70,7 +69,6 @@ class BaseCelestialObject:
             a += (2 * math.pi)
         converted_angle = a
         return converted_angle
-
 
     def abs_floor(self, b):
         if b >= 0:

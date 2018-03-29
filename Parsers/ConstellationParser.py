@@ -2,6 +2,7 @@ from Parsers import Parser
 import csv
 import os.path
 
+
 class ConstellationParser(Parser):
     def __init__(self):
         fileDir = os.path.dirname(os.path.realpath('__file__'))
@@ -30,10 +31,12 @@ class ConstellationParser(Parser):
         self.ElementsList.pop(0)
         return self.ElementsList
 
+
 def main():
     const = ConstellationParser()
     stars = const.parse_file()
     print(stars)
+
 
 if __name__ == "__main__":
     main()

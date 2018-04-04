@@ -11,7 +11,6 @@ import os
 import sys
 import random
 
-
 class MainApplication(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent)
@@ -291,8 +290,6 @@ class StarMapFrame(ttk.Frame):
         self.hsb_canvas.config(command=self.canvas.xview)
         self.canvas.config(xscrollcommand=self.hsb_canvas.set, yscrollcommand=self.vsb_canvas.set,
                            scrollregion=(-4000, -4000, 4000, 4000), background='black', highlightbackground='black') # highlightthickness=10
-        #self.canvas.bind('<MouseWheel>', lambda e: self.on_mouse_wheel_scroll(e))
-        #self.canvas.bind('<Shift-MouseWheel>', lambda e: self.on_mouse_wheel_scroll(e))
 
         # Click map, and move mouse to scroll
         self.canvas.bind("<ButtonPress-1>", self.scroll_start)
@@ -328,6 +325,7 @@ class StarMapFrame(ttk.Frame):
     def wheeldown(self, event):
         self.canvas.scale("all", event.x, event.y, 0.9, 0.9)
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+        self.canvas.update()
 
     def draw_star(self, star, x, y):
         if star.magnitude <= 1.0:
@@ -479,7 +477,7 @@ class StarMapFrame(ttk.Frame):
 
         if isinstance(object, Star):
             if object.proper_name != '':
-                tk.Label(modal_dlg, text='Star Name: ') + str(object.proper_name).grid(column=0, row=0, columnspan=3,
+                tk.Label(modal_dlg, text='Star Name: ' + str(object.proper_name)).grid(column=0, row=0, columnspan=3,
                                                                               sticky='nsew')
             else:
                 tk.Label(modal_dlg, text='Star HD ID: ' + str(object.hd_id)).grid(column=0, row=0, columnspan=3,

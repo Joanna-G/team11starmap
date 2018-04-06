@@ -25,12 +25,13 @@ class Controller():
         self.menubar.add_cascade(label='File', menu=self.filemenu)
         self.root.config(menu=self.menubar)
 
-        self.root.attributes("-fullscreen", True)
+        self.root.attributes("-fullscreen", False)
         self.state = True
         self.root.bind("<F11>", self.toggle_fullscreen)
         self.root.bind("<Escape>", self.end_fullscreen)
 
         self.empty_map = True
+        self.constellation_lines = []
 
     def toggle_fullscreen(self, event=None):
         self.state = not self.state
@@ -57,7 +58,7 @@ class Controller():
     def generate_map(self):
         ready = True
         for widget in self.view.user_frame.validation_widgets:
-            ready =  self.view.user_frame.validate_combobox(widget)
+            ready = self.view.user_frame.validate_combobox(widget)
             if ready is False:
                 print('validate_widget: wrong values')
                 return
@@ -65,6 +66,7 @@ class Controller():
         # Clear Canvas
         self.view.star_map_frame.canvas.delete('all')
         self.constellation_lines = []
+
         try:
             month = int(self.view.user_frame.month_value.get())
             day = int(self.view.user_frame.day_value.get())
@@ -152,6 +154,9 @@ class Controller():
                 self.view.star_map_frame.canvas.delete('label')
                 self.view.star_map_frame.canvas.delete('const_label')
 
+    # Somehow, the reset needs to reset the x, y coordinates of the map back to the center. As it is, at least on a Mac,
+    # when you zoom and pan and then reset and re-generate the map, it draws it where you left off panning instead of
+    # where it was originally.
     def reset_app(self):
         self.view.star_map_frame.constellation_lines = []
         self.empty_map = True

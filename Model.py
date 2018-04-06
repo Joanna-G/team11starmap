@@ -47,16 +47,12 @@ class Model():
         #         star_list.append(index)
         #     constellation = Constellation(name, star_list)
 
-        # Jo is breaking things, but I promise I'll fix it.
         for cp_constellation in self.c_parse:
             name = cp_constellation[0]
             stars = []
             for index in cp_constellation[1:]:
                 stars.append(index)
-            # print(stars)
 
-            # Working out a way to find the center of a constellation for labels.
-            # Ignore this for now.
             constellation = Constellation(name, stars, self.star_list)
             constellation.set_const_stars()
             # print(constellation.const_stars[0])

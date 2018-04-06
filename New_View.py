@@ -9,7 +9,7 @@ from Celestial_Objects import *
 import ghostscript
 import os
 import sys
-import random
+
 
 class MainApplication(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
@@ -259,6 +259,7 @@ class UserFrame(ttk.Frame):
             combobox.set(combobox.values[0])
             return False
 
+
 class StarMapFrame(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent)
@@ -289,7 +290,7 @@ class StarMapFrame(ttk.Frame):
         self.hsb_canvas.grid(column=0, row=1, sticky='ew')
         self.hsb_canvas.config(command=self.canvas.xview)
         self.canvas.config(xscrollcommand=self.hsb_canvas.set, yscrollcommand=self.vsb_canvas.set,
-                           scrollregion=(-4000, -4000, 4000, 4000), background='black', highlightbackground='black') # highlightthickness=10
+                           scrollregion=(-4000, -4000, 4000, 4000), background='black', highlightbackground='black')
 
         # Click map, and move mouse to scroll
         self.canvas.bind("<ButtonPress-1>", self.scroll_start)
@@ -419,7 +420,7 @@ class StarMapFrame(ttk.Frame):
     def display_moon_info(self, e, moon):
         x = self.parent.parent.winfo_pointerx()
         y = self.parent.parent.winfo_pointery()
-        self.create_modal_dialog(moon, moon.x + 20, moon.y + 20)
+        self.create_modal_dialog(moon, moon.x, moon.y)
 
     def display_planet_info(self, e, planet):
         x = self.parent.parent.winfo_pointerx()
@@ -495,9 +496,9 @@ class StarMapFrame(ttk.Frame):
         elif isinstance(object, Moon):
             tk.Label(modal_dlg, text='Moon').grid(column=0, row=0, columnspan=3, sticky='nsew')
             tk.Label(modal_dlg, text="Moon's Alt: " + str(object.alt)).grid(column=0, row=1, columnspan=3, sticky='nsew')
-            tk.Label(modal_dlg, text='Moon\'s Azi: ' + str(object.az)).grid(column=0, row=2, columnspan=3,
+            tk.Label(modal_dlg, text="Moon's Azi: " + str(object.az)).grid(column=0, row=2, columnspan=3,
                                                                             sticky='nsew')
-            tk.Label(modal_dlg, text='Moon\'s Phase: ' + str(object.phase)).grid(column=0, row=4, columnspan=3,
+            tk.Label(modal_dlg, text="Moon's Phase: " + str(object.phase)).grid(column=0, row=4, columnspan=3,
                                                                             sticky='nsew')
         elif isinstance(object, Planet):
             tk.Label(modal_dlg, text='Planet Name: ' + str(object.proper_name)).grid(column=0, row=0, columnspan=3,

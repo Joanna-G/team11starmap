@@ -1,5 +1,5 @@
 import math
-
+from datetime import datetime, timedelta
 
 class TimeCalculations:
     def __init__(self, year, month, day, hour, minute, utc_offset, lat, lon):
@@ -34,15 +34,25 @@ class TimeCalculations:
     #         hour += 24
 
     def update_times(self, year, month, day, hour, minute, utc_offset, lat, lon):
+        self.utc_offset = utc_offset
         self.year = year
         self.month = month
         self.day = day
         self.hour = hour
         self.minute = minute
         self.second = 0
-        self.utc_offset = utc_offset
         self.lat = lat
         self.lon = lon
+
+        # Convert to UTC
+        date = datetime.now()
+        date.replace(self.year, self.month, self.day, self.hour, self.minute, 0, 0)
+        future_date = date + timedelta(hours=self.utc_offset)
+        self.year = future_date.year
+        self.month = future_date.month
+        self.day = future_date.day
+        self.hour = future_date.hour
+        self.minute = future_date.minute
 
         self.julian_day = self.calculate_julian_day(self.year, self.month, self.day, self.hour, self.minute)
         self.gmst = self.calculate_gmst(self.julian_day, self.year)

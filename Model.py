@@ -37,15 +37,9 @@ class Model():
             star = Star(sp_star[0], sp_star[1], sp_star[2], float(sp_star[3]), float(sp_star[4]), float(sp_star[5]))
             self.star_list.append(star)
 
-    # Create all constellations based on infromation from Constellation Parser (c_parse) and append to constellation_list
+    # Create all constellations based on infromation from
+    # Constellation Parser (c_parse) and append to constellation_list
     def Create_Constellations(self):
-
-        # for cp_constellation in self.c_parse:
-        #     name = cp_constellation[0]
-        #     star_list = []
-        #     for index in cp_constellation[1:]:
-        #         star_list.append(index)
-        #     constellation = Constellation(name, star_list)
 
         for cp_constellation in self.c_parse:
             name = cp_constellation[0]
@@ -55,12 +49,11 @@ class Model():
 
             constellation = Constellation(name, stars, self.star_list)
             constellation.set_const_stars()
-            # print(constellation.const_stars[0])
             constellation.set_num_stars()
-            # print(str(constellation.number_stars))
             self.constellation_list.append(constellation)
 
-    # Create all Messier Deep Space objects based on infromation from Messier Parser (m_parse) and append to messier_list
+    # Create all Messier Deep Space objects based on infromation from
+    # Messier Parser (m_parse) and append to messier_list
     def Create_Messier_Obj(self):
         for mm_messier in self.m_parse:
             messier = MessierObject(mm_messier[0], mm_messier[1], mm_messier[2], mm_messier[3], mm_messier[4],

@@ -85,6 +85,9 @@ class Controller():
         # Update the Model's TimeCalculations class with the newly inputted times
         self.model.time_calc.update_times(year, month, day, hour, minute, utc_offset, latitude, longitude)
 
+        # Draw a black rectangle for saving map purposes
+        self.view.star_map_frame.draw_background()
+
         # Calculate the Stars' positions
         self.model.Calculate_Star_Positions()
 

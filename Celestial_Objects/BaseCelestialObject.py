@@ -10,6 +10,9 @@ class BaseCelestialObject:
         self.declination = dec
         self.x = None
         self.y = None
+        self.canvas_id = None
+        self.canvas_x = None
+        self.canvas_y = None
 
     def get_xy_coords(self, alt, az, r):
         # self.x = r * math.sin(math.radians(alt)) * math.cos(math.radians(az))

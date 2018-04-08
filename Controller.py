@@ -11,7 +11,7 @@ class Controller():
         self.root = tk.Tk()
 
         self.model = Model.Model(now.year, now.month, now.day, now.hour, now.minute, 0, 0, 0)
-        self.view = New_View.MainApplication(parent=self.root)
+        self.view = New_View.MainApplication(self.model.star_list, parent=self.root)
         self.view.user_frame.button_generate_map.config(command=self.generate_map)
         self.view.user_frame.checkbox_show_constellations.config(command=self.toggle_constellations)
         self.view.user_frame.checkbox_show_labels.config(command=self.toggle_labels)
@@ -120,6 +120,8 @@ class Controller():
 
         # Toggle Constellations
         self.toggle_constellations()
+
+        self.view.star_map_frame.create_ps_file()
 
     def toggle_constellations(self):
         if self.empty_map is False:

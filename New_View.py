@@ -12,7 +12,7 @@ import sys
 
 
 class MainApplication(ttk.Frame):
-    def __init__(self, parent, *args, **kwargs):
+    def __init__(self, star_list, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent)
         self.parent = parent
 
@@ -22,7 +22,7 @@ class MainApplication(ttk.Frame):
         self.rowconfigure(0, weight=1)
 
         self.user_frame = UserFrame(self)
-        self.star_map_frame = StarMapFrame(self)
+        self.star_map_frame = StarMapFrame(self, star_list)
         self.user_frame.grid(column=0, row=0, sticky='nsew')
         self.star_map_frame.grid(column=1, row=0, sticky='nsew')
 
@@ -261,9 +261,11 @@ class UserFrame(ttk.Frame):
 
 
 class StarMapFrame(ttk.Frame):
-    def __init__(self, parent, *args, **kwargs):
+    def __init__(self, parent, star_list, *args, **kwargs):
         ttk.Frame.__init__(self, parent)
         self.parent = parent
+
+        self.star_list = star_list
 
         self.grid(column=0, row=0, sticky='nsew')
         self.columnconfigure(0, weight=1)
@@ -299,6 +301,7 @@ class StarMapFrame(ttk.Frame):
         self.canvas.bind('<Button-5>', self.wheelup)  # only with Linux, wheel scroll down
         self.canvas.bind('<Button-4>', self.wheeldown)  # only with Linux, wheel scroll up
 
+
     def draw_background(self):
         # Draw a black rectangle for saving map purposes
         self.canvas.create_rectangle(-4000, -4000, 4000, 4000, fill='black', outline='black')
@@ -318,6 +321,11 @@ class StarMapFrame(ttk.Frame):
         elif event.delta < 0:
             self.canvas.scale("all", true_x, true_y, 0.9, 0.9)
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+        for star in self.star_list:
+            canvas_coords = self.canvas.coords(star.canvas_id)
+            star.canvas_x = canvas_coords[0]
+            star.canvas_y = canvas_coords[1]
 
         # Update canvas so labels appear in the correct locations
         # Don't think this is actually doing anything? -- Jo
@@ -348,16 +356,21 @@ class StarMapFrame(ttk.Frame):
             r = 0.5
         else:
             r = 0
-        x = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='#F6DC83', outline='#F6DC83')
-        self.canvas.tag_bind(x, '<ButtonPress-1>', lambda e: self.display_star_info(e, star))
+        star.canvas_id = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='#F6DC83', outline='#F6DC83')
+
+        canvas_coords = self.canvas.coords(star.canvas_id)
+        star.canvas_x = canvas_coords[0]
+        star.canvas_y = canvas_coords[1]
+
+        self.canvas.tag_bind(star.canvas_id, '<ButtonPress-1>', lambda e: self.display_star_info(e, star))
 
     def draw_constellation_line(self, star_1, star_2):
-        const = self.canvas.create_line(star_1.x, star_1.y, star_2.x, star_2.y, fill='pink')
+        const = self.canvas.create_line(star_1.canvas_x, star_1.canvas_y, star_2.canvas_x, star_2.canvas_y, fill='pink')
 
         # Redraw stars on top of constellation lines. Breaks with zooming because it
         # redraws stars that shouldn't be there.
-        self.draw_star(star_1, star_1.x, star_1.y)
-        self.draw_star(star_2, star_2.x, star_2.y)
+        # self.draw_star(star_1, star_1.x, star_1.y)
+        # self.draw_star(star_2, star_2.x, star_2.y)
 
         # Don't need to be able to click on constellations to see names. - Jo
         # self.canvas.tag_bind(const, '<ButtonPress-1>', lambda e: self.display_constellation_info(e, constellation))
@@ -563,9 +576,9 @@ class StarMapFrame(ttk.Frame):
     # Save the current canvas as a jpeg
     def save_canvas(self):
         save_file = asksaveasfilename(filetypes=[('', '.jpeg')], defaultextension='*.jpeg')
-        self.canvas.update()
-
-        self.canvas.postscript(file='canvas.ps', x=-4000, y=-4000, width=8000, height=8000)
+        # self.canvas.update()
+        #
+        # self.canvas.postscript(file='canvas.ps', x=-4000, y=-4000, width=8000, height=8000)
 
         if save_file != '':
             args = [
@@ -580,6 +593,10 @@ class StarMapFrame(ttk.Frame):
             encoding = locale.getpreferredencoding()
             args = [a.encode(encoding) for a in args]
             ghostscript.Ghostscript(*args)
+
+    def create_ps_file(self):
+        self.canvas.update()
+        self.canvas.postscript(file='canvas.ps', x=-4000, y=-4000, width=8000, height=8000)
 
     def on_mouse_wheel_scroll(self, e):
         if e.state == 8:

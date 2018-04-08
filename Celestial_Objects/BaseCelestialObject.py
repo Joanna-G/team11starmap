@@ -36,7 +36,7 @@ class BaseCelestialObject:
         hours = int(ra / 15.0)
         minutes = int(((ra / 15.0) - hours) * 60)
         seconds = ((((ra / 15.0) - hours) * 60.0) - minutes) * 60
-        print('hh:mm:ss: ' + str(hours) + ' ' + str(minutes) + ' ' + str(seconds))
+        # print('hh:mm:ss: ' + str(hours) + ' ' + str(minutes) + ' ' + str(seconds))
         ra_time_decimal = hours + (minutes / 60) + (seconds / 3600)
         return ra_time_decimal
 

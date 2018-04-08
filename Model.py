@@ -37,7 +37,7 @@ class Model():
             star = Star(sp_star[0], sp_star[1], sp_star[2], float(sp_star[3]), float(sp_star[4]), float(sp_star[5]))
             self.star_list.append(star)
 
-    # Create all constellations based on infromation from
+    # Create all constellations based on information from
     # Constellation Parser (c_parse) and append to constellation_list
     def Create_Constellations(self):
 
@@ -90,13 +90,13 @@ class Model():
             planet.true_anomaly = planet.calculate_true_anomaly(math.radians(planet.mean_anomaly),
                                                                 math.radians(planet.eccentricity))
             planet.right_ascension, planet.declination, planet.distance = planet.calculate_ra_dec_planet(
-                 planet.proper_name, planet.lscal, planet.lprop, planet.ascal, planet.aprop,
-                 planet.escal, planet.eprop, planet.iscal, planet.iprop, planet.wscal,
-                 planet.wprop, planet.oscal, planet.oprop, planet.lscal, planet.lprop,
-                 self.planet_list[2].ascal, self.planet_list[2].aprop, self.planet_list[2].escal,
-                 self.planet_list[2].eprop, self.planet_list[2].iscal,
-                 self.planet_list[2].iprop, self.planet_list[2].wscal, self.planet_list[2].wprop,
-                 self.planet_list[2].oscal, self.planet_list[2].oprop, self.time_calc.cy, self.time_calc.d)
+                planet.proper_name, planet.lscal, planet.lprop, planet.ascal, planet.aprop,
+                planet.escal, planet.eprop, planet.iscal, planet.iprop, planet.wscal,
+                planet.wprop, planet.oscal, planet.oprop, planet.lscal, planet.lprop,
+                self.planet_list[2].ascal, self.planet_list[2].aprop, self.planet_list[2].escal,
+                self.planet_list[2].eprop, self.planet_list[2].iscal,
+                self.planet_list[2].iprop, self.planet_list[2].wscal, self.planet_list[2].wprop,
+                self.planet_list[2].oscal, self.planet_list[2].oprop, self.time_calc.cy, self.time_calc.d)
             ha_time = planet.calculate_ha_time(self.time_calc.lst, planet.right_ascension)
             planet.ha = planet.ha_time_to_degrees(ha_time)
             planet.alt, planet.az = planet.calculate_alt_az(planet.declination, self.time_calc.lat,
@@ -122,4 +122,3 @@ class Model():
             messier.altitude, messier.azimuth = messier.calculate_alt_az(messier.declination, self.time_calc.lat,
                                                                          messier.ha_degrees, None, None, None)
             messier.get_xy_coords(messier.altitude, messier.azimuth, 4000)
-

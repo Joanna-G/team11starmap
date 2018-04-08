@@ -1,6 +1,5 @@
 import tkinter as tk
 import Model
-import View
 import New_View
 import datetime
 
@@ -61,6 +60,7 @@ class Controller():
             ready = self.view.user_frame.validate_combobox(widget)
             if ready is False:
                 print('validate_widget: wrong values')
+                self.view.create_error_dialog('validate_widget: wrong values')
                 return
 
         # Clear Canvas
@@ -77,6 +77,7 @@ class Controller():
             latitude = float(self.view.user_frame.latitude_value.get())
             longitude = float(self.view.user_frame.longitude_value.get())
         except ValueError:
+            self.view.create_error_dialog('wrong values')
             print('wrong values')
             return
 

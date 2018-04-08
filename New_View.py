@@ -12,7 +12,7 @@ import sys
 
 
 class MainApplication(ttk.Frame):
-    def __init__(self, star_list, parent, *args, **kwargs):
+    def __init__(self, star_list, messier_list, planet_list, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent)
         self.parent = parent
 
@@ -22,7 +22,7 @@ class MainApplication(ttk.Frame):
         self.rowconfigure(0, weight=1)
 
         self.user_frame = UserFrame(self)
-        self.star_map_frame = StarMapFrame(self, star_list)
+        self.star_map_frame = StarMapFrame(self, star_list, messier_list, planet_list)
         self.user_frame.grid(column=0, row=0, sticky='nsew')
         self.star_map_frame.grid(column=1, row=0, sticky='nsew')
 
@@ -285,11 +285,15 @@ class UserFrame(ttk.Frame):
 
 
 class StarMapFrame(ttk.Frame):
-    def __init__(self, parent, star_list, *args, **kwargs):
+    def __init__(self, parent, star_list, messier_list, planet_list,*args, **kwargs):
         ttk.Frame.__init__(self, parent)
         self.parent = parent
 
         self.star_list = star_list
+        self.messier_list = messier_list
+        self.planet_list = planet_list
+
+        self.multiplier = 1
 
         self.grid(column=0, row=0, sticky='nsew')
         self.columnconfigure(0, weight=1)
@@ -339,20 +343,33 @@ class StarMapFrame(ttk.Frame):
     def wheel(self, event):
         true_x = self.canvas.canvasx(event.x)
         true_y = self.canvas.canvasy(event.y)
+        scale = 1
         if event.delta > 0:
+            scale = 1.1
             self.canvas.scale("all", true_x, true_y, 1.1, 1.1)
         elif event.delta < 0:
+            scale = 0.9
             self.canvas.scale("all", true_x, true_y, 0.9, 0.9)
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
+        self.multiplier *= scale
+
+        # Update canvas x, y coordinates
         for star in self.star_list:
             canvas_coords = self.canvas.coords(star.canvas_id)
             star.canvas_x = canvas_coords[0]
             star.canvas_y = canvas_coords[1]
 
-        # Update canvas so labels appear in the correct locations
-        # Don't think this is actually doing anything? -- Jo
-        self.canvas.update()
+        for messier in self.messier_list:
+            canvas_coords = self.canvas.coords(messier.canvas_id)
+            messier.canvas_x = canvas_coords[0]
+            messier.canvas_y = canvas_coords[1]
+
+        # So, planets aren't working for some bizarre reason. It doesn't like the canvas ID i'm passing -Irene
+        for planet in self.planet_list:
+            canvas_coords = self.canvas.coords(planet.canvas_id)
+            planet.canvas_x = canvas_coords[0]
+            planet.canvas_y = canvas_coords[1]
 
     # linux zoom
     def wheelup(self, event):
@@ -416,27 +433,42 @@ class StarMapFrame(ttk.Frame):
         r = 12
         # If moon.phase is new, draw black circle with white outline
         if phase == 'New':
-            x = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='black', outline='white')
+            moon.canvas_id = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='black', outline='white')
         # If moon.phase is first, somehow draw a circle with the left half black, right half white, white outline
         elif phase == 'First Quarter':
             self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='black', outline='white')
+
+            moon.canvas_id = self.canvas.create_arc(x - r, y - r, x + r, y + r, start=270, extent=180, fill='white',
+                                                    outline='white',
+                                                    style=tk.CHORD)
             x = self.canvas.create_arc(x - r, y - r, x + r, y + r, start=270, extent=180, fill='white', outline='white',
                                        style=tk.CHORD)
+
         # If moon.phase is full, draw a white circle with white outline
         elif phase == 'Full':
-            x = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='white', outline='white')
+            moon.canvas_id = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='white', outline='white')
         # If moon.phase is last, somehow draw a circle with the left half white, right half black, white outline
         else:
             self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='black', outline='white')
-            x = self.canvas.create_arc(x - r, y - r, x + r, y + r, start=90.0, extent=180.0, style=tk.CHORD,
-                                       fill='white', outline='white')
+            moon.canvas_id = self.canvas.create_arc(x - r, y - r, x + r, y + r, start=90.0, extent=180.0,
+                                                    style=tk.CHORD,
+                                                    fill='white', outline='white')
 
-        self.canvas.tag_bind(x, '<ButtonPress-1>', lambda e: self.display_moon_info(e, moon))
+        canvas_coords = self.canvas.coords(moon.canvas_id)
+        moon.canvas_x = canvas_coords[0]
+        moon.canvas_y = canvas_coords[1]
+
+        self.canvas.tag_bind(moon.canvas_id, '<ButtonPress-1>', lambda e: self.display_moon_info(e, moon))
 
     def draw_planet(self, planet, x, y):
         r = 6
-        x = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='blue', outline='blue')
-        self.canvas.tag_bind(x, '<ButtonPress-1>', lambda e: self.display_planet_info(e, planet))
+        planet.canvas_id = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='blue', outline='blue')
+
+        canvas_coords = self.canvas.coords(planet.canvas_id)
+        planet.canvas_x = canvas_coords[0]
+        planet.canvas_y = canvas_coords[1]
+
+        self.canvas.tag_bind(planet.canvas_id, '<ButtonPress-1>', lambda e: self.display_planet_info(e, planet))
 
     def draw_messier_object(self, messier, x, y):
         if messier.magnitude <= 1.0:
@@ -453,8 +485,12 @@ class StarMapFrame(ttk.Frame):
             r = 0.5
         else:
             r = 0
-        x = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='red', outline='red')
-        self.canvas.tag_bind(x, '<ButtonPress-1>', lambda e: self.display_messier_info(e, messier))
+        messier.canvas_id = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='red', outline='red')
+        canvas_coords = self.canvas.coords(messier.canvas_id)
+        messier.canvas_x = canvas_coords[0]
+        messier.canvas_y = canvas_coords[1]
+
+        self.canvas.tag_bind(messier.canvas_id, '<ButtonPress-1>', lambda e: self.display_messier_info(e, messier))
 
     def display_star_info(self, e, star):
         x = self.parent.parent.winfo_pointerx()
@@ -483,6 +519,9 @@ class StarMapFrame(ttk.Frame):
         self.create_modal_dialog(messier, x, y)
 
     def display_object_label(self, object):
+        tag = "label"
+        font = ""
+        size = 0
         if isinstance(object, Star):
             if object.magnitude <= 2:
                 offset = 13
@@ -527,12 +566,15 @@ class StarMapFrame(ttk.Frame):
             offset = 0
             fill = 'purple'
         if isinstance(object, Constellation):
+            self.label_widgets.append((self.canvas.create_text(object.x, object.y, text=str(object.proper_name),
+                                                               fill=fill, tag=tag, font=(font, size))))
             self.label_widgets.append(
                 (self.canvas.create_text(object.x, object.y + offset, text=str(object.proper_name),
                                          fill=fill, tag=tag, font=(font, size))))
         else:
             self.label_widgets.append(
-                (self.canvas.create_text(object.x, object.y + offset, text=str(object.proper_name),
+                (self.canvas.create_text(object.canvas_x + (offset / 3 * self.multiplier),
+                                         object.canvas_y + (offset * self.multiplier), text=str(object.proper_name),
                                          fill=fill, tag=tag)))
 
     def create_modal_dialog(self, object, x, y):

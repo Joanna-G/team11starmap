@@ -30,7 +30,7 @@ class Constellation:
         x_sum = 0
         y_sum = 0
         for star in self.const_stars:
-            x_sum = x_sum + star.x
-            y_sum = y_sum + star.y
+            x_sum = x_sum + star.canvas_x
+            y_sum = y_sum + star.canvas_y
         self.x = x_sum / self.number_stars
         self.y = y_sum / self.number_stars

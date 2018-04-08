@@ -10,7 +10,7 @@ class Controller():
         self.root = tk.Tk()
 
         self.model = Model.Model(now.year, now.month, now.day, now.hour, now.minute, 0, 0, 0)
-        self.view = New_View.MainApplication(self.model.star_list, parent=self.root)
+        self.view = New_View.MainApplication(self.model.star_list, self.model.messier_list, self.model.planet_list, parent=self.root)
         self.view.user_frame.button_generate_map.config(command=self.generate_map)
         self.view.user_frame.checkbox_show_constellations.config(command=self.toggle_constellations)
         self.view.user_frame.checkbox_show_labels.config(command=self.toggle_labels)

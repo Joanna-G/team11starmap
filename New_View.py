@@ -12,7 +12,7 @@ import sys
 
 
 class MainApplication(ttk.Frame):
-    def __init__(self, star_list, parent, *args, **kwargs):
+    def __init__(self, star_list, messier_list, planet_list, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent)
         self.parent = parent
 
@@ -22,9 +22,23 @@ class MainApplication(ttk.Frame):
         self.rowconfigure(0, weight=1)
 
         self.user_frame = UserFrame(self)
-        self.star_map_frame = StarMapFrame(self, star_list)
+        self.star_map_frame = StarMapFrame(self, star_list, messier_list, planet_list)
         self.user_frame.grid(column=0, row=0, sticky='nsew')
         self.star_map_frame.grid(column=1, row=0, sticky='nsew')
+
+    # I stole this code from below, no idea if this is actually how this should work.
+    def create_error_dialog(self, error_message):
+        modal_dlg = tk.Toplevel(master=self)
+        modal_dlg.columnconfigure(0, weight=1)
+        modal_dlg.resizable(False, False)
+
+        tk.Label(modal_dlg, text=error_message).grid(column=0, row=0, columnspan=3, sticky='nw')
+
+        modal_dlg.geometry('+%d+%d' % (2000, 2000))
+        modal_dlg.transient(self.parent)
+        modal_dlg.focus_set()
+        modal_dlg.grab_set()
+        self.wait_window(modal_dlg)
 
 
 class UserFrame(ttk.Frame):
@@ -122,12 +136,13 @@ class UserFrame(ttk.Frame):
         self.label_logo = logo
 
         # Date label, comboboxes, and daylight savings checkbox
-        self.label_date = tk.Label(self.menu_frame, text='Date:', background=self.menu_color, foreground=self.text_color)
+        self.label_date = tk.Label(self.menu_frame, text='Date:', background=self.menu_color,
+                                   foreground=self.text_color)
         self.label_date.grid(column=0, row=1, columnspan=3, padx=self.padx, pady=self.pady, sticky='nsw')
         self.label_date.config(font=(self.font, self.size))
 
         self.combobox_month = ttk.Combobox(self.menu_frame, textvariable=self.month_value, state='normal')
-        self.combobox_month.grid(column=0, row=2, sticky='nsew', padx=(self.padx,0), pady=self.pady)
+        self.combobox_month.grid(column=0, row=2, sticky='nsew', padx=(self.padx, 0), pady=self.pady)
         self.combobox_month.bind('<FocusIn>', lambda e: self.validate_combobox(self.combobox_month, e))
         self.combobox_month.bind('<FocusOut>', lambda e: self.validate_combobox(self.combobox_month, e))
         self.combobox_month.var = self.month_value
@@ -135,7 +150,7 @@ class UserFrame(ttk.Frame):
         self.validation_widgets.append(self.combobox_month)
 
         self.combobox_day = ttk.Combobox(self.menu_frame, textvariable=self.day_value, state='normal')
-        self.combobox_day.grid(column=1, row=2, sticky='nsew', padx=(self.padx,0), pady=self.pady)
+        self.combobox_day.grid(column=1, row=2, sticky='nsew', padx=(self.padx, 0), pady=self.pady)
         self.combobox_day.bind('<FocusIn>', lambda e: self.validate_combobox(self.combobox_day, e))
         self.combobox_day.bind('<FocusOut>', lambda e: self.validate_combobox(self.combobox_day, e))
         self.combobox_day.var = self.day_value
@@ -151,19 +166,20 @@ class UserFrame(ttk.Frame):
         self.validation_widgets.append(self.combobox_year)
 
         # Time label and comboboxes
-        self.label_time = tk.Label(self.menu_frame, text='Time:', background=self.menu_color, foreground=self.text_color)
+        self.label_time = tk.Label(self.menu_frame, text='Time:', background=self.menu_color,
+                                   foreground=self.text_color)
         self.label_time.grid(column=0, row=3, columnspan=3, sticky='nsw', padx=self.padx, pady=self.pady)
         self.label_time.config(font=(self.font, self.size))
 
         self.combobox_hour = ttk.Combobox(self.menu_frame, textvariable=self.hour_value, state='normal')
-        self.combobox_hour.grid(column=0, row=4, sticky='nsew', padx=(self.padx,0), pady=self.pady)
+        self.combobox_hour.grid(column=0, row=4, sticky='nsew', padx=(self.padx, 0), pady=self.pady)
         self.combobox_hour.bind('<FocusIn>', lambda e: self.validate_combobox(self.combobox_hour, e))
         self.combobox_hour.bind('<FocusOut>', lambda e: self.validate_combobox(self.combobox_hour, e))
         self.combobox_hour.var = self.hour_value
         self.combobox_hour.range = (0, 23)
         self.validation_widgets.append(self.combobox_hour)
         self.combobox_minute = ttk.Combobox(self.menu_frame, textvariable=self.minute_value, state='normal')
-        self.combobox_minute.grid(column=1, row=4, sticky='nsew', padx=(self.padx,0), pady=self.pady)
+        self.combobox_minute.grid(column=1, row=4, sticky='nsew', padx=(self.padx, 0), pady=self.pady)
         self.combobox_minute.bind('<FocusIn>', lambda e: self.validate_combobox(self.combobox_minute, e))
         self.combobox_minute.bind('<FocusOut>', lambda e: self.validate_combobox(self.combobox_minute, e))
         self.combobox_minute.var = self.minute_value
@@ -177,16 +193,19 @@ class UserFrame(ttk.Frame):
         self.combobox_utc.range = (-12, 14)
         self.validation_widgets.append(self.combobox_utc)
 
-        self.checkbox_daylight_savings = tk.Checkbutton(self.menu_frame, text='Daylight Savings', background=self.menu_color, foreground=self.text_color, variable=self.daylight_savings_value)
+        self.checkbox_daylight_savings = tk.Checkbutton(self.menu_frame, text='Daylight Savings',
+                                                        background=self.menu_color, foreground=self.text_color,
+                                                        variable=self.daylight_savings_value)
         self.checkbox_daylight_savings.grid(column=0, row=5, sticky='nsw', columnspan=3, padx=self.padx, pady=self.pady)
 
         # Location label and lat/lon comboboxes
-        self.label_location = tk.Label(self.menu_frame, text='Location:', background=self.menu_color, foreground=self.text_color)
+        self.label_location = tk.Label(self.menu_frame, text='Location:', background=self.menu_color,
+                                       foreground=self.text_color)
         self.label_location.grid(column=0, row=6, columnspan=3, sticky='nsw', padx=self.padx, pady=self.pady)
         self.label_location.config(font=(self.font, self.size))
 
         self.combobox_latitude = ttk.Combobox(self.menu_frame, textvariable=self.latitude_value, state='normal')
-        self.combobox_latitude.grid(column=0, row=7, sticky='nsew', padx=(self.padx,0), pady=self.pady)
+        self.combobox_latitude.grid(column=0, row=7, sticky='nsew', padx=(self.padx, 0), pady=self.pady)
         self.combobox_latitude.bind('<FocusIn>', lambda e: self.validate_combobox(self.combobox_latitude, e))
         self.combobox_latitude.bind('<FocusOut>', lambda e: self.validate_combobox(self.combobox_latitude, e))
         self.combobox_latitude.var = self.latitude_value
@@ -201,9 +220,14 @@ class UserFrame(ttk.Frame):
         self.validation_widgets.append(self.combobox_longitude)
 
         # Show/Hide checkboxes and labels
-        self.checkbox_show_constellations = tk.Checkbutton(self.menu_frame, text='Show Constellations', background=self.menu_color, variable=self.constellations_value, foreground=self.text_color)
-        self.checkbox_show_constellations.grid(column=0, row=8, sticky='nsw', columnspan=3, padx=self.padx, pady=self.pady)
-        self.checkbox_show_labels = tk.Checkbutton(self.menu_frame, text='Show Labels', background=self.menu_color, variable=self.labels_value, foreground=self.text_color)
+        self.checkbox_show_constellations = tk.Checkbutton(self.menu_frame, text='Show Constellations',
+                                                           background=self.menu_color,
+                                                           variable=self.constellations_value,
+                                                           foreground=self.text_color)
+        self.checkbox_show_constellations.grid(column=0, row=8, sticky='nsw', columnspan=3, padx=self.padx,
+                                               pady=self.pady)
+        self.checkbox_show_labels = tk.Checkbutton(self.menu_frame, text='Show Labels', background=self.menu_color,
+                                                   variable=self.labels_value, foreground=self.text_color)
         self.checkbox_show_labels.grid(column=0, row=9, sticky='nsw', columnspan=3, padx=self.padx, pady=self.pady)
 
         # Generate map and reset buttons
@@ -261,11 +285,15 @@ class UserFrame(ttk.Frame):
 
 
 class StarMapFrame(ttk.Frame):
-    def __init__(self, parent, star_list, *args, **kwargs):
+    def __init__(self, parent, star_list, messier_list, planet_list,*args, **kwargs):
         ttk.Frame.__init__(self, parent)
         self.parent = parent
 
         self.star_list = star_list
+        self.messier_list = messier_list
+        self.planet_list = planet_list
+
+        self.multiplier = 1
 
         self.grid(column=0, row=0, sticky='nsew')
         self.columnconfigure(0, weight=1)
@@ -301,7 +329,6 @@ class StarMapFrame(ttk.Frame):
         self.canvas.bind('<Button-5>', self.wheelup)  # only with Linux, wheel scroll down
         self.canvas.bind('<Button-4>', self.wheeldown)  # only with Linux, wheel scroll up
 
-
     def draw_background(self):
         # Draw a black rectangle for saving map purposes
         self.canvas.create_rectangle(-4000, -4000, 4000, 4000, fill='black', outline='black')
@@ -316,20 +343,34 @@ class StarMapFrame(ttk.Frame):
     def wheel(self, event):
         true_x = self.canvas.canvasx(event.x)
         true_y = self.canvas.canvasy(event.y)
+        scale = 1
         if event.delta > 0:
+            scale = 1.1
             self.canvas.scale("all", true_x, true_y, 1.1, 1.1)
         elif event.delta < 0:
+            scale = 0.9
             self.canvas.scale("all", true_x, true_y, 0.9, 0.9)
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
+        self.multiplier *= scale
+
+        # Update canvas x, y coordinates
         for star in self.star_list:
             canvas_coords = self.canvas.coords(star.canvas_id)
             star.canvas_x = canvas_coords[0]
             star.canvas_y = canvas_coords[1]
 
-        # Update canvas so labels appear in the correct locations
-        # Don't think this is actually doing anything? -- Jo
-        self.canvas.update()
+        for messier in self.messier_list:
+            canvas_coords = self.canvas.coords(messier.canvas_id)
+            messier.canvas_x = canvas_coords[0]
+            messier.canvas_y = canvas_coords[1]
+
+        # So, planets aren't working for some bizarre reason. It doesn't like the canvas ID i'm passing -Irene
+        for planet in self.planet_list:
+            if planet.proper_name != 'Earth/Sun':
+                canvas_coords = self.canvas.coords(planet.canvas_id)
+                planet.canvas_x = canvas_coords[0]
+                planet.canvas_y = canvas_coords[1]
 
     # linux zoom
     def wheelup(self, event):
@@ -399,27 +440,42 @@ class StarMapFrame(ttk.Frame):
         r = 12
         # If moon.phase is new, draw black circle with white outline
         if phase == 'New':
-            x = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='black', outline='white')
+            moon.canvas_id = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='black', outline='white')
         # If moon.phase is first, somehow draw a circle with the left half black, right half white, white outline
         elif phase == 'First Quarter':
             self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='black', outline='white')
+
+            moon.canvas_id = self.canvas.create_arc(x - r, y - r, x + r, y + r, start=270, extent=180, fill='white',
+                                                    outline='white',
+                                                    style=tk.CHORD)
             x = self.canvas.create_arc(x - r, y - r, x + r, y + r, start=270, extent=180, fill='white', outline='white',
-                                   style=tk.CHORD)
+                                       style=tk.CHORD)
+
         # If moon.phase is full, draw a white circle with white outline
         elif phase == 'Full':
-            x = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='white', outline='white')
+            moon.canvas_id = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='white', outline='white')
         # If moon.phase is last, somehow draw a circle with the left half white, right half black, white outline
         else:
             self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='black', outline='white')
-            x = self.canvas.create_arc(x - r, y - r, x + r, y + r, start=90.0, extent=180.0, style=tk.CHORD,
-                                       fill='white', outline='white')
+            moon.canvas_id = self.canvas.create_arc(x - r, y - r, x + r, y + r, start=90.0, extent=180.0,
+                                                    style=tk.CHORD,
+                                                    fill='white', outline='white')
 
-        self.canvas.tag_bind(x, '<ButtonPress-1>', lambda e: self.display_moon_info(e, moon))
+        canvas_coords = self.canvas.coords(moon.canvas_id)
+        moon.canvas_x = canvas_coords[0]
+        moon.canvas_y = canvas_coords[1]
+
+        self.canvas.tag_bind(moon.canvas_id, '<ButtonPress-1>', lambda e: self.display_moon_info(e, moon))
 
     def draw_planet(self, planet, x, y):
         r = 6
-        x = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='blue', outline='blue')
-        self.canvas.tag_bind(x, '<ButtonPress-1>', lambda e: self.display_planet_info(e, planet))
+        planet.canvas_id = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='blue', outline='blue')
+
+        canvas_coords = self.canvas.coords(planet.canvas_id)
+        planet.canvas_x = canvas_coords[0]
+        planet.canvas_y = canvas_coords[1]
+
+        self.canvas.tag_bind(planet.canvas_id, '<ButtonPress-1>', lambda e: self.display_planet_info(e, planet))
 
     def draw_messier_object(self, messier, x, y):
         if messier.magnitude <= 1.0:
@@ -436,8 +492,12 @@ class StarMapFrame(ttk.Frame):
             r = 0.5
         else:
             r = 0
-        x = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='red', outline='red')
-        self.canvas.tag_bind(x, '<ButtonPress-1>', lambda e: self.display_messier_info(e, messier))
+        messier.canvas_id = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='red', outline='red')
+        canvas_coords = self.canvas.coords(messier.canvas_id)
+        messier.canvas_x = canvas_coords[0]
+        messier.canvas_y = canvas_coords[1]
+
+        self.canvas.tag_bind(messier.canvas_id, '<ButtonPress-1>', lambda e: self.display_messier_info(e, messier))
 
     def display_star_info(self, e, star):
         x = self.parent.parent.winfo_pointerx()
@@ -453,12 +513,12 @@ class StarMapFrame(ttk.Frame):
     def display_moon_info(self, e, moon):
         x = self.parent.parent.winfo_pointerx()
         y = self.parent.parent.winfo_pointery()
-        self.create_modal_dialog(moon, moon.x, moon.y)
+        self.create_modal_dialog(moon, x, y)
 
     def display_planet_info(self, e, planet):
         x = self.parent.parent.winfo_pointerx()
         y = self.parent.parent.winfo_pointery()
-        self.create_modal_dialog(planet, planet.x, planet.y)
+        self.create_modal_dialog(planet, x, y)
 
     def display_messier_info(self, e, messier):
         x = self.parent.parent.winfo_pointerx()
@@ -466,6 +526,9 @@ class StarMapFrame(ttk.Frame):
         self.create_modal_dialog(messier, x, y)
 
     def display_object_label(self, object):
+        tag = "label"
+        font = ""
+        size = 0
         if isinstance(object, Star):
             if object.magnitude <= 2:
                 offset = 13
@@ -510,12 +573,12 @@ class StarMapFrame(ttk.Frame):
             offset = 0
             fill = 'purple'
         if isinstance(object, Constellation):
-            self.label_widgets.append((self.canvas.create_text(object.x, object.y+offset, text=str(object.proper_name),
-                                                           fill=fill, tag=tag, font=(font, size))))
+            self.label_widgets.append((self.canvas.create_text(object.x, object.y, text=str(object.proper_name),
+                                                               fill=fill, tag=tag, font=(font, size))))
         else:
             self.label_widgets.append(
-                (self.canvas.create_text(object.x, object.y + offset, text=str(object.proper_name),
-                                         fill=fill, tag=tag)))
+                (self.canvas.create_text(object.canvas_x + (offset / 3 * self.multiplier), object.canvas_y +
+                                (offset * self.multiplier), text=str(object.proper_name), fill=fill, tag=tag)))
 
     def create_modal_dialog(self, object, x, y):
         modal_dlg = tk.Toplevel(master=self)
@@ -527,16 +590,16 @@ class StarMapFrame(ttk.Frame):
         if isinstance(object, Star):
             if object.proper_name != '':
                 tk.Label(modal_dlg, text='Star Name: ' + str(object.proper_name)).grid(column=0, row=0, columnspan=3,
-                                                                              sticky='nw')
+                                                                                       sticky='nw')
             else:
                 tk.Label(modal_dlg, text='Star HD ID: ' + str(object.hd_id)).grid(column=0, row=0, columnspan=3,
-                                                                              sticky='nw')
+                                                                                  sticky='nw')
             tk.Label(modal_dlg, text='Star Altitude: ' + str(object.altitude)).grid(column=0, row=1, columnspan=3,
-                                                                               sticky='nw')
+                                                                                    sticky='nw')
             tk.Label(modal_dlg, text='Star Azimuth: ' + str(object.azimuth)).grid(column=0, row=2, columnspan=3,
-                                                                              sticky='nw')
+                                                                                  sticky='nw')
             tk.Label(modal_dlg, text='Star Magnitude: ' + str(object.magnitude)).grid(column=0, row=4, columnspan=3,
-                                                                                     sticky='nw')
+                                                                                      sticky='nw')
 
         # Don't really need to have dialog for constellations
         # elif isinstance(object, Constellation):
@@ -545,7 +608,8 @@ class StarMapFrame(ttk.Frame):
 
         elif isinstance(object, Moon):
             tk.Label(modal_dlg, text='Moon').grid(column=0, row=0, columnspan=3, sticky='nw')
-            tk.Label(modal_dlg, text="Moon Altitude: " + str(object.alt)).grid(column=0, row=1, columnspan=3, sticky='nw')
+            tk.Label(modal_dlg, text="Moon Altitude: " + str(object.alt)).grid(column=0, row=1, columnspan=3,
+                                                                               sticky='nw')
             tk.Label(modal_dlg, text="Moon Azimuth: " + str(object.az)).grid(column=0, row=2, columnspan=3,
                                                                             sticky='nw')
             tk.Label(modal_dlg, text="Moon Phase: " + str(object.phase)).grid(column=0, row=4, columnspan=3,
@@ -562,8 +626,8 @@ class StarMapFrame(ttk.Frame):
                 tk.Label(modal_dlg, text='Messier Object Name: ' + str(object.proper_name)).grid(column=0, row=0,
                                                                                 columnspan=3, sticky='nw')
             else:
-                tk.Label(modal_dlg, text='Messier Catalog ID: ' + str(object.messier_cat)).grid(column=0, row=0, columnspan=3,
-                                                                                  sticky='nw')
+                tk.Label(modal_dlg, text='Messier Catalog ID: ' + str(object.messier_cat)).grid(column=0, row=0,
+                                                                                columnspan=3, sticky='nw')
             tk.Label(modal_dlg, text='Messier Object Description: ' + str(object.description)).grid(column=0, row=1,
                                                                                 columnspan=3, sticky='nw')
             tk.Label(modal_dlg, text='Messier Object Altitude: ' + str(object.altitude)).grid(column=0, row=2,

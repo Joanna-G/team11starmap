@@ -1,6 +1,5 @@
 import tkinter as tk
 import Model
-import View
 import New_View
 import datetime
 
@@ -11,7 +10,7 @@ class Controller():
         self.root = tk.Tk()
 
         self.model = Model.Model(now.year, now.month, now.day, now.hour, now.minute, 0, 0, 0)
-        self.view = New_View.MainApplication(self.model.star_list, parent=self.root)
+        self.view = New_View.MainApplication(self.model.star_list, self.model.messier_list, self.model.planet_list, parent=self.root)
         self.view.user_frame.button_generate_map.config(command=self.generate_map)
         self.view.user_frame.checkbox_show_constellations.config(command=self.toggle_constellations)
         self.view.user_frame.checkbox_show_labels.config(command=self.toggle_labels)
@@ -32,6 +31,10 @@ class Controller():
 
         self.empty_map = True
         self.constellation_lines = []
+
+        # store the center of the canvas
+        self.centerX = self.view.star_map_frame.canvas.xview()[0]
+        self.centerY = self.view.star_map_frame.canvas.yview()[0]
 
     def toggle_fullscreen(self, event=None):
         self.state = not self.state
@@ -61,6 +64,7 @@ class Controller():
             ready = self.view.user_frame.validate_combobox(widget)
             if ready is False:
                 print('validate_widget: wrong values')
+                self.view.create_error_dialog('validate_widget: wrong values')
                 return
 
         # Clear Canvas
@@ -77,6 +81,7 @@ class Controller():
             latitude = float(self.view.user_frame.latitude_value.get())
             longitude = float(self.view.user_frame.longitude_value.get())
         except ValueError:
+            self.view.create_error_dialog('wrong values')
             print('wrong values')
             return
 
@@ -122,6 +127,7 @@ class Controller():
         self.toggle_constellations()
 
         self.view.star_map_frame.create_ps_file()
+
 
     def toggle_constellations(self):
         if self.empty_map is False:
@@ -176,6 +182,10 @@ class Controller():
         self.view.star_map_frame.canvas.delete('label')
         self.view.star_map_frame.canvas.delete('const_label')
         self.view.star_map_frame.label_widgets.clear()
+
+        # Recenter the canvas
+        self.view.star_map_frame.canvas.xview_moveto(self.centerX)
+        self.view.star_map_frame.canvas.yview_moveto(self.centerY)
 
 
 if __name__ == "__main__":

@@ -507,12 +507,12 @@ class StarMapFrame(ttk.Frame):
     def display_moon_info(self, e, moon):
         x = self.parent.parent.winfo_pointerx()
         y = self.parent.parent.winfo_pointery()
-        self.create_modal_dialog(moon, moon.x, moon.y)
+        self.create_modal_dialog(moon, x, y)
 
     def display_planet_info(self, e, planet):
         x = self.parent.parent.winfo_pointerx()
         y = self.parent.parent.winfo_pointery()
-        self.create_modal_dialog(planet, planet.x, planet.y)
+        self.create_modal_dialog(planet, x, y)
 
     def display_messier_info(self, e, messier):
         x = self.parent.parent.winfo_pointerx()

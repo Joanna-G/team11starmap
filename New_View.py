@@ -367,9 +367,10 @@ class StarMapFrame(ttk.Frame):
 
         # So, planets aren't working for some bizarre reason. It doesn't like the canvas ID i'm passing -Irene
         for planet in self.planet_list:
-            canvas_coords = self.canvas.coords(planet.canvas_id)
-            planet.canvas_x = canvas_coords[0]
-            planet.canvas_y = canvas_coords[1]
+            if planet.proper_name != 'Earth/Sun':
+                canvas_coords = self.canvas.coords(planet.canvas_id)
+                planet.canvas_x = canvas_coords[0]
+                planet.canvas_y = canvas_coords[1]
 
     # linux zoom
     def wheelup(self, event):
@@ -568,14 +569,10 @@ class StarMapFrame(ttk.Frame):
         if isinstance(object, Constellation):
             self.label_widgets.append((self.canvas.create_text(object.x, object.y, text=str(object.proper_name),
                                                                fill=fill, tag=tag, font=(font, size))))
-            self.label_widgets.append(
-                (self.canvas.create_text(object.x, object.y + offset, text=str(object.proper_name),
-                                         fill=fill, tag=tag, font=(font, size))))
         else:
             self.label_widgets.append(
-                (self.canvas.create_text(object.canvas_x + (offset / 3 * self.multiplier),
-                                         object.canvas_y + (offset * self.multiplier), text=str(object.proper_name),
-                                         fill=fill, tag=tag)))
+                (self.canvas.create_text(object.canvas_x + (offset / 3 * self.multiplier), object.canvas_y +
+                                (offset * self.multiplier), text=str(object.proper_name), fill=fill, tag=tag)))
 
     def create_modal_dialog(self, object, x, y):
         modal_dlg = tk.Toplevel(master=self)
@@ -605,7 +602,8 @@ class StarMapFrame(ttk.Frame):
 
         elif isinstance(object, Moon):
             tk.Label(modal_dlg, text='Moon').grid(column=0, row=0, columnspan=3, sticky='nw')
-            tk.Label(modal_dlg, text="Moon Altitude: " + str(object.alt)).grid(column=0, row=1, columnspan=3, sticky='nw')
+            tk.Label(modal_dlg, text="Moon Altitude: " + str(object.alt)).grid(column=0, row=1, columnspan=3,
+                                                                               sticky='nw')
             tk.Label(modal_dlg, text="Moon Azimuth: " + str(object.az)).grid(column=0, row=2, columnspan=3,
                                                                             sticky='nw')
             tk.Label(modal_dlg, text="Moon Phase: " + str(object.phase)).grid(column=0, row=4, columnspan=3,
@@ -622,8 +620,8 @@ class StarMapFrame(ttk.Frame):
                 tk.Label(modal_dlg, text='Messier Object Name: ' + str(object.proper_name)).grid(column=0, row=0,
                                                                                 columnspan=3, sticky='nw')
             else:
-                tk.Label(modal_dlg, text='Messier Catalog ID: ' + str(object.messier_cat)).grid(column=0, row=0, columnspan=3,
-                                                                                  sticky='nw')
+                tk.Label(modal_dlg, text='Messier Catalog ID: ' + str(object.messier_cat)).grid(column=0, row=0,
+                                                                                columnspan=3, sticky='nw')
             tk.Label(modal_dlg, text='Messier Object Description: ' + str(object.description)).grid(column=0, row=1,
                                                                                 columnspan=3, sticky='nw')
             tk.Label(modal_dlg, text='Messier Object Altitude: ' + str(object.altitude)).grid(column=0, row=2,

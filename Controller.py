@@ -31,7 +31,7 @@ class Controller():
 
         self.empty_map = True
         self.constellation_lines = []
-        
+
         # store the center of the canvas
         self.centerX = self.view.star_map_frame.canvas.xview()[0]
         self.centerY = self.view.star_map_frame.canvas.yview()[0]

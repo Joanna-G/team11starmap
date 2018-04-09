@@ -31,6 +31,10 @@ class Controller():
 
         self.empty_map = True
         self.constellation_lines = []
+        
+        # store the center of the canvas
+        self.centerX = self.view.star_map_frame.canvas.xview()[0]
+        self.centerY = self.view.star_map_frame.canvas.yview()[0]
 
     def toggle_fullscreen(self, event=None):
         self.state = not self.state
@@ -124,6 +128,7 @@ class Controller():
 
         self.view.star_map_frame.create_ps_file()
 
+
     def toggle_constellations(self):
         if self.empty_map is False:
             if self.view.user_frame.constellations_value.get() == 1:
@@ -177,6 +182,10 @@ class Controller():
         self.view.star_map_frame.canvas.delete('label')
         self.view.star_map_frame.canvas.delete('const_label')
         self.view.star_map_frame.label_widgets.clear()
+
+        # Recenter the canvas
+        self.view.star_map_frame.canvas.xview_moveto(self.centerX)
+        self.view.star_map_frame.canvas.yview_moveto(self.centerY)
 
 
 if __name__ == "__main__":

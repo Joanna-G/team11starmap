@@ -34,11 +34,15 @@ class MainApplication(ttk.Frame):
 
         tk.Label(modal_dlg, text=error_message).grid(column=0, row=0, columnspan=3, sticky='nw')
 
-        modal_dlg.geometry('+%d+%d' % (2000, 2000))
+        # Don't know what this does or what it should be set to
+        modal_dlg.geometry('+%d+%d' % (0, 0))
         modal_dlg.transient(self.parent)
         modal_dlg.focus_set()
         modal_dlg.grab_set()
         self.wait_window(modal_dlg)
+
+    def display_help(self):
+        pass
 
 
 class UserFrame(ttk.Frame):
@@ -248,15 +252,15 @@ class UserFrame(ttk.Frame):
         # self.set_combobox_values(self.combobox_latitude, 'Lat', -90, 91)
         # self.set_combobox_values(self.combobox_longitude, 'Long', -180, 181)
 
-        # Default values for testing purpose. Jo's birthday and location. Yes, I'm conceited. LOL
+        # Default values for testing purpose. April 10, 2018 8:30 AM, offset -6, 34.7 lat, 86.6 long
         self.set_combobox_values(self.combobox_month, 4, 1, 13)
         self.set_combobox_values(self.combobox_day, 22, 1, 32)
         self.set_combobox_values(self.combobox_year, 1985, 1900, 2101)
         self.set_combobox_values(self.combobox_hour, 18, 0, 25)
         self.set_combobox_values(self.combobox_minute, 30, 0, 60)
         self.set_combobox_values(self.combobox_utc, -6, -12, 15)
-        self.set_combobox_values(self.combobox_latitude, 35, -90, 91)
-        self.set_combobox_values(self.combobox_longitude, 87, -180, 181)
+        self.set_combobox_values(self.combobox_latitude, 34.7, -90, 91)
+        self.set_combobox_values(self.combobox_longitude, 86.6, -180, 181)
 
     def set_combobox_values(self, combobox, default, first, last):
         combobox.set(default)
@@ -392,7 +396,7 @@ class StarMapFrame(ttk.Frame):
         # If moon.phase is new, draw black circle with white outline
         if phase == 'New':
             moon.canvas_id = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='black', outline='white')
-        # If moon.phase is first, somehow draw a circle with the left half black, right half white, white outline
+        # If moon.phase is first, draw a circle with the left half black, right half white, white outline
         elif phase == 'First Quarter':
             self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='black', outline='white')
 
@@ -405,7 +409,7 @@ class StarMapFrame(ttk.Frame):
         # If moon.phase is full, draw a white circle with white outline
         elif phase == 'Full':
             moon.canvas_id = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='white', outline='white')
-        # If moon.phase is last, somehow draw a circle with the left half white, right half black, white outline
+        # If moon.phase is last, draw a circle with the left half white, right half black, white outline
         else:
             self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='black', outline='white')
             moon.canvas_id = self.canvas.create_arc(x - r, y - r, x + r, y + r, start=90.0, extent=180.0,

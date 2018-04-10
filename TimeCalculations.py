@@ -1,8 +1,9 @@
 import math
 from datetime import datetime, timedelta
 
+
 class TimeCalculations:
-    def __init__(self, year, month, day, hour, minute, utc_offset, lat, lon):
+    def __init__(self, year, month, day, hour, minute, utc_offset, lat, lon, dst):
         self.year = year
         self.month = month
         self.day = day
@@ -12,6 +13,7 @@ class TimeCalculations:
         self.utc_offset = utc_offset
         self.lat = lat
         self.lon = lon
+        self.dst = dst
 
         self.julian_day = self.calculate_julian_day(self.year, self.month, self.day, self.hour, self.minute)
         self.gmst = self.calculate_gmst(self.julian_day, self.year)
@@ -33,7 +35,7 @@ class TimeCalculations:
     #         day -= 1
     #         hour += 24
 
-    def update_times(self, year, month, day, hour, minute, utc_offset, lat, lon):
+    def update_times(self, year, month, day, hour, minute, utc_offset, lat, lon, dst):
         self.utc_offset = utc_offset
         self.year = year
         self.month = month
@@ -43,11 +45,17 @@ class TimeCalculations:
         self.second = 0
         self.lat = lat
         self.lon = lon
+        self.dst = dst
 
         # Convert to UTC
         date = datetime.now()
         date.replace(self.year, self.month, self.day, self.hour, self.minute, 0, 0)
-        future_date = date + timedelta(hours=self.utc_offset)
+
+        if self.dst == 1:
+            future_date = date + timedelta(hours=(self.utc_offset + 1))
+        else:
+            future_date = date + timedelta(hours=self.utc_offset)
+
         self.year = future_date.year
         self.month = future_date.month
         self.day = future_date.day

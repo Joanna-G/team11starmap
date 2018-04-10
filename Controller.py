@@ -22,7 +22,7 @@ class Controller():
         self.menubar = tk.Menu(self.root)
         self.filemenu = tk.Menu(self.menubar, tearoff=0)
         self.filemenu.add_command(label='Save Map', command=self.view.star_map_frame.save_canvas)
-        self.filemenu.add_command(label='Help')
+        self.filemenu.add_command(label='Help', command=self.view.display_help())
         self.filemenu.add_command(label='Exit')
         self.menubar.add_cascade(label='File', menu=self.filemenu)
         self.root.config(menu=self.menubar)
@@ -66,7 +66,7 @@ class Controller():
             ready = self.view.user_frame.validate_combobox(widget)
             if ready is False:
                 print('validate_widget: wrong values')
-                self.view.create_error_dialog('validate_widget: wrong values')
+                # self.view.create_error_dialog('validate_widget: wrong values')
                 return
 
         # Clear Canvas
@@ -83,15 +83,16 @@ class Controller():
             utc_offset = int(self.view.user_frame.utc_value.get())
             latitude = float(self.view.user_frame.latitude_value.get())
             longitude = float(self.view.user_frame.longitude_value.get())
+            dst = int(self.view.user_frame.daylight_savings_value.get())
         except ValueError:
-            self.view.create_error_dialog('wrong values')
+            # self.view.create_error_dialog('wrong values')
             print('wrong values')
             return
 
         self.empty_map = False
 
         # Update the Model's TimeCalculations class with the newly inputted times
-        self.model.time_calc.update_times(year, month, day, hour, minute, utc_offset, latitude, longitude)
+        self.model.time_calc.update_times(year, month, day, hour, minute, utc_offset, latitude, longitude, dst)
 
         # Draw a black rectangle for saving map purposes
         self.view.star_map_frame.draw_background()
@@ -135,7 +136,6 @@ class Controller():
 
         self.view.star_map_frame.create_ps_file()
 
-
     def toggle_constellations(self):
         if self.empty_map is False:
             if self.view.user_frame.constellations_value.get() == 1:
@@ -144,6 +144,8 @@ class Controller():
                     self.view.star_map_frame.draw_constellation(const, self.model.star_list)
                     if self.view.user_frame.labels_value.get() == 1:
                         self.view.star_map_frame.display_object_label(const)
+                    elif self.view.user_frame.labels_value.get() == 0:
+                        self.view.star_map_frame.canvas.delete('const_label')
             elif self.view.user_frame.constellations_value.get() == 0:
                 for line in self.view.star_map_frame.constellation_lines:
                     self.view.star_map_frame.canvas.delete(line)
@@ -159,6 +161,7 @@ class Controller():
                 for planet in self.model.planet_list:
                     if planet.proper_name != 'Earth/Sun':       # Don't need a label to show up for Earth
                         self.view.star_map_frame.display_object_label(planet)
+
                 self.view.star_map_frame.display_object_label(self.model.moon)
 
                 # Constellation labels need special treatment because they're divas.

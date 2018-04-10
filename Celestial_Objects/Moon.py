@@ -1,5 +1,6 @@
 from Celestial_Objects import BaseCelestialObject
 import math
+import TimeCalculations
 
 
 class Moon(BaseCelestialObject):
@@ -123,3 +124,27 @@ class Moon(BaseCelestialObject):
         y_ecl = y_eq * math.cos(obl) + z_eq * math.sin(obl)
         z_ecl = - y_eq * math.sin(obl) + z_eq * math.cos(obl)
         return x_ecl, y_ecl, z_ecl
+
+
+if __name__ == "__main__":
+    year = 2018
+    month = 4
+    day = 10
+    hour = 19
+    minute = 30
+    lat = 34.73
+    lon = 86.58
+    offset = -6
+    dst = 1
+
+    moon = Moon()
+    time = TimeCalculations.TimeCalculations(year, month, day, hour, minute, offset, lat, lon, dst)
+    moon.phase = moon.lunar_phase(time.jd_current, time.new_moon_ref)
+    gmst = time.calculate_gmst(time.jd_current, year)
+    moon.right_ascension, moon.declination = moon.calculate_alt_az(time.t, 34, 0, time.t, lon, gmst)
+    moon.right_ascension = time.ra_degrees_to_time_decimal(moon.right_ascension)
+    lst = time.calculate_lst(lon, gmst)
+    ha = moon.calculate_ha_time(lst, moon.right_ascension)
+    alt = moon.testing_alt(moon.declination, lat, ha)
+    az = moon.testing_az(moon.declination, lat, ha, alt)
+    print("Altitude: " + str(alt) + " Azimuth: " + str(az) + " Phase: " + str(moon.phase))

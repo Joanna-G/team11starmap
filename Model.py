@@ -23,6 +23,9 @@ class Model():
         self.moon = Moon()
         self.Create_Celestial_Objects()
 
+        self.boundary_x = None
+        self.boundary_y = None
+
     # Create all Stars, Constellations, Planets, Messier Deep Space Objects, and Planets
     def Create_Celestial_Objects(self):
         self.Create_Stars()

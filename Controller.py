@@ -61,6 +61,7 @@ class Controller():
     # Has Model calculate celestial objects locations
     # Tells View to draw objects
     def generate_map(self):
+        self.view.star_map_frame.multiplier = 1
         ready = True
         for widget in self.view.user_frame.validation_widgets:
             ready = self.view.user_frame.validate_combobox(widget)
@@ -179,6 +180,7 @@ class Controller():
     # when you zoom and pan and then reset and re-generate the map, it draws it where you left off panning instead of
     # where it was originally.
     def reset_app(self):
+        self.view.star_map_frame.multiplier = 1
         self.view.star_map_frame.canvas.delete('all')
         self.view.star_map_frame.reset_values()
         self.model.reset_values()

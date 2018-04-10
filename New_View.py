@@ -254,9 +254,9 @@ class UserFrame(ttk.Frame):
 
         # Default values for testing purpose. April 10, 2018 8:30 AM, offset -6, 34.7 lat, 86.6 long
         self.set_combobox_values(self.combobox_month, 4, 1, 13)
-        self.set_combobox_values(self.combobox_day, 22, 1, 32)
-        self.set_combobox_values(self.combobox_year, 1985, 1900, 2101)
-        self.set_combobox_values(self.combobox_hour, 18, 0, 25)
+        self.set_combobox_values(self.combobox_day, 10, 1, 32)
+        self.set_combobox_values(self.combobox_year, 2018, 1900, 2101)
+        self.set_combobox_values(self.combobox_hour, 8, 0, 25)
         self.set_combobox_values(self.combobox_minute, 30, 0, 60)
         self.set_combobox_values(self.combobox_utc, -6, -12, 15)
         self.set_combobox_values(self.combobox_latitude, 34.7, -90, 91)
@@ -369,10 +369,9 @@ class StarMapFrame(ttk.Frame):
     def draw_constellation_line(self, star_1, star_2):
         const = self.canvas.create_line(star_1.canvas_x, star_1.canvas_y, star_2.canvas_x, star_2.canvas_y, fill='pink')
 
-        # Redraw stars on top of constellation lines. Breaks with zooming because it
-        # redraws stars that shouldn't be there.
-        # self.draw_star(star_1, star_1.x, star_1.y)
-        # self.draw_star(star_2, star_2.x, star_2.y)
+        # Redraw stars on top of constellation lines. Broken.
+        # self.draw_star(star_1, star_1.canvas_x, star_1.canvas_y)
+        # self.draw_star(star_2, star_2.canvas_x, star_2.canvas_y)
 
         # Don't need to be able to click on constellations to see names. - Jo
         # self.canvas.tag_bind(const, '<ButtonPress-1>', lambda e: self.display_constellation_info(e, constellation))
@@ -401,20 +400,18 @@ class StarMapFrame(ttk.Frame):
             self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='black', outline='white')
 
             moon.canvas_id = self.canvas.create_arc(x - r, y - r, x + r, y + r, start=270, extent=180, fill='white',
-                                                    outline='white',
-                                                    style=tk.CHORD)
-            x = self.canvas.create_arc(x - r, y - r, x + r, y + r, start=270, extent=180, fill='white', outline='white',
-                                       style=tk.CHORD)
+                                                    outline='white', style=tk.CHORD)
 
         # If moon.phase is full, draw a white circle with white outline
         elif phase == 'Full':
             moon.canvas_id = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='white', outline='white')
         # If moon.phase is last, draw a circle with the left half white, right half black, white outline
-        else:
+        elif phase == 'Last Quarter':
             self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='black', outline='white')
             moon.canvas_id = self.canvas.create_arc(x - r, y - r, x + r, y + r, start=90.0, extent=180.0,
-                                                    style=tk.CHORD,
-                                                    fill='white', outline='white')
+                                                    style=tk.CHORD, fill='white', outline='white')
+        else:
+            print("Error: Phase Incorrect")
 
         canvas_coords = self.canvas.coords(moon.canvas_id)
         moon.canvas_x = canvas_coords[0]
@@ -555,6 +552,14 @@ class StarMapFrame(ttk.Frame):
                                                                                   sticky='nw')
             tk.Label(modal_dlg, text='Star Magnitude: ' + str(object.magnitude)).grid(column=0, row=4, columnspan=3,
                                                                                       sticky='nw')
+            tk.Label(modal_dlg, text='Star X: ' + str(object.x)).grid(column=0, row=5, columnspan=3,
+                                                                                      sticky='nw')
+            tk.Label(modal_dlg, text='Star Y: ' + str(object.y)).grid(column=0, row=6, columnspan=3,
+                                                                                      sticky='nw')
+            tk.Label(modal_dlg, text='Star Canvas X: ' + str(object.canvas_x)).grid(column=0, row=7, columnspan=3,
+                                                                      sticky='nw')
+            tk.Label(modal_dlg, text='Star Canvas Y: ' + str(object.canvas_y)).grid(column=0, row=8, columnspan=3,
+                                                                      sticky='nw')
 
         # Don't really need to have dialog for constellations
         # elif isinstance(object, Constellation):

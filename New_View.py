@@ -6,13 +6,13 @@ from PIL import ImageTk, Image, ImageDraw
 from tkinter.filedialog import asksaveasfilename
 import locale
 from Celestial_Objects import *
-import ghostscript
+#import ghostscript
 import os
 import sys
 
 
 class MainApplication(ttk.Frame):
-    def __init__(self, star_list, messier_list, planet_list, parent, *args, **kwargs):
+    def __init__(self, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent)
         self.parent = parent
 
@@ -22,7 +22,7 @@ class MainApplication(ttk.Frame):
         self.rowconfigure(0, weight=1)
 
         self.user_frame = UserFrame(self)
-        self.star_map_frame = StarMapFrame(self, star_list, messier_list, planet_list)
+        self.star_map_frame = StarMapFrame(self)
         self.user_frame.grid(column=0, row=0, sticky='nsew')
         self.star_map_frame.grid(column=1, row=0, sticky='nsew')
 
@@ -285,13 +285,9 @@ class UserFrame(ttk.Frame):
 
 
 class StarMapFrame(ttk.Frame):
-    def __init__(self, parent, star_list, messier_list, planet_list,*args, **kwargs):
+    def __init__(self, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent)
         self.parent = parent
-
-        self.star_list = star_list
-        self.messier_list = messier_list
-        self.planet_list = planet_list
 
         self.multiplier = 1
 
@@ -325,9 +321,12 @@ class StarMapFrame(ttk.Frame):
         # Click map, and move mouse to scroll
         self.canvas.bind("<ButtonPress-1>", self.scroll_start)
         self.canvas.bind("<B1-Motion>", self.scroll_move)
-        self.canvas.bind('<MouseWheel>', self.wheel)  # with Windows and MacOS, but not Linux
-        self.canvas.bind('<Button-5>', self.wheelup)  # only with Linux, wheel scroll down
-        self.canvas.bind('<Button-4>', self.wheeldown)  # only with Linux, wheel scroll up
+
+
+    def reset_values(self):
+        self.multiplier = 1
+        self.label_widgets.clear()
+        self.constellation_lines.clear()
 
     def draw_background(self):
         # Draw a black rectangle for saving map purposes
@@ -339,48 +338,6 @@ class StarMapFrame(ttk.Frame):
 
     def scroll_move(self, event):
         self.canvas.scan_dragto(event.x, event.y, gain=1)
-
-    def wheel(self, event):
-        true_x = self.canvas.canvasx(event.x)
-        true_y = self.canvas.canvasy(event.y)
-        scale = 1
-        if event.delta > 0:
-            scale = 1.1
-            self.canvas.scale("all", true_x, true_y, 1.1, 1.1)
-        elif event.delta < 0:
-            scale = 0.9
-            self.canvas.scale("all", true_x, true_y, 0.9, 0.9)
-        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-
-        self.multiplier *= scale
-
-        # Update canvas x, y coordinates
-        for star in self.star_list:
-            canvas_coords = self.canvas.coords(star.canvas_id)
-            star.canvas_x = canvas_coords[0]
-            star.canvas_y = canvas_coords[1]
-
-        for messier in self.messier_list:
-            canvas_coords = self.canvas.coords(messier.canvas_id)
-            messier.canvas_x = canvas_coords[0]
-            messier.canvas_y = canvas_coords[1]
-
-        # So, planets aren't working for some bizarre reason. It doesn't like the canvas ID i'm passing -Irene
-        for planet in self.planet_list:
-            if planet.proper_name != 'Earth/Sun':
-                canvas_coords = self.canvas.coords(planet.canvas_id)
-                planet.canvas_x = canvas_coords[0]
-                planet.canvas_y = canvas_coords[1]
-
-    # linux zoom
-    def wheelup(self, event):
-        self.canvas.scale("all", event.x, event.y, 1.1, 1.1)
-        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-
-    def wheeldown(self, event):
-        self.canvas.scale("all", event.x, event.y, 0.9, 0.9)
-        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-        self.canvas.update()
 
     def draw_star(self, star, x, y):
         if star.magnitude <= 1.0:

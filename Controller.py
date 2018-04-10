@@ -10,11 +10,14 @@ class Controller():
         self.root = tk.Tk()
 
         self.model = Model.Model(now.year, now.month, now.day, now.hour, now.minute, 0, 0, 0)
-        self.view = New_View.MainApplication(self.model.star_list, self.model.messier_list, self.model.planet_list, parent=self.root)
+        self.view = New_View.MainApplication(parent=self.root)
         self.view.user_frame.button_generate_map.config(command=self.generate_map)
         self.view.user_frame.checkbox_show_constellations.config(command=self.toggle_constellations)
         self.view.user_frame.checkbox_show_labels.config(command=self.toggle_labels)
         self.view.user_frame.button_reset.config(command=self.reset_app)
+        self.view.star_map_frame.canvas.bind('<MouseWheel>', self.wheel)  # with Windows and MacOS, but not Linux
+        self.view.star_map_frame.canvas.bind('<Button-5>', self.wheelup)  # only with Linux, wheel scroll down
+        self.view.star_map_frame.canvas.bind('<Button-4>', self.wheeldown)  # only with Linux, wheel scroll up
 
         self.menubar = tk.Menu(self.root)
         self.filemenu = tk.Menu(self.menubar, tearoff=0)
@@ -30,7 +33,6 @@ class Controller():
         self.root.bind("<Escape>", self.end_fullscreen)
 
         self.empty_map = True
-        self.constellation_lines = []
 
         # store the center of the canvas
         self.centerX = self.view.star_map_frame.canvas.xview()[0]
@@ -69,7 +71,8 @@ class Controller():
 
         # Clear Canvas
         self.view.star_map_frame.canvas.delete('all')
-        self.constellation_lines = []
+        self.view.star_map_frame.reset_values()
+        self.model.reset_values()
 
         try:
             month = int(self.view.user_frame.month_value.get())
@@ -124,7 +127,11 @@ class Controller():
             self.view.star_map_frame.draw_messier_object(messier, messier.x, messier.y)
 
         # Toggle Constellations
-        self.toggle_constellations()
+        if self.view.user_frame.constellations_value.get() == 1:
+            self.toggle_constellations()
+
+        if self.view.user_frame.labels_value.get() == 1:
+            self.toggle_labels()
 
         self.view.star_map_frame.create_ps_file()
 
@@ -169,6 +176,16 @@ class Controller():
     # when you zoom and pan and then reset and re-generate the map, it draws it where you left off panning instead of
     # where it was originally.
     def reset_app(self):
+        self.view.star_map_frame.canvas.delete('all')
+        self.view.star_map_frame.reset_values()
+        self.model.reset_values()
+
+        # Recenter the canvas
+        self.view.star_map_frame.canvas.xview_moveto(self.centerX)
+        self.view.star_map_frame.canvas.yview_moveto(self.centerY)
+        self.view.star_map_frame.canvas.scale("all", self.centerX, self.centerY, 1.0, 1.0)
+
+    '''def reset_app(self):
         self.view.star_map_frame.constellation_lines = []
         self.empty_map = True
         self.view.star_map_frame.canvas.delete('all')
@@ -185,7 +202,60 @@ class Controller():
 
         # Recenter the canvas
         self.view.star_map_frame.canvas.xview_moveto(self.centerX)
-        self.view.star_map_frame.canvas.yview_moveto(self.centerY)
+        self.view.star_map_frame.canvas.yview_moveto(self.centerY)'''
+
+    def wheel(self, event):
+        true_x = self.view.star_map_frame.canvas.canvasx(event.x)
+        true_y = self.view.star_map_frame.canvas.canvasy(event.y)
+        scale = 1
+        if event.delta > 0:
+            scale = 1.1
+            self.view.star_map_frame.canvas.scale("all", true_x, true_y, 1.1, 1.1)
+        elif event.delta < 0:
+            scale = 0.9
+            self.view.star_map_frame.canvas.scale("all", true_x, true_y, 0.9, 0.9)
+        self.view.star_map_frame.canvas.configure(scrollregion=self.view.star_map_frame.canvas.bbox("all"))
+
+        self.view.star_map_frame.multiplier *= scale
+        self.update_canvas_coords()
+
+    # linux zoom
+    def wheelup(self, event):
+        self.view.star_map_frame.canvas.scale("all", event.x, event.y, 1.1, 1.1)
+        self.view.star_map_frame.canvas.configure(scrollregion=self.view.star_map_frame.canvas.bbox("all"))
+        self.view.star_map_frame.multiplier *= 1.1
+        self.view.star_map_frame.update_canvas_coords()
+
+    def wheeldown(self, event):
+        self.view.star_map_frame.canvas.scale("all", event.x, event.y, 0.9, 0.9)
+        self.view.star_map_frame.canvas.configure(scrollregion=self.view.star_map_frame.canvas.bbox("all"))
+        self.view.star_map_frame.multiplier *= 0.9
+        self.view.star_map_frame.update_canvas_coords()
+
+    def update_canvas_coords(self):
+        # Update canvas x, y coordinates
+        for star in self.model.star_list:
+            canvas_coords = self.view.star_map_frame.canvas.coords(star.canvas_id)
+            star.canvas_x = canvas_coords[0]
+            star.canvas_y = canvas_coords[1]
+
+        for messier in self.model.messier_list:
+            canvas_coords = self.view.star_map_frame.canvas.coords(messier.canvas_id)
+            messier.canvas_x = canvas_coords[0]
+            messier.canvas_y = canvas_coords[1]
+
+        for planet in self.model.planet_list:
+            if planet.proper_name != 'Earth/Sun':
+                canvas_coords = self.view.star_map_frame.canvas.coords(planet.canvas_id)
+                planet.canvas_x = canvas_coords[0]
+                planet.canvas_y = canvas_coords[1]
+
+        canvas_coords = self.view.star_map_frame.canvas.coords(self.model.moon.canvas_id)
+        self.model.moon.canvas_x = canvas_coords[0]
+        self.model.moon.canvas_y = canvas_coords[1]
+
+        for constellation in self.model.constellation_list:
+            constellation.set_center()
 
 
 if __name__ == "__main__":

@@ -122,3 +122,27 @@ class Model():
             messier.altitude, messier.azimuth = messier.calculate_alt_az(messier.declination, self.time_calc.lat,
                                                                          messier.ha_degrees, None, None, None)
             messier.get_xy_coords(messier.altitude, messier.azimuth, 4000)
+
+    def reset_values(self):
+        for star in self.star_list:
+            star.canvas_y = None
+            star.canvas_x = None
+            star.canvas_id = None
+
+        for planet in self.planet_list:
+            planet.canvas_x = None
+            planet.canvas_y = None
+            planet.canvas_id = None
+
+        for messier in self.messier_list:
+            messier.canvas_x = None
+            messier.canvas_y = None
+            messier.canvas_id = None
+
+        self.moon.canvas_id = None
+        self.moon.canvas_x = None
+        self.moon.canvas_y = None
+
+        for constellation in self.constellation_list:
+            constellation.x = 0
+            constellation.y = 0

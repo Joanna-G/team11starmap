@@ -404,10 +404,10 @@ class StarMapFrame(ttk.Frame):
         star.canvas_x = canvas_coords[0]
         star.canvas_y = canvas_coords[1]
 
-        offset_x = star.canvas_x - x
-        offset_y = star.canvas_y - y
+        star.offset_x = star.canvas_x - x
+        star.offset_y = star.canvas_y - y
 
-        self.canvas.move(star.canvas_id, offset_x, offset_y)
+        self.canvas.move(star.canvas_id, star.offset_x, star.offset_y)
 
         self.canvas.tag_bind(star.canvas_id, '<ButtonPress-1>', lambda e: self.display_star_info(e, star))
 

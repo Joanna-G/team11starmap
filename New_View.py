@@ -6,13 +6,13 @@ from PIL import ImageTk, Image, ImageDraw
 from tkinter.filedialog import asksaveasfilename
 import locale
 from Celestial_Objects import *
-import ghostscript
+#import ghostscript
 import os
 import sys
 
 
 class MainApplication(ttk.Frame):
-    def __init__(self, star_list, messier_list, planet_list, parent, *args, **kwargs):
+    def __init__(self, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent)
         self.parent = parent
 
@@ -22,7 +22,7 @@ class MainApplication(ttk.Frame):
         self.rowconfigure(0, weight=1)
 
         self.user_frame = UserFrame(self)
-        self.star_map_frame = StarMapFrame(self, star_list, messier_list, planet_list)
+        self.star_map_frame = StarMapFrame(self)
         self.user_frame.grid(column=0, row=0, sticky='nsew')
         self.star_map_frame.grid(column=1, row=0, sticky='nsew')
 
@@ -34,11 +34,15 @@ class MainApplication(ttk.Frame):
 
         tk.Label(modal_dlg, text=error_message).grid(column=0, row=0, columnspan=3, sticky='nw')
 
-        modal_dlg.geometry('+%d+%d' % (2000, 2000))
+        # Don't know what this does or what it should be set to
+        modal_dlg.geometry('+%d+%d' % (0, 0))
         modal_dlg.transient(self.parent)
         modal_dlg.focus_set()
         modal_dlg.grab_set()
         self.wait_window(modal_dlg)
+
+    def display_help(self):
+        pass
 
 
 class UserFrame(ttk.Frame):
@@ -248,15 +252,15 @@ class UserFrame(ttk.Frame):
         # self.set_combobox_values(self.combobox_latitude, 'Lat', -90, 91)
         # self.set_combobox_values(self.combobox_longitude, 'Long', -180, 181)
 
-        # Default values for testing purpose. Jo's birthday and location. Yes, I'm conceited. LOL
+        # Default values for testing purpose. April 10, 2018 8:30 AM, offset -6, 34.7 lat, 86.6 long
         self.set_combobox_values(self.combobox_month, 4, 1, 13)
-        self.set_combobox_values(self.combobox_day, 22, 1, 32)
-        self.set_combobox_values(self.combobox_year, 1985, 1900, 2101)
-        self.set_combobox_values(self.combobox_hour, 18, 0, 25)
+        self.set_combobox_values(self.combobox_day, 10, 1, 32)
+        self.set_combobox_values(self.combobox_year, 2018, 1900, 2101)
+        self.set_combobox_values(self.combobox_hour, 8, 0, 25)
         self.set_combobox_values(self.combobox_minute, 30, 0, 60)
         self.set_combobox_values(self.combobox_utc, -6, -12, 15)
-        self.set_combobox_values(self.combobox_latitude, 35, -90, 91)
-        self.set_combobox_values(self.combobox_longitude, 87, -180, 181)
+        self.set_combobox_values(self.combobox_latitude, 34.7, -90, 91)
+        self.set_combobox_values(self.combobox_longitude, 86.6, -180, 181)
 
     def set_combobox_values(self, combobox, default, first, last):
         combobox.set(default)
@@ -285,13 +289,9 @@ class UserFrame(ttk.Frame):
 
 
 class StarMapFrame(ttk.Frame):
-    def __init__(self, parent, star_list, messier_list, planet_list,*args, **kwargs):
+    def __init__(self, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent)
         self.parent = parent
-
-        self.star_list = star_list
-        self.messier_list = messier_list
-        self.planet_list = planet_list
 
         self.multiplier = 1
 
@@ -325,9 +325,12 @@ class StarMapFrame(ttk.Frame):
         # Click map, and move mouse to scroll
         self.canvas.bind("<ButtonPress-1>", self.scroll_start)
         self.canvas.bind("<B1-Motion>", self.scroll_move)
-        self.canvas.bind('<MouseWheel>', self.wheel)  # with Windows and MacOS, but not Linux
-        self.canvas.bind('<Button-5>', self.wheelup)  # only with Linux, wheel scroll down
-        self.canvas.bind('<Button-4>', self.wheeldown)  # only with Linux, wheel scroll up
+
+
+    def reset_values(self):
+        self.multiplier = 1
+        self.label_widgets.clear()
+        self.constellation_lines.clear()
 
     def draw_background(self):
         # Draw a black rectangle for saving map purposes
@@ -339,48 +342,6 @@ class StarMapFrame(ttk.Frame):
 
     def scroll_move(self, event):
         self.canvas.scan_dragto(event.x, event.y, gain=1)
-
-    def wheel(self, event):
-        true_x = self.canvas.canvasx(event.x)
-        true_y = self.canvas.canvasy(event.y)
-        scale = 1
-        if event.delta > 0:
-            scale = 1.1
-            self.canvas.scale("all", true_x, true_y, 1.1, 1.1)
-        elif event.delta < 0:
-            scale = 0.9
-            self.canvas.scale("all", true_x, true_y, 0.9, 0.9)
-        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-
-        self.multiplier *= scale
-
-        # Update canvas x, y coordinates
-        for star in self.star_list:
-            canvas_coords = self.canvas.coords(star.canvas_id)
-            star.canvas_x = canvas_coords[0]
-            star.canvas_y = canvas_coords[1]
-
-        for messier in self.messier_list:
-            canvas_coords = self.canvas.coords(messier.canvas_id)
-            messier.canvas_x = canvas_coords[0]
-            messier.canvas_y = canvas_coords[1]
-
-        # So, planets aren't working for some bizarre reason. It doesn't like the canvas ID i'm passing -Irene
-        for planet in self.planet_list:
-            if planet.proper_name != 'Earth/Sun':
-                canvas_coords = self.canvas.coords(planet.canvas_id)
-                planet.canvas_x = canvas_coords[0]
-                planet.canvas_y = canvas_coords[1]
-
-    # linux zoom
-    def wheelup(self, event):
-        self.canvas.scale("all", event.x, event.y, 1.1, 1.1)
-        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-
-    def wheeldown(self, event):
-        self.canvas.scale("all", event.x, event.y, 0.9, 0.9)
-        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-        self.canvas.update()
 
     def draw_star(self, star, x, y):
         if star.magnitude <= 1.0:
@@ -414,10 +375,9 @@ class StarMapFrame(ttk.Frame):
     def draw_constellation_line(self, star_1, star_2):
         const = self.canvas.create_line(star_1.canvas_x, star_1.canvas_y, star_2.canvas_x, star_2.canvas_y, fill='pink')
 
-        # Redraw stars on top of constellation lines. Breaks with zooming because it
-        # redraws stars that shouldn't be there.
-        # self.draw_star(star_1, star_1.x, star_1.y)
-        # self.draw_star(star_2, star_2.x, star_2.y)
+        # Redraw stars on top of constellation lines. Broken.
+        # self.draw_star(star_1, star_1.canvas_x, star_1.canvas_y)
+        # self.draw_star(star_2, star_2.canvas_x, star_2.canvas_y)
 
         # Don't need to be able to click on constellations to see names. - Jo
         # self.canvas.tag_bind(const, '<ButtonPress-1>', lambda e: self.display_constellation_info(e, constellation))
@@ -441,25 +401,23 @@ class StarMapFrame(ttk.Frame):
         # If moon.phase is new, draw black circle with white outline
         if phase == 'New':
             moon.canvas_id = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='black', outline='white')
-        # If moon.phase is first, somehow draw a circle with the left half black, right half white, white outline
+        # If moon.phase is first, draw a circle with the left half black, right half white, white outline
         elif phase == 'First Quarter':
             self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='black', outline='white')
 
             moon.canvas_id = self.canvas.create_arc(x - r, y - r, x + r, y + r, start=270, extent=180, fill='white',
-                                                    outline='white',
-                                                    style=tk.CHORD)
-            x = self.canvas.create_arc(x - r, y - r, x + r, y + r, start=270, extent=180, fill='white', outline='white',
-                                       style=tk.CHORD)
+                                                    outline='white', style=tk.CHORD)
 
         # If moon.phase is full, draw a white circle with white outline
         elif phase == 'Full':
             moon.canvas_id = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='white', outline='white')
-        # If moon.phase is last, somehow draw a circle with the left half white, right half black, white outline
-        else:
+        # If moon.phase is last, draw a circle with the left half white, right half black, white outline
+        elif phase == 'Last Quarter':
             self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='black', outline='white')
             moon.canvas_id = self.canvas.create_arc(x - r, y - r, x + r, y + r, start=90.0, extent=180.0,
-                                                    style=tk.CHORD,
-                                                    fill='white', outline='white')
+                                                    style=tk.CHORD, fill='white', outline='white')
+        else:
+            print("Error: Phase Incorrect")
 
         canvas_coords = self.canvas.coords(moon.canvas_id)
         moon.canvas_x = canvas_coords[0]
@@ -600,6 +558,14 @@ class StarMapFrame(ttk.Frame):
                                                                                   sticky='nw')
             tk.Label(modal_dlg, text='Star Magnitude: ' + str(object.magnitude)).grid(column=0, row=4, columnspan=3,
                                                                                       sticky='nw')
+            tk.Label(modal_dlg, text='Star X: ' + str(object.x)).grid(column=0, row=5, columnspan=3,
+                                                                                      sticky='nw')
+            tk.Label(modal_dlg, text='Star Y: ' + str(object.y)).grid(column=0, row=6, columnspan=3,
+                                                                                      sticky='nw')
+            tk.Label(modal_dlg, text='Star Canvas X: ' + str(object.canvas_x)).grid(column=0, row=7, columnspan=3,
+                                                                      sticky='nw')
+            tk.Label(modal_dlg, text='Star Canvas Y: ' + str(object.canvas_y)).grid(column=0, row=8, columnspan=3,
+                                                                      sticky='nw')
 
         # Don't really need to have dialog for constellations
         # elif isinstance(object, Constellation):

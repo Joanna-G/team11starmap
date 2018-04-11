@@ -13,7 +13,7 @@ class Model():
         self.s_parse = StarParser().parse_file()
 
         # Create TimeCalculations object, with default values (The Current day/time)
-        self.time_calc = TimeCalculations.TimeCalculations(year, month, day, hour, minute, utc_offset, lat, lon)
+        self.time_calc = TimeCalculations.TimeCalculations(year, month, day, hour, minute, utc_offset, lat, lon, 0)
         self.star_list = []
         self.constellation_list = []
         self.messier_list = []
@@ -22,6 +22,9 @@ class Model():
         # Create all objects
         self.moon = Moon()
         self.Create_Celestial_Objects()
+
+        self.boundary_x = None
+        self.boundary_y = None
 
     # Create all Stars, Constellations, Planets, Messier Deep Space Objects, and Planets
     def Create_Celestial_Objects(self):
@@ -107,7 +110,7 @@ class Model():
     # Calculate the position of the Moon
     def Calculate_Moon_Position(self):
         self.moon.right_ascension, self.moon.declination = self.moon.calculate_alt_az(self.time_calc.t,
-                    self.time_calc.lat, self.time_calc.t, self.time_calc.t, self.time_calc.lon, self.time_calc.gmst)
+                                                                                      self.time_calc.lat, self.time_calc.t, self.time_calc.t, self.time_calc.lon, self.time_calc.gmst)
         ha_time = self.moon.calculate_ha_time(self.time_calc.lst, self.moon.right_ascension)
         self.moon.alt = self.moon.testing_alt(self.moon.declination, self.time_calc.lat, ha_time)
         self.moon.az = self.moon.testing_az(self.moon.declination, self.time_calc.lat, ha_time, self.moon.alt)
@@ -122,3 +125,27 @@ class Model():
             messier.altitude, messier.azimuth = messier.calculate_alt_az(messier.declination, self.time_calc.lat,
                                                                          messier.ha_degrees, None, None, None)
             messier.get_xy_coords(messier.altitude, messier.azimuth, 4000)
+
+    def reset_values(self):
+        for star in self.star_list:
+            star.canvas_y = None
+            star.canvas_x = None
+            star.canvas_id = None
+
+        for planet in self.planet_list:
+            planet.canvas_x = None
+            planet.canvas_y = None
+            planet.canvas_id = None
+
+        for messier in self.messier_list:
+            messier.canvas_x = None
+            messier.canvas_y = None
+            messier.canvas_id = None
+
+        self.moon.canvas_id = None
+        self.moon.canvas_x = None
+        self.moon.canvas_y = None
+
+        for constellation in self.constellation_list:
+            constellation.x = 0
+            constellation.y = 0

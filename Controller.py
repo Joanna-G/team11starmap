@@ -206,6 +206,7 @@ class Controller():
         self.view.star_map_frame.label_widgets.clear()
 
         # Recenter the canvas
+        #self.view.star_map_frame.canvas.scale("all", self.centerX, self.centerY, 1, 1)
         self.view.star_map_frame.canvas.xview_moveto(self.centerX)
         self.view.star_map_frame.canvas.yview_moveto(self.centerY)'''
 
@@ -261,6 +262,11 @@ class Controller():
 
         for constellation in self.model.constellation_list:
             constellation.set_center()
+
+        #self.true_x = self.canvas.canvasx(event.x)
+        #self.true_y = self.canvas.canvasy(event.y)
+
+        # self.view.star_map_frame.canvas.scale("all", 0, 0, 1.0, 1.0)
 
 
 if __name__ == "__main__":

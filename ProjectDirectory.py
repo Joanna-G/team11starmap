@@ -11,3 +11,4 @@ class ProjectDirectory:
             self.directory = os.path.dirname(__file__)
         self.dll_file = os.path.join(self.directory, 'gsdll64.dll')
         self.lib_file = os.path.join(self.directory, 'gsdll64.lib')
+        print(self.dll_file)

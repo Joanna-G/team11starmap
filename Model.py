@@ -102,10 +102,14 @@ class Model():
                 self.planet_list[2].oscal, self.planet_list[2].oprop, self.time_calc.cy, self.time_calc.d)
             ha_time = planet.calculate_ha_time(self.time_calc.lst, planet.right_ascension)
             planet.ha = planet.ha_time_to_degrees(ha_time)
-            planet.alt, planet.az = planet.calculate_alt_az(planet.declination, self.time_calc.lat,
+            planet.alt, planet.az = planet.calculate_alt_az(planet.right_ascension, planet.declination, self.time_calc.lat,
                                                             planet.ha, self.time_calc.t, self.time_calc.lon,
                                                             self.time_calc.mst)
             planet.get_xy_coords(planet.alt, planet.az, 4000)
+            print(planet.proper_name)
+            print("Right Ascension: ", planet.right_ascension)
+            print("Declination: ", planet.declination)
+            print()
 
     # Calculate the position of the Moon
     def Calculate_Moon_Position(self):

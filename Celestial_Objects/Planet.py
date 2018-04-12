@@ -30,14 +30,14 @@ class Planet(BaseCelestialObject):
         self.distance = None
         self.ha = None
 
-    def calculate_alt_az(self, dec, lat, ha_degrees, t, lon, mst):
+    def calculate_alt_az(self, ra, dec, lat, ha_degrees, t, lon, mst):
         if lat < 0:
             lat *= -1.0
         if lon < 0:
             lon *= -1.0
 
         #hour_angle = calculate_mst(year, month, day, hour, minute, 0, lat, lon)
-        hour_angle = mst
+        hour_angle = mst - ra
         if hour_angle < 0:
             hour_angle += 360
 
@@ -153,7 +153,7 @@ class Planet(BaseCelestialObject):
                                 e_iscal, e_iprop, e_wscal, e_wprop, e_oscal, e_oprop, cy, d):
 
         # calculate elements of planetary orbit of the planet
-        # pl_mean_long = calculate_mean_longitude(pl_lscal, pl_lprop, cy)
+        #pl_mean_long = self.calculate_mean_longitude(pl_lscal, pl_lprop, cy)
         pl_axis = self.calculate_semi_axis(pl_ascal, pl_aprop, cy)
         pl_eccentricity = self.calculate_eccentricity(pl_escal, pl_eprop, cy)
         pl_inclination = self.calculate_inclination(pl_iscal, pl_iprop, cy)
@@ -161,7 +161,7 @@ class Planet(BaseCelestialObject):
         pl_long_asc_node = self.calculate_long_asc_node(pl_oscal, pl_oprop, cy)
 
         # calculate elements of the planetary orbit of the Earth
-        # e_mean_long = calculate_mean_longitude(e_lscal, e_lprop, cy)
+        #e_mean_long = self.calculate_mean_longitude(e_lscal, e_lprop, cy)
         e_axis = self.calculate_semi_axis(e_ascal, e_aprop, cy)
         e_eccentricity = self.calculate_eccentricity(e_escal, e_eprop, cy)
         # e_inclination = calculate_inclination(e_iscal, e_iprop, cy)
@@ -169,7 +169,7 @@ class Planet(BaseCelestialObject):
         # e_long_asc_node = calculate_long_asc_node(e_oscal, e_oprop, cy)
 
         # calculate the position of the Earth in its orbit
-        # e_m = mod2pi(e_mean_long - e_arg_perihelion)
+        #e_mean_anomaly = self.mod2pi(e_mean_long - e_arg_perihelion)
         e_mean_anomaly = self.calculate_mean_anomaly("Earth/Sun", d)
         e_v = self.calculate_true_anomaly(math.radians(e_mean_anomaly), math.radians(e_eccentricity))
         e_r = e_axis * (1 - math.pow(e_eccentricity, 2)) / (1 + e_eccentricity * math.cos(e_v))
@@ -180,7 +180,7 @@ class Planet(BaseCelestialObject):
         e_z = 0.0
 
         # calculate the position of the planet in its' orbit
-        # pl_m = mod2pi(pl_mean_long - pl_arg_perihelion)
+        #pl_mean_anomaly = self.mod2pi(pl_mean_long - pl_arg_perihelion)
         pl_mean_anomaly = self.calculate_mean_anomaly(pl_name, d)
         pl_v = self.calculate_true_anomaly(math.radians(pl_mean_anomaly), math.radians(pl_eccentricity))
         pl_r = pl_axis * (1 - math.pow(pl_eccentricity, 2)) / (1 + pl_eccentricity * math.cos(pl_v))

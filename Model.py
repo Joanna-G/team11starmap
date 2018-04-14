@@ -82,34 +82,62 @@ class Model():
 
     # Calculate the position of each planet
     def Calculate_Planet_Positions(self):
+        self.planet_list[2].semi_axis = self.planet_list[2].calculate_semi_axis(self.planet_list[2].ascal, self.planet_list[2].aprop, self.time_calc.cy)
+        self.planet_list[2].eccentricity = self.planet_list[2].calculate_eccentricity(self.planet_list[2].escal, self.planet_list[2].eprop, self.time_calc.cy)
+        self.planet_list[2].inclination = self.planet_list[2].calculate_inclination(self.planet_list[2].iscal, self.planet_list[2].iprop, self.time_calc.cy)
+        self.planet_list[2].arg_perihelion = self.planet_list[2].calculate_arg_perihelion(self.planet_list[2].wscal, self.planet_list[2].wprop, self.time_calc.cy)
+        self.planet_list[2].long_asc_node = self.planet_list[2].calculate_long_asc_node(self.planet_list[2].oscal, self.planet_list[2].oprop, self.time_calc.cy)
+        self.planet_list[2].mean_long = self.planet_list[2].calculate_mean_longitude(self.planet_list[2].lscal, self.planet_list[2].lprop, self.time_calc.cy)
+        # self.planet_list[2].mean_anomaly = self.planet_list[2].calculate_mean_anomaly(self.planet_list[2].proper_name, self.time_calc.d)
+        # self.planet_list[2].true_anomaly = self.planet_list[2].calculate_true_anomaly(
+        #     math.radians(self.planet_list[2].mean_anomaly), math.radians(self.planet_list[2].eccentricity))
+        #self.planet_list[2].true_anomaly = self.planet_list[2].calculate_true_anomaly(math.radians(self.planet_list[2].mean_anomaly), math.radians(self.planet_list[2].eccentricity))
+        self.planet_list[2].right_ascension, self.planet_list[2].declination, self.planet_list[2].distance = \
+            self.planet_list[2].calculate_ra_dec_planet(self.planet_list[2].proper_name, self.planet_list[2].semi_axis,
+                                                        math.radians(self.planet_list[2].eccentricity),
+                                                        self.planet_list[2].inclination,
+                                                        self.planet_list[2].arg_perihelion,
+                                                        self.planet_list[2].long_asc_node,
+                                                        self.planet_list[2].mean_long,
+                                                        self.planet_list[2].semi_axis,
+                                                        math.radians(self.planet_list[2].eccentricity),
+                                                        self.planet_list[2].inclination,
+                                                        self.planet_list[2].arg_perihelion,
+                                                        self.planet_list[2].long_asc_node,
+                                                        self.planet_list[2].mean_long)
+        print(self.planet_list[2].proper_name)
+        print("Right Ascension: ", self.planet_list[2].right_ascension)
+        print("Declination: ", self.planet_list[2].declination)
+        print()
+
         for planet in self.planet_list:
-            planet.semi_axis = planet.calculate_semi_axis(planet.ascal, planet.aprop, self.time_calc.cy)
-            planet.eccentricity = planet.calculate_eccentricity(planet.escal, planet.eprop, self.time_calc.cy)
-            planet.inclination = planet.calculate_inclination(planet.iscal, planet.iprop, self.time_calc.cy)
-            planet.arg_perihelion = planet.calculate_arg_perihelion(planet.wscal, planet.wprop, self.time_calc.cy)
-            planet.long_asc_node = planet.calculate_long_asc_node(planet.oscal, planet.oprop, self.time_calc.cy)
-            planet.mean_long = planet.calculate_mean_longitude(planet.lscal, planet.lprop, self.time_calc.cy)
-            planet.mean_anomaly = planet.calculate_mean_anomaly(planet.proper_name, self.time_calc.d)
-            planet.true_anomaly = planet.calculate_true_anomaly(math.radians(planet.mean_anomaly),
-                                                                math.radians(planet.eccentricity))
-            planet.right_ascension, planet.declination, planet.distance = planet.calculate_ra_dec_planet(
-                planet.proper_name, planet.lscal, planet.lprop, planet.ascal, planet.aprop,
-                planet.escal, planet.eprop, planet.iscal, planet.iprop, planet.wscal,
-                planet.wprop, planet.oscal, planet.oprop, planet.lscal, planet.lprop,
-                self.planet_list[2].ascal, self.planet_list[2].aprop, self.planet_list[2].escal,
-                self.planet_list[2].eprop, self.planet_list[2].iscal,
-                self.planet_list[2].iprop, self.planet_list[2].wscal, self.planet_list[2].wprop,
-                self.planet_list[2].oscal, self.planet_list[2].oprop, self.time_calc.cy, self.time_calc.d)
-            ha_time = planet.calculate_ha_time(self.time_calc.lst, planet.right_ascension)
-            planet.ha = planet.ha_time_to_degrees(ha_time)
-            planet.alt, planet.az = planet.calculate_alt_az(planet.right_ascension, planet.declination, self.time_calc.lat,
-                                                            planet.ha, self.time_calc.t, self.time_calc.lon,
-                                                            self.time_calc.mst)
-            planet.get_xy_coords(planet.alt, planet.az, 4000)
-            print(planet.proper_name)
-            print("Right Ascension: ", planet.right_ascension)
-            print("Declination: ", planet.declination)
-            print()
+            if planet.proper_name != "Earth/Sun":
+                planet.semi_axis = planet.calculate_semi_axis(planet.ascal, planet.aprop, self.time_calc.cy)
+                planet.eccentricity = planet.calculate_eccentricity(planet.escal, planet.eprop, self.time_calc.cy)
+                planet.inclination = planet.calculate_inclination(planet.iscal, planet.iprop, self.time_calc.cy)
+                planet.arg_perihelion = planet.calculate_arg_perihelion(planet.wscal, planet.wprop, self.time_calc.cy)
+                planet.long_asc_node = planet.calculate_long_asc_node(planet.oscal, planet.oprop, self.time_calc.cy)
+                planet.mean_long = planet.calculate_mean_longitude(planet.lscal, planet.lprop, self.time_calc.cy)
+                #planet.mean_anomaly = planet.calculate_mean_anomaly(planet.proper_name, self.time_calc.d)
+                #planet.true_anomaly = planet.calculate_true_anomaly(planet.mean_anomaly,
+                                                                   # math.radians(planet.eccentricity))
+                #planet.true_anomaly = planet.calculate_true_anomaly(math.radians(planet.mean_anomaly),
+                                                                    #math.radians(planet.eccentricity))
+                planet.right_ascension, planet.declination, planet.distance = planet.calculate_ra_dec_planet(
+                    planet.proper_name, planet.semi_axis, math.radians(planet.eccentricity), planet.inclination,
+                    planet.arg_perihelion, planet.long_asc_node, planet.mean_long, self.planet_list[2].semi_axis,
+                    math.radians(self.planet_list[2].eccentricity), self.planet_list[2].inclination,
+                    self.planet_list[2].arg_perihelion, self.planet_list[2].long_asc_node,
+                    self.planet_list[2].mean_long)
+                ha_time = planet.calculate_ha_time(self.time_calc.lst, planet.right_ascension)
+                planet.ha = planet.ha_time_to_degrees(ha_time)
+                planet.alt, planet.az = planet.calculate_alt_az(planet.right_ascension, planet.declination,
+                                                                self.time_calc.lat, self.time_calc.lon,
+                                                                self.time_calc.mst)
+                planet.get_xy_coords(planet.alt, planet.az, 4000)
+                print("Altitude: ", planet.alt)
+                print("Azimuth: ", planet.az)
+                print()
 
     # Calculate the position of the Moon
     def Calculate_Moon_Position(self):

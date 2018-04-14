@@ -92,8 +92,8 @@ class TimeCalculations:
         return jd
 
     # Added by Ben - I need this for planet calculations. Can move if needed, but is time related
-    def calculate_julian_century(self, jd):
-        return math.radians(jd / 36525)
+    #def calculate_julian_century(self):
+     #   return math.radians(self.julian_day / 36525)
 
     # Added by Ben - also needed this
     # Joanna also needs this

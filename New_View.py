@@ -32,10 +32,10 @@ class MainApplication(ttk.Frame):
         modal_dlg.columnconfigure(0, weight=1)
         modal_dlg.resizable(False, False)
 
-        tk.Label(modal_dlg, text=error_message).grid(column=0, row=0, columnspan=3, sticky='nw')
+        tk.Label(modal_dlg, text=error_message).grid(column=0, row=0, columnspan=3, sticky='nw', padx=50, pady=50)
 
         # Don't know what this does or what it should be set to
-        modal_dlg.geometry('+%d+%d' % (0, 0))
+        modal_dlg.geometry('+%d+%d' % (10, 500))
         modal_dlg.transient(self.parent)
         modal_dlg.focus_set()
         modal_dlg.grab_set()
@@ -253,8 +253,8 @@ class UserFrame(ttk.Frame):
         # self.set_combobox_values(self.combobox_longitude, 'Long', -180, 181)
 
         # Default values for testing purpose. April 10, 2018 8:30 AM, offset -6, 34.7 lat, 86.6 long
-        self.set_combobox_values(self.combobox_month, 4, 1, 13)
-        self.set_combobox_values(self.combobox_day, 11, 1, 32)
+        self.set_combobox_values(self.combobox_month, 5, 1, 13)
+        self.set_combobox_values(self.combobox_day, 22, 1, 32)
         self.set_combobox_values(self.combobox_year, 2018, 1900, 2101)
         self.set_combobox_values(self.combobox_hour, 17, 0, 25)
         self.set_combobox_values(self.combobox_minute, 0, 0, 60)
@@ -407,9 +407,10 @@ class StarMapFrame(ttk.Frame):
                         star2 = star
             if star1 is not None and star2 is not None:
                 self.constellation_lines.append(self.draw_constellation_line(star1, star2))
+                const.visible = 1
 
     def draw_moon(self, moon, phase, x, y):
-        r = 12
+        r = 20
         # If moon.phase is new, draw black circle with white outline
         if phase == 'New':
             moon.canvas_id = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='black', outline='white')
@@ -533,16 +534,17 @@ class StarMapFrame(ttk.Frame):
             # Set Label font based on platform
             if sys.platform == "win32" or sys.platform == "win64":
                 font = 'Magneto'
-                size = 14
+                size = 18
             elif sys.platform == "darwin":
                 font = 'Brush Script MT'
-                size = 28
+                size = 24
             elif sys.platform == "linux" or sys.platform == "linux2":
                 font = 'URW Chancery L'
-                size = 14
+                size = 18
         else:
             offset = 0
             fill = 'purple'
+
         if isinstance(object, Constellation):
             self.label_widgets.append((self.canvas.create_text(object.x, object.y, text=str(object.proper_name),
                                                                fill=fill, tag=tag, font=(font, size))))
@@ -586,12 +588,29 @@ class StarMapFrame(ttk.Frame):
         #                   columnspan=3, sticky='nsew')
 
         elif isinstance(object, Moon):
-            tk.Label(modal_dlg, text='Moon').grid(column=0, row=0, columnspan=3, sticky='nw')
-            tk.Label(modal_dlg, text="Moon Altitude: " + str(object.alt)).grid(column=0, row=1, columnspan=3,
+            if getattr(sys, 'frozen', False):
+                directory = os.path.dirname(sys.executable)
+            elif __file__:
+                directory = os.path.dirname(__file__)
+            full = os.path.join(directory, 'resources', 'moon_full_small.jpeg')
+            first = os.path.join(directory, 'resources', 'moon_first_quarter_small.jpeg')
+            new = os.path.join(directory, 'resources', 'moon_new_small.png')
+            last = os.path.join(directory, 'resources', 'moon_last_quarter_small.png')
+            if object.phase == 'New':
+                logo = ImageTk.PhotoImage(Image.open(new))
+            elif object.phase == 'First Quarter':
+                logo = ImageTk.PhotoImage(Image.open(first))
+            elif object.phase == 'Full':
+                logo = ImageTk.PhotoImage(Image.open(full))
+            else:
+                logo = ImageTk.PhotoImage(Image.open(last))
+            tk.Label(modal_dlg, image=logo).grid(column=0, row=0, rowspan=3, sticky = 'nw')
+            tk.Label(modal_dlg, text='Moon').grid(column=1, row=0, columnspan=3, sticky='nw')
+            tk.Label(modal_dlg, text="Moon Altitude: " + str(object.alt)).grid(column=1, row=1, columnspan=3,
                                                                                sticky='nw')
-            tk.Label(modal_dlg, text="Moon Azimuth: " + str(object.az)).grid(column=0, row=2, columnspan=3,
+            tk.Label(modal_dlg, text="Moon Azimuth: " + str(object.az)).grid(column=1, row=2, columnspan=3,
                                                                             sticky='nw')
-            tk.Label(modal_dlg, text="Moon Phase: " + str(object.phase)).grid(column=0, row=4, columnspan=3,
+            tk.Label(modal_dlg, text="Moon Phase: " + str(object.phase)).grid(column=1, row=3, columnspan=3,
                                                                             sticky='nw')
         elif isinstance(object, Planet):
             tk.Label(modal_dlg, text='Planet Name: ' + str(object.proper_name)).grid(column=0, row=0, columnspan=3,

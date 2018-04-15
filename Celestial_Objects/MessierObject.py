@@ -11,6 +11,7 @@ class MessierObject(BaseCelestialObject):
         self.messier_cat = messier_cat
         self.right_ascension = self.degrees_to_decimal(ra_hour, ra_min, ra_sec)
         self.declination = self.degrees_to_decimal(dec_deg, dec_min, dec_sec)
+        self.altitude = None
 
     # Same as Star
     def calculate_alt_az(self, dec, lat, ha_degrees, t, lon, mst):
@@ -19,6 +20,7 @@ class MessierObject(BaseCelestialObject):
                   math.cos(math.radians(lat)) * math.cos(math.radians(ha_degrees))
         alt_rad = math.asin(alt_rad)
         alt_degrees = math.degrees(alt_rad)
+        self.altitude = alt_degrees
 
         # ha_degrees = self.ha_time_to_degrees(ha_time)
         az_rad = (math.sin(math.radians(dec)) - (math.sin(math.radians(alt_degrees)) * math.sin(math.radians(lat)))) / \

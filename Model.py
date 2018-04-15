@@ -76,7 +76,7 @@ class Model():
             star.altitude, star.azimuth = star.calculate_alt_az(star.declination, self.time_calc.lat, star.ha_degrees,
                                                                 None, None, None)
             star.calculate_radius()
-            print(star.radius)
+            # print(star.radius)
             star.get_xy_coords(star.altitude, star.azimuth, 4000)
 
     # Calculate the position of each planet
@@ -138,17 +138,17 @@ class Model():
                                                                 planet.declination, self.time_calc.lon,
                                                                 self.time_calc.mst)
                 planet.get_xy_coords(planet.alt, planet.az, 4000)
-                print("Semimajor Axis: ", planet.semi_axis)
-                print("Eccentricity: ", math.radians(planet.eccentricity))
-                print("Inclination: ", math.degrees(planet.inclination))
-                print("Long Ascending Node: ", math.degrees(planet.long_asc_node))
-                print("Argument of Perihelion: ", math.degrees(planet.arg_perihelion))
-                print("Mean Longitude: ", planet.mean_long)
-                print("Altitude: ", planet.alt)
-                print("Azimuth: ", planet.az)
-                print("CY: ", self.time_calc.cy)
-                print("D: ", self.time_calc.d)
-                print()
+                # print("Semimajor Axis: ", planet.semi_axis)
+                # print("Eccentricity: ", math.radians(planet.eccentricity))
+                # print("Inclination: ", math.degrees(planet.inclination))
+                # print("Long Ascending Node: ", math.degrees(planet.long_asc_node))
+                # print("Argument of Perihelion: ", math.degrees(planet.arg_perihelion))
+                # print("Mean Longitude: ", planet.mean_long)
+                # print("Altitude: ", planet.alt)
+                # print("Azimuth: ", planet.az)
+                # print("CY: ", self.time_calc.cy)
+                # print("D: ", self.time_calc.d)
+                # print()
 
     # Calculate the position of the Moon
     def Calculate_Moon_Position(self):

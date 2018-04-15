@@ -14,6 +14,7 @@ class Constellation:
         # self.number_lines = None
         self.x = 0
         self.y = 0
+        self.visible = 0
 
     def set_const_stars(self):
         for element in self.line_stars:

@@ -101,28 +101,28 @@ class Planet(BaseCelestialObject):
     # def calculate_mean_anomaly(self, planet_name, d):
     #     if planet_name == "Mercury":
     #         #return (168.6562 + 4.0923344368 * d) % 360
-    #         return self.mod2pi(168.6562 + 4.0923344368 * d)
+    #         return self.mod2pi(math.radians(168.6562 + 4.0923344368 * d))
     #          # return 102.27938 + 149472.51529 * T + 0.000007 * math.pow(cy, 2)
     #     elif planet_name == "Venus":
     #         #return (48.0052 + 1.6021302244 * d) % 360
-    #         return math.radians((48.0052 + 1.6021302244 * d)) % (math.pi * 2)
+    #         return self.mod2pi(math.radians(48.0052 + 1.6021302244 * d))
     #          # return 212.60322 + 58517.80387 * T + 0.001286 * math.pow(cy, 2)
     #     elif planet_name == "Mars":
-    #         return (18.6021 + 0.5240207766 * d) % 360
+    #         return self.mod2pi(math.radians(18.6021 + 0.5240207766 * d))
     #          # return 319.51913 + 19139.85475 * T + 0.000181 * math.pow(cy, 2)
     #     elif planet_name == "Earth/Sun":
-    #         return math.radians((356.0470 + 0.9856002585 * d)) % (math.pi * 2)
+    #         return self.mod2pi(math.radians(356.0470 + 0.9856002585 * d))
     #     elif planet_name == "Jupiter":
     #         #return (19.8950 + 0.0830853001 * d) % 360
-    #         return (19.8950 + 0.0830853001 * d) % (math.pi * 2)
+    #         return self.mod2pi(math.radians(19.8950 + 0.0830853001 * d))
     #          # return 225.32833 + 3034.69202 * T - 0.000722 * math.pow(cy, 2)
     #     elif planet_name == "Saturn":
-    #         return (316.9670 + 0.0334442282 * d) % 360
+    #         return self.mod2pi(math.radians(316.9670 + 0.0334442282 * d))
     #          # return 175.46622 + 1221.55147 * cy - 0.000502 * math.pow(cy, 2)
     #     elif planet_name == "Uranus":
-    #         return (142.5905 + 0.011725806 * d) % 360
+    #         return self.mod2pi(math.radians(142.5905 + 0.011725806 * d))
     #     elif planet_name == "Neptune":
-    #         return (260.2471 + 0.005995147 * d) % 360
+    #         return self.mod2pi(math.radians(260.2471 + 0.005995147 * d))
     #     else:
     #         return 1
 
@@ -153,7 +153,7 @@ class Planet(BaseCelestialObject):
     # calculate right ascension and declination of a planet
     def calculate_ra_dec_planet(self, pl_name, pl_axis, pl_eccentricity, pl_inclination,
                                 pl_arg_perihelion, pl_long_asc_node, pl_mean_long, e_axis,
-                                e_eccentricity, e_inclination, e_arg_perihelion, e_long_asc_node, e_mean_long):
+                                e_eccentricity, e_inclination, e_arg_perihelion, e_long_asc_node, e_mean_long, d):
 
         # calculate elements of planetary orbit of the planet
         #pl_mean_long = self.calculate_mean_longitude(pl_lscal, pl_lprop, cy)
@@ -174,7 +174,7 @@ class Planet(BaseCelestialObject):
         # calculate the position of the Earth in its orbit
         e_mean_anomaly = self.mod2pi(e_mean_long - e_arg_perihelion)
         #e_mean_anomaly = (e_mean_long - e_arg_perihelion) % 360
-        #e_mean_anomaly = self.calculate_mean_anomaly("Earth/Sun", d)
+        # e_mean_anomaly = self.calculate_mean_anomaly("Earth/Sun", d)
         #e_mean_anomaly = self.planet_list[2].mean_anomaly
         e_v = self.calculate_true_anomaly(e_mean_anomaly, math.radians(e_eccentricity))
         #e_v = self.calculate_true_anomaly(e_mean_anomaly, e_eccentricity)
@@ -227,8 +227,8 @@ class Planet(BaseCelestialObject):
         dist = math.sqrt(math.pow(xeq, 2) + math.pow(yeq, 2) + math.pow(zeq, 2))
 
         print(pl_name)
-        print("Mean Anomaly: ", pl_mean_anomaly)
-        print("True Anomaly: ", pl_v)
+        print("Mean Anomaly (degs): ", math.degrees(pl_mean_anomaly))
+        print("True Anomaly (rads): ", pl_v)
         print("Right Ascension: ", ra)
         print("Declination: ", dec)
 

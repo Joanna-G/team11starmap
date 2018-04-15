@@ -32,7 +32,6 @@ class Model():
         self.Create_Constellations()
         self.Create_Planets()
         self.Create_Messier_Obj()
-        self.Create_Planets()
 
     # Create Stars based on information from Star Parser (s_parse) information and append to star_list
     def Create_Stars(self):
@@ -70,6 +69,7 @@ class Model():
                             pp_planet[6], pp_planet[7], pp_planet[8], pp_planet[9], pp_planet[10], pp_planet[11],
                             pp_planet[12])
             self.planet_list.append(planet)
+            #print(pp_planet[0])
 
     # Calculate all stars positions based on user inputted date, time, and location values
     def Calculate_Star_Positions(self):
@@ -104,7 +104,7 @@ class Model():
                                                         self.planet_list[2].inclination,
                                                         self.planet_list[2].arg_perihelion,
                                                         self.planet_list[2].long_asc_node,
-                                                        self.planet_list[2].mean_long)
+                                                        self.planet_list[2].mean_long, self.time_calc.d)
         print(self.planet_list[2].proper_name)
         print("Right Ascension: ", self.planet_list[2].right_ascension)
         print("Declination: ", self.planet_list[2].declination)
@@ -123,20 +123,32 @@ class Model():
                                                                    # math.radians(planet.eccentricity))
                 #planet.true_anomaly = planet.calculate_true_anomaly(math.radians(planet.mean_anomaly),
                                                                     #math.radians(planet.eccentricity))
-                planet.right_ascension, planet.declination, planet.distance = planet.calculate_ra_dec_planet(
-                    planet.proper_name, planet.semi_axis, math.radians(planet.eccentricity), planet.inclination,
-                    planet.arg_perihelion, planet.long_asc_node, planet.mean_long, self.planet_list[2].semi_axis,
-                    math.radians(self.planet_list[2].eccentricity), self.planet_list[2].inclination,
-                    self.planet_list[2].arg_perihelion, self.planet_list[2].long_asc_node,
-                    self.planet_list[2].mean_long)
+                planet.right_ascension, planet.declination, planet.distance = \
+                    planet.calculate_ra_dec_planet(planet.proper_name, planet.semi_axis,
+                                                   math.radians(planet.eccentricity), planet.inclination,
+                                                   planet.arg_perihelion, planet.long_asc_node, planet.mean_long,
+                                                   self.planet_list[2].semi_axis,
+                                                   math.radians(self.planet_list[2].eccentricity),
+                                                   self.planet_list[2].inclination, self.planet_list[2].arg_perihelion,
+                                                   self.planet_list[2].long_asc_node,
+                                                   self.planet_list[2].mean_long, self.time_calc.d)
+
                 ha_time = planet.calculate_ha_time(self.time_calc.lst, planet.right_ascension)
                 planet.ha = planet.ha_time_to_degrees(ha_time)
                 planet.alt, planet.az = planet.calculate_alt_az(planet.right_ascension, planet.declination,
                                                                 self.time_calc.lat, self.time_calc.lon,
                                                                 self.time_calc.mst)
                 planet.get_xy_coords(planet.alt, planet.az, 4000)
+                print("Semimajor Axis: ", planet.semi_axis)
+                print("Eccentricity: ", math.radians(planet.eccentricity))
+                print("Inclination: ", math.degrees(planet.inclination))
+                print("Long Ascending Node: ", math.degrees(planet.long_asc_node))
+                print("Argument of Perihelion: ", math.degrees(planet.arg_perihelion))
+                print("Mean Longitude: ", planet.mean_long)
                 print("Altitude: ", planet.alt)
                 print("Azimuth: ", planet.az)
+                print("CY: ", self.time_calc.cy)
+                print("D: ", self.time_calc.d)
                 print()
 
     # Calculate the position of the Moon

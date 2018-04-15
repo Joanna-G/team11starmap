@@ -254,13 +254,13 @@ class UserFrame(ttk.Frame):
 
         # Default values for testing purpose. April 10, 2018 8:30 AM, offset -6, 34.7 lat, 86.6 long
         self.set_combobox_values(self.combobox_month, 4, 1, 13)
-        self.set_combobox_values(self.combobox_day, 10, 1, 32)
+        self.set_combobox_values(self.combobox_day, 11, 1, 32)
         self.set_combobox_values(self.combobox_year, 2018, 1900, 2101)
-        self.set_combobox_values(self.combobox_hour, 8, 0, 25)
-        self.set_combobox_values(self.combobox_minute, 30, 0, 60)
-        self.set_combobox_values(self.combobox_utc, -6, -12, 15)
+        self.set_combobox_values(self.combobox_hour, 17, 0, 25)
+        self.set_combobox_values(self.combobox_minute, 0, 0, 60)
+        self.set_combobox_values(self.combobox_utc, 0, -12, 15)
         self.set_combobox_values(self.combobox_latitude, 34.7, -90, 91)
-        self.set_combobox_values(self.combobox_longitude, 86.6, -180, 181)
+        self.set_combobox_values(self.combobox_longitude, -86.6, -180, 181)
 
     def set_combobox_values(self, combobox, default, first, last):
         combobox.set(default)

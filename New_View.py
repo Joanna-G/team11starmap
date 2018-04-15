@@ -6,7 +6,7 @@ from PIL import ImageTk, Image, ImageDraw
 from tkinter.filedialog import asksaveasfilename
 import locale
 from Celestial_Objects import *
-#import ghostscript
+import ghostscript
 import os
 import sys
 
@@ -362,22 +362,32 @@ class StarMapFrame(ttk.Frame):
         star.canvas_id = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='#F6DC83', outline='#F6DC83')
 
         canvas_coords = self.canvas.coords(star.canvas_id)
-        star.canvas_x = canvas_coords[0]
-        star.canvas_y = canvas_coords[1]
+        # star.canvas_x = canvas_coords[0]
+        # star.canvas_y = canvas_coords[1]
 
-        star.offset_x = star.canvas_x - x
-        star.offset_y = star.canvas_y - y
+        # star.offset_x = star.canvas_x - x
+        # star.offset_y = star.canvas_y - y
 
-        self.canvas.move(star.canvas_id, star.offset_x, star.offset_y)
+        # self.canvas.move(star.canvas_id, star.offset_x, star.offset_y)
 
         self.canvas.tag_bind(star.canvas_id, '<ButtonPress-1>', lambda e: self.display_star_info(e, star))
 
     def draw_constellation_line(self, star_1, star_2):
         const = self.canvas.create_line(star_1.canvas_x, star_1.canvas_y, star_2.canvas_x, star_2.canvas_y, fill='pink')
+        # const = self.canvas.create_line(star_1.canvas_x + star_1.offset_x, star_1.canvas_y + star_1.offset_y, star_2.canvas_x + star_2.offset_x, star_2.canvas_y + star_2.offset_y, fill='pink')
+
+        # self.canvas.move(star_1.canvas_id, star_1.offset_x, star_1.offset_y)
+        # self.canvas.move(star_2.canvas_id, star_2.offset_x, star_2.offset_y)
+
+        # self.canvas.delete(star_1.canvas_id)
+        # self.canvas.delete(star_2.canvas_id)
 
         # Redraw stars on top of constellation lines. Broken.
         # self.draw_star(star_1, star_1.canvas_x, star_1.canvas_y)
         # self.draw_star(star_2, star_2.canvas_x, star_2.canvas_y)
+        # #
+        # const = self.canvas.create_line(star_1.canvas_x, star_1.canvas_y, star_2.canvas_x, star_2.canvas_y, fill='pink')
+
 
         # Don't need to be able to click on constellations to see names. - Jo
         # self.canvas.tag_bind(const, '<ButtonPress-1>', lambda e: self.display_constellation_info(e, constellation))
@@ -566,6 +576,7 @@ class StarMapFrame(ttk.Frame):
                                                                       sticky='nw')
             tk.Label(modal_dlg, text='Star Canvas Y: ' + str(object.canvas_y)).grid(column=0, row=8, columnspan=3,
                                                                       sticky='nw')
+            print('offset x: ' + str(object.offset_x) + ' offset y: ' + str(object.offset_y))
 
         # Don't really need to have dialog for constellations
         # elif isinstance(object, Constellation):

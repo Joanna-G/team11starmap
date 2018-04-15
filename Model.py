@@ -23,9 +23,6 @@ class Model():
         self.moon = Moon()
         self.Create_Celestial_Objects()
 
-        self.boundary_x = None
-        self.boundary_y = None
-
     # Create all Stars, Constellations, Planets, Messier Deep Space Objects, and Planets
     def Create_Celestial_Objects(self):
         self.Create_Stars()
@@ -69,7 +66,7 @@ class Model():
                             pp_planet[6], pp_planet[7], pp_planet[8], pp_planet[9], pp_planet[10], pp_planet[11],
                             pp_planet[12])
             self.planet_list.append(planet)
-            #print(pp_planet[0])
+            # print(pp_planet[0])
 
     # Calculate all stars positions based on user inputted date, time, and location values
     def Calculate_Star_Positions(self):
@@ -118,11 +115,11 @@ class Model():
                 planet.arg_perihelion = planet.calculate_arg_perihelion(planet.wscal, planet.wprop, self.time_calc.cy)
                 planet.long_asc_node = planet.calculate_long_asc_node(planet.oscal, planet.oprop, self.time_calc.cy)
                 planet.mean_long = planet.calculate_mean_longitude(planet.lscal, planet.lprop, self.time_calc.cy)
-                #planet.mean_anomaly = planet.calculate_mean_anomaly(planet.proper_name, self.time_calc.d)
-                #planet.true_anomaly = planet.calculate_true_anomaly(planet.mean_anomaly,
-                                                                   # math.radians(planet.eccentricity))
-                #planet.true_anomaly = planet.calculate_true_anomaly(math.radians(planet.mean_anomaly),
-                                                                    #math.radians(planet.eccentricity))
+                # planet.mean_anomaly = planet.calculate_mean_anomaly(planet.proper_name, self.time_calc.d)
+                # planet.true_anomaly = planet.calculate_true_anomaly(planet.mean_anomaly,
+                                                                # math.radians(planet.eccentricity))
+                # planet.true_anomaly = planet.calculate_true_anomaly(math.radians(planet.mean_anomaly),
+                                                                # math.radians(planet.eccentricity))
                 planet.right_ascension, planet.declination, planet.distance = \
                     planet.calculate_ra_dec_planet(planet.proper_name, planet.semi_axis,
                                                    math.radians(planet.eccentricity), planet.inclination,

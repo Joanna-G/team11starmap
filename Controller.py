@@ -261,6 +261,9 @@ class Controller():
         self.model.moon.canvas_y = canvas_coords[1]
 
         for constellation in self.model.constellation_list:
+            constellation.main_star_list = self.model.star_list
+            constellation.set_const_stars()
+            constellation.set_num_stars()
             constellation.set_center()
 
         #self.true_x = self.canvas.canvasx(event.x)

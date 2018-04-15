@@ -326,7 +326,6 @@ class StarMapFrame(ttk.Frame):
         self.canvas.bind("<ButtonPress-1>", self.scroll_start)
         self.canvas.bind("<B1-Motion>", self.scroll_move)
 
-
     def reset_values(self):
         self.multiplier = 1
         self.label_widgets.clear()
@@ -362,8 +361,11 @@ class StarMapFrame(ttk.Frame):
         star.canvas_id = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='#F6DC83', outline='#F6DC83')
 
         canvas_coords = self.canvas.coords(star.canvas_id)
-        star.canvas_x = canvas_coords[0]
-        star.canvas_y = canvas_coords[1]
+
+        star.canvas_x = -canvas_coords[0] + r
+        star.canvas_y = canvas_coords[1] + r
+
+        print(star.canvas_id, star.x, star.canvas_x, star.y, star.canvas_y, star.magnitude)
 
         star.offset_x = star.canvas_x - x
         star.offset_y = star.canvas_y - y

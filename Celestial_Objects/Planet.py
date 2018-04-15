@@ -30,7 +30,10 @@ class Planet(BaseCelestialObject):
         self.distance = None
         self.ha = None
 
-    def calculate_alt_az(self, ra, dec, lat, lon, mst):
+    def calculate_alt_az(self, ra, lat, dec, lon, mst):
+        print(lat)
+        print(lon)
+        print(mst)
         if lat < 0:
             lat *= -1.0
         if lon < 0:

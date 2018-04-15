@@ -130,10 +130,10 @@ class Model():
                                                    self.planet_list[2].long_asc_node,
                                                    self.planet_list[2].mean_long, self.time_calc.d)
 
-                ha_time = planet.calculate_ha_time(self.time_calc.lst, planet.right_ascension)
-                planet.ha = planet.ha_time_to_degrees(ha_time)
-                planet.alt, planet.az = planet.calculate_alt_az(planet.right_ascension, planet.declination,
-                                                                self.time_calc.lat, self.time_calc.lon,
+                #ha_time = planet.calculate_ha_time(self.time_calc.lst, planet.right_ascension)
+                #planet.ha = planet.ha_time_to_degrees(ha_time)
+                planet.alt, planet.az = planet.calculate_alt_az(planet.right_ascension, self.time_calc.lat,
+                                                                planet.declination, self.time_calc.lon,
                                                                 self.time_calc.mst)
                 planet.get_xy_coords(planet.alt, planet.az, 4000)
                 print("Semimajor Axis: ", planet.semi_axis)

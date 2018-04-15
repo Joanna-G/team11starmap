@@ -375,7 +375,8 @@ class StarMapFrame(ttk.Frame):
         self.canvas.tag_bind(star.canvas_id, '<ButtonPress-1>', lambda e: self.display_star_info(e, star))
 
     def draw_constellation_line(self, star_1, star_2):
-        const = self.canvas.create_line(star_1.canvas_x, star_1.canvas_y, star_2.canvas_x, star_2.canvas_y, fill='pink')
+        if star_1.altitude and star_2.altitude >= 0:
+            const = self.canvas.create_line(star_1.canvas_x, star_1.canvas_y, star_2.canvas_x, star_2.canvas_y, fill='pink')
 
         # Redraw stars on top of constellation lines. Broken.
         # self.draw_star(star_1, star_1.canvas_x, star_1.canvas_y)
@@ -391,10 +392,11 @@ class StarMapFrame(ttk.Frame):
             star1 = None
             star2 = None
             for star in star_list:
-                if index[0] == star.hd_id:
-                    star1 = star
-                elif index[1] == star.hd_id:
-                    star2 = star
+                if star.altitude >=0:
+                    if index[0] == star.hd_id:
+                        star1 = star
+                    elif index[1] == star.hd_id:
+                        star2 = star
             if star1 is not None and star2 is not None:
                 self.constellation_lines.append(self.draw_constellation_line(star1, star2))
 
@@ -490,14 +492,15 @@ class StarMapFrame(ttk.Frame):
         font = ""
         size = 0
         if isinstance(object, Star):
-            if object.magnitude <= 2:
-                offset = 13
-            elif 2 < object.magnitude <= 6:
-                offset = 10
-            else:
-                offset = 5
-            fill = '#F6DC83'
-            tag = 'label'
+           if object.altitude >= 0:
+                if object.magnitude <= 2:
+                    offset = 13
+                elif 2 < object.magnitude <= 6:
+                    offset = 10
+                else:
+                    offset = 5
+                fill = '#F6DC83'
+                tag = 'label'
         elif isinstance(object, MessierObject):
             if object.magnitude <= 2:
                 offset = 13

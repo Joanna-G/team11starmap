@@ -169,7 +169,8 @@ class Controller():
                     if planet.proper_name != 'Earth/Sun' and planet.alt >= 0:       # Don't need a label to show up for Earth
                         self.view.star_map_frame.display_object_label(planet)
 
-                self.view.star_map_frame.display_object_label(self.model.moon)
+                if self.model.moon.alt >= 0:
+                    self.view.star_map_frame.display_object_label(self.model.moon)
 
                 # Constellation labels need special treatment because they're divas.
                 for const in self.model.constellation_list:

@@ -264,8 +264,8 @@ class UserFrame(ttk.Frame):
 
     def set_combobox_values(self, combobox, default, first, last):
         combobox.set(default)
-        values = []
-        values.append(default)
+        values = [default]
+        # values.append(default)
         for i in range(first, last):
             values.append(i)
         combobox['values'] = values
@@ -400,7 +400,7 @@ class StarMapFrame(ttk.Frame):
             star1 = None
             star2 = None
             for star in star_list:
-                if star.altitude >=0:
+                if star.altitude >= 0:
                     if index[0] == star.hd_id:
                         star1 = star
                     elif index[1] == star.hd_id:
@@ -410,7 +410,7 @@ class StarMapFrame(ttk.Frame):
                 const.visible = 1
 
     def draw_moon(self, moon, phase, x, y):
-        r = 20
+        r = 15
         # If moon.phase is new, draw black circle with white outline
         if phase == 'New':
             moon.canvas_id = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='black', outline='white')
@@ -520,7 +520,7 @@ class StarMapFrame(ttk.Frame):
             fill = 'red'
             tag = 'label'
         elif isinstance(object, Moon):
-            offset = 30
+            offset = 50
             fill = 'white'
             tag = 'label'
         elif isinstance(object, Planet):

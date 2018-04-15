@@ -8,6 +8,7 @@ class Star(BaseCelestialObject):
         self.hd_id = hd_id
         self.proper_name = proper_name
         self.magnitude = mag
+        self.radius = 0
         self.ha_time = None
         self.ha_degrees = None
         self.altitude = None
@@ -31,3 +32,19 @@ class Star(BaseCelestialObject):
             az_degrees = 360 - az_degrees
 
         return (alt_degrees, az_degrees)
+
+    def calculate_radius(self):
+        if self.magnitude <= 1.0:
+            self.radius = 5.5
+        elif self.magnitude <= 2.0:
+            self.radius = 4.5
+        elif self.magnitude <= 3.0:
+            self.radius = 3.5
+        elif self.magnitude <= 4.0:
+            self.radius = 2.5
+        elif self.magnitude <= 5.0:
+            self.radius = 1.5
+        elif self.magnitude <= 6.0:
+            self.radius = 0.5
+        else:
+            self.radius = 0

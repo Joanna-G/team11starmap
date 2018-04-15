@@ -75,6 +75,8 @@ class Model():
             star.ha_degrees = star.ha_time_to_degrees(star.ha_time)
             star.altitude, star.azimuth = star.calculate_alt_az(star.declination, self.time_calc.lat, star.ha_degrees,
                                                                 None, None, None)
+            star.calculate_radius()
+            print(star.radius)
             star.get_xy_coords(star.altitude, star.azimuth, 4000)
 
     # Calculate the position of each planet

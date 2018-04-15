@@ -362,10 +362,12 @@ class StarMapFrame(ttk.Frame):
 
         canvas_coords = self.canvas.coords(star.canvas_id)
 
-        star.canvas_x = -canvas_coords[0] + r
+        # Including the radius in the calculation for the canvas_x and canvas_y makes them match to the
+        # actual x and y on first generation of the map. Not sure how useful that is.
+        star.canvas_x = -canvas_coords[0] - r
         star.canvas_y = canvas_coords[1] + r
 
-        print(star.canvas_id, star.x, star.canvas_x, star.y, star.canvas_y, star.magnitude)
+        # print(star.canvas_id, star.x, star.canvas_x, star.y, star.canvas_y, star.magnitude)
 
         star.offset_x = star.canvas_x - x
         star.offset_y = star.canvas_y - y
@@ -376,7 +378,13 @@ class StarMapFrame(ttk.Frame):
 
     def draw_constellation_line(self, star_1, star_2):
         if star_1.altitude and star_2.altitude >= 0:
-            const = self.canvas.create_line(star_1.canvas_x, star_1.canvas_y, star_2.canvas_x, star_2.canvas_y, fill='pink')
+            if self.multiplier == 1:
+                const = self.canvas.create_line(star_1.canvas_x, star_1.canvas_y,
+                                            star_2.canvas_x, star_2.canvas_y, fill='pink')
+            else:
+                const = self.canvas.create_line(star_1.canvas_x + star_1.radius, star_1.canvas_y + star_1.radius,
+                                            star_2.canvas_x + star_2.radius, star_2.canvas_y + star_2.radius,
+                                            fill='pink')
 
         # Redraw stars on top of constellation lines. Broken.
         # self.draw_star(star_1, star_1.canvas_x, star_1.canvas_y)

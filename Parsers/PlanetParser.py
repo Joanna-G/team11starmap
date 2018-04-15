@@ -24,7 +24,7 @@ class PlanetParser(Parser):
                     element.append(row[i])
             self.ElementsList.append(element)
 
-        # print(self.ElementsList)
+        #print(self.ElementsList)
         return self.ElementsList
 
 

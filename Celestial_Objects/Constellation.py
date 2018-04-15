@@ -29,7 +29,13 @@ class Constellation:
     def set_center(self):
         x_sum = 0
         y_sum = 0
+        prev_canvas_x = 0
+        prev_canvas_y = 0
         for star in self.const_stars:
+            if star.canvas_x is None:
+                star.canvas_x = prev_canvas_x
+            if star.canvas_y is None:
+                star.canvas_y = prev_canvas_y
             x_sum = x_sum + star.canvas_x
             y_sum = y_sum + star.canvas_y
         self.x = x_sum / self.number_stars

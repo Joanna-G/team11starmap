@@ -103,15 +103,16 @@ class Controller():
 
         # Draw each star
         for star in self.model.star_list:
-            self.view.star_map_frame.draw_star(star, star.x, star.y)
-            # if star.proper_name is not None:
-            #     print(star.proper_name)
+            if star.altitude >= 0:
+                self.view.star_map_frame.draw_star(star, -1 * star.x, star.y)
+                # if star.proper_name is not None:
+                #     print(star.proper_name)
 
         # Calculate Moon Position and Phase
         self.model.Calculate_Moon_Position()
 
         # Draw Moon
-        self.view.star_map_frame.draw_moon(self.model.moon, self.model.moon.phase, self.model.moon.x, self.model.moon.y)
+        self.view.star_map_frame.draw_moon(self.model.moon, self.model.moon.phase, -1 * self.model.moon.x, self.model.moon.y)
 
         # Calculate Planets' Positions
         self.model.Calculate_Planet_Positions()
@@ -126,7 +127,7 @@ class Controller():
 
         # Draw Each Messier Objects
         for messier in self.model.messier_list:
-            self.view.star_map_frame.draw_messier_object(messier, messier.x, messier.y)
+            self.view.star_map_frame.draw_messier_object(messier, -1 * messier.x, messier.y)
 
         # Toggle Constellations
         if self.view.user_frame.constellations_value.get() == 1:
@@ -157,8 +158,9 @@ class Controller():
         if self.empty_map is False:
             if self.view.user_frame.labels_value.get() == 1:
                 for star in self.model.star_list:
-                    if star.proper_name != '':
-                        self.view.star_map_frame.display_object_label(star)
+                    if star.altitude >= 0:
+                        if star.proper_name != '':
+                            self.view.star_map_frame.display_object_label(star)
                 for planet in self.model.planet_list:
                     if planet.proper_name != 'Earth/Sun':       # Don't need a label to show up for Earth
                         self.view.star_map_frame.display_object_label(planet)
@@ -206,6 +208,7 @@ class Controller():
         self.view.star_map_frame.label_widgets.clear()
 
         # Recenter the canvas
+        #self.view.star_map_frame.canvas.scale("all", self.centerX, self.centerY, 1, 1)
         self.view.star_map_frame.canvas.xview_moveto(self.centerX)
         self.view.star_map_frame.canvas.yview_moveto(self.centerY)'''
 
@@ -240,9 +243,10 @@ class Controller():
     def update_canvas_coords(self):
         # Update canvas x, y coordinates
         for star in self.model.star_list:
-            canvas_coords = self.view.star_map_frame.canvas.coords(star.canvas_id)
-            star.canvas_x = canvas_coords[0]
-            star.canvas_y = canvas_coords[1]
+            if star.altitude >= 0:
+                canvas_coords = self.view.star_map_frame.canvas.coords(star.canvas_id)
+                star.canvas_x = canvas_coords[0]
+                star.canvas_y = canvas_coords[1]
 
         for messier in self.model.messier_list:
             canvas_coords = self.view.star_map_frame.canvas.coords(messier.canvas_id)
@@ -260,7 +264,15 @@ class Controller():
         self.model.moon.canvas_y = canvas_coords[1]
 
         for constellation in self.model.constellation_list:
+            constellation.main_star_list = self.model.star_list
+            constellation.set_const_stars()
+            constellation.set_num_stars()
             constellation.set_center()
+
+        #self.true_x = self.canvas.canvasx(event.x)
+        #self.true_y = self.canvas.canvasy(event.y)
+
+        # self.view.star_map_frame.canvas.scale("all", 0, 0, 1.0, 1.0)
 
 
 if __name__ == "__main__":

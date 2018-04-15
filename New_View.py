@@ -254,13 +254,13 @@ class UserFrame(ttk.Frame):
 
         # Default values for testing purpose. April 10, 2018 8:30 AM, offset -6, 34.7 lat, 86.6 long
         self.set_combobox_values(self.combobox_month, 4, 1, 13)
-        self.set_combobox_values(self.combobox_day, 10, 1, 32)
+        self.set_combobox_values(self.combobox_day, 11, 1, 32)
         self.set_combobox_values(self.combobox_year, 2018, 1900, 2101)
-        self.set_combobox_values(self.combobox_hour, 8, 0, 25)
-        self.set_combobox_values(self.combobox_minute, 30, 0, 60)
-        self.set_combobox_values(self.combobox_utc, -6, -12, 15)
+        self.set_combobox_values(self.combobox_hour, 17, 0, 25)
+        self.set_combobox_values(self.combobox_minute, 0, 0, 60)
+        self.set_combobox_values(self.combobox_utc, 0, -12, 15)
         self.set_combobox_values(self.combobox_latitude, 34.7, -90, 91)
-        self.set_combobox_values(self.combobox_longitude, 86.6, -180, 181)
+        self.set_combobox_values(self.combobox_longitude, -86.6, -180, 181)
 
     def set_combobox_values(self, combobox, default, first, last):
         combobox.set(default)
@@ -326,7 +326,6 @@ class StarMapFrame(ttk.Frame):
         self.canvas.bind("<ButtonPress-1>", self.scroll_start)
         self.canvas.bind("<B1-Motion>", self.scroll_move)
 
-
     def reset_values(self):
         self.multiplier = 1
         self.label_widgets.clear()
@@ -362,32 +361,34 @@ class StarMapFrame(ttk.Frame):
         star.canvas_id = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='#F6DC83', outline='#F6DC83')
 
         canvas_coords = self.canvas.coords(star.canvas_id)
-        # star.canvas_x = canvas_coords[0]
-        # star.canvas_y = canvas_coords[1]
 
-        # star.offset_x = star.canvas_x - x
-        # star.offset_y = star.canvas_y - y
+        # Including the radius in the calculation for the canvas_x and canvas_y makes them match to the
+        # actual x and y on first generation of the map. Not sure how useful that is.
+        star.canvas_x = -canvas_coords[0] - r
+        star.canvas_y = canvas_coords[1] + r
 
-        # self.canvas.move(star.canvas_id, star.offset_x, star.offset_y)
+        # print(star.canvas_id, star.x, star.canvas_x, star.y, star.canvas_y, star.magnitude)
+
+        star.offset_x = star.canvas_x - x
+        star.offset_y = star.canvas_y - y
+
+        self.canvas.move(star.canvas_id, star.offset_x, star.offset_y)
 
         self.canvas.tag_bind(star.canvas_id, '<ButtonPress-1>', lambda e: self.display_star_info(e, star))
 
     def draw_constellation_line(self, star_1, star_2):
-        const = self.canvas.create_line(star_1.canvas_x, star_1.canvas_y, star_2.canvas_x, star_2.canvas_y, fill='pink')
-        # const = self.canvas.create_line(star_1.canvas_x + star_1.offset_x, star_1.canvas_y + star_1.offset_y, star_2.canvas_x + star_2.offset_x, star_2.canvas_y + star_2.offset_y, fill='pink')
-
-        # self.canvas.move(star_1.canvas_id, star_1.offset_x, star_1.offset_y)
-        # self.canvas.move(star_2.canvas_id, star_2.offset_x, star_2.offset_y)
-
-        # self.canvas.delete(star_1.canvas_id)
-        # self.canvas.delete(star_2.canvas_id)
+        if star_1.altitude and star_2.altitude >= 0:
+            if self.multiplier == 1:
+                const = self.canvas.create_line(star_1.canvas_x, star_1.canvas_y,
+                                            star_2.canvas_x, star_2.canvas_y, fill='pink')
+            else:
+                const = self.canvas.create_line(star_1.canvas_x + star_1.radius, star_1.canvas_y + star_1.radius,
+                                            star_2.canvas_x + star_2.radius, star_2.canvas_y + star_2.radius,
+                                            fill='pink')
 
         # Redraw stars on top of constellation lines. Broken.
         # self.draw_star(star_1, star_1.canvas_x, star_1.canvas_y)
         # self.draw_star(star_2, star_2.canvas_x, star_2.canvas_y)
-        # #
-        # const = self.canvas.create_line(star_1.canvas_x, star_1.canvas_y, star_2.canvas_x, star_2.canvas_y, fill='pink')
-
 
         # Don't need to be able to click on constellations to see names. - Jo
         # self.canvas.tag_bind(const, '<ButtonPress-1>', lambda e: self.display_constellation_info(e, constellation))
@@ -399,10 +400,11 @@ class StarMapFrame(ttk.Frame):
             star1 = None
             star2 = None
             for star in star_list:
-                if index[0] == star.hd_id:
-                    star1 = star
-                elif index[1] == star.hd_id:
-                    star2 = star
+                if star.altitude >=0:
+                    if index[0] == star.hd_id:
+                        star1 = star
+                    elif index[1] == star.hd_id:
+                        star2 = star
             if star1 is not None and star2 is not None:
                 self.constellation_lines.append(self.draw_constellation_line(star1, star2))
 
@@ -498,14 +500,15 @@ class StarMapFrame(ttk.Frame):
         font = ""
         size = 0
         if isinstance(object, Star):
-            if object.magnitude <= 2:
-                offset = 13
-            elif 2 < object.magnitude <= 6:
-                offset = 10
-            else:
-                offset = 5
-            fill = '#F6DC83'
-            tag = 'label'
+           if object.altitude >= 0:
+                if object.magnitude <= 2:
+                    offset = 13
+                elif 2 < object.magnitude <= 6:
+                    offset = 10
+                else:
+                    offset = 5
+                fill = '#F6DC83'
+                tag = 'label'
         elif isinstance(object, MessierObject):
             if object.magnitude <= 2:
                 offset = 13
@@ -576,7 +579,6 @@ class StarMapFrame(ttk.Frame):
                                                                       sticky='nw')
             tk.Label(modal_dlg, text='Star Canvas Y: ' + str(object.canvas_y)).grid(column=0, row=8, columnspan=3,
                                                                       sticky='nw')
-            print('offset x: ' + str(object.offset_x) + ' offset y: ' + str(object.offset_y))
 
         # Don't really need to have dialog for constellations
         # elif isinstance(object, Constellation):

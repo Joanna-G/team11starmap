@@ -43,12 +43,25 @@ class MainApplication(ttk.Frame):
 
     def display_help(self):
         help_dlg = tk.Toplevel(master=self)
-        #help_dlg.grid(column=0, row=0, sticky='nsew')
+        vsb_help = tk.Scrollbar(help_dlg, orient=tk.VERTICAL)
+        vsb_help.grid(column=1, row=0, sticky='ns')
+        # vsb_help.config(command=self.Toplevel.yview)
+        # help_dlg.grid(column=0, row=0, sticky='nsew')
         help_dlg.columnconfigure(0, weight=1)
         help_dlg.rowconfigure(0, weight=1)
         help_dlg.title("Help")
+        # Set Label font based on platform
+        if sys.platform == "win32" or sys.platform == "win64":
+            head_font = 'Magneto'
+            head_size = 18
+        elif sys.platform == "darwin":
+            head_font = 'Brush Script MT'
+            head_size = 36
+        elif sys.platform == "linux" or sys.platform == "linux2":
+            head_font = 'URW Chancery L'
+            head_size = 18
 
-        self.lum_label = tk.Label(help_dlg, text='About Lumarium')
+        self.lum_label = tk.Label(help_dlg, text='About Lumarium', font=(head_font, head_size), justify='left')
         self.lum_label.grid(column=0, row=0, sticky='nsw')
 
         lum_message = 'Lumarium allows you to create on-screen displays and printable images at any location on the earth\n' \
@@ -59,12 +72,12 @@ class MainApplication(ttk.Frame):
                        'Messier deep space objects. The lines of the major constellations and labels for all named\n' \
                        'celestial objects may be toggled on and off. You may also use Lumarium to generate and save the\n' \
                        'star map as an image with or without labels and constellations for offline viewing or printing.'
-        self.lum_text = tk.Label(help_dlg, text=lum_message)
+        self.lum_text = tk.Label(help_dlg, text=lum_message, justify='left')
         self.lum_text.grid(column=0, row=1, sticky='nsw')
-        self.lum_text2 = tk.Label(help_dlg, text=lum_message2)
+        self.lum_text2 = tk.Label(help_dlg, text=lum_message2, justify='left')
         self.lum_text2.grid(column=0, row=2, sticky='nsw')
 
-        self.gen_label = tk.Label(help_dlg, text='General Functionality')
+        self.gen_label = tk.Label(help_dlg, text='General Functionality', font=(head_font, head_size), justify='left')
         self.gen_label.grid(column=0, row=3, sticky='nsw')
 
         gen_message = 'Under the Date heading enter a date using the dropdown menus. Lumarium accepts dates between January\n' \
@@ -79,35 +92,35 @@ class MainApplication(ttk.Frame):
                        'Messier deep space objects, planets, constellations, and the moon.'
         gen_message6 = 'Click Generate Map once you have entered all infomation into the above fields to generate the star\n' \
                        'map. Click Reset to reset the map to its default values.'
-        self.lum_text = tk.Label(help_dlg, text=gen_message)
+        self.lum_text = tk.Label(help_dlg, text=gen_message, justify='left')
         self.lum_text.grid(column=0, row=4, sticky='nsw')
-        self.lum_text = tk.Label(help_dlg, text=gen_message2)
+        self.lum_text = tk.Label(help_dlg, text=gen_message2, justify='left')
         self.lum_text.grid(column=0, row=5, sticky='nsw')
-        self.lum_text = tk.Label(help_dlg, text=gen_message3)
+        self.lum_text = tk.Label(help_dlg, text=gen_message3, justify='left')
         self.lum_text.grid(column=0, row=6, sticky='nsw')
-        self.lum_text = tk.Label(help_dlg, text=gen_message4)
+        self.lum_text = tk.Label(help_dlg, text=gen_message4, justify='left')
         self.lum_text.grid(column=0, row=7, sticky='nsw')
-        self.lum_text = tk.Label(help_dlg, text=gen_message5)
+        self.lum_text = tk.Label(help_dlg, text=gen_message5, justify='left')
         self.lum_text.grid(column=0, row=8, sticky='nsw')
-        self.lum_text = tk.Label(help_dlg, text=gen_message6)
+        self.lum_text = tk.Label(help_dlg, text=gen_message6, justify='left')
         self.lum_text.grid(column=0, row=9, sticky='nsw')
 
-        self.ddl = tk.Label(help_dlg, text='Dropdown Menus')
+        self.ddl = tk.Label(help_dlg, text='Dropdown Menus', font=(head_font, head_size), justify='left')
         self.ddl.grid(column=0, row=10, sticky='nsw')
 
         ddl_msg = 'You may either type in a valid entry into the box, or select the arrow to choose from a list of options.'
-        self.ddl_text = tk.Label(help_dlg, text=ddl_msg)
+        self.ddl_text = tk.Label(help_dlg, text=ddl_msg, justify='left')
         self.ddl_text.grid(column=0, row=11, sticky='nsw')
 
-        self.cb = tk.Label(help_dlg, text='Checkboxes')
+        self.cb = tk.Label(help_dlg, text='Checkboxes', font=(head_font, head_size), justify='left')
         self.cb.grid(column=0, row=12, sticky='nsw')
 
         cb_msg = 'When toggled on, checkboxes will display a check or "X". Click on the box to toggle it. Both "Show Constellations"\n' \
                  'and "Show Labels" may be toggled on and off after the map has been generated.'
-        self.cb_text = tk.Label(help_dlg, text=cb_msg)
+        self.cb_text = tk.Label(help_dlg, text=cb_msg, justify='left')
         self.cb_text.grid(column=0, row=13, sticky='nsw')
 
-        self.menu = tk.Label(help_dlg, text='Checkboxes')
+        self.menu = tk.Label(help_dlg, text='Menus', font=(head_font, head_size), justify='left')
         self.menu.grid(column=0, row=14, sticky='nsw')
 
         menu_msg = 'Choose "Save Map" to save the current view of the map as a .jpeg image. Lumarium will prompt you for\n' \
@@ -115,11 +128,11 @@ class MainApplication(ttk.Frame):
                    'image editing program to invert the image prior to printing.'
         menu_msg2 = 'Choose "Help" to display this help dialog.'
         menu_msg3 = 'Choose "Exit" to exit Lumarium.'
-        self.menu_text = tk.Label(help_dlg, text=menu_msg)
+        self.menu_text = tk.Label(help_dlg, text=menu_msg, justify='left')
         self.menu_text.grid(column=0, row=15, sticky='nsw')
-        self.menu_text = tk.Label(help_dlg, text=menu_msg2)
+        self.menu_text = tk.Label(help_dlg, text=menu_msg2, justify='left')
         self.menu_text.grid(column=0, row=16, sticky='nsw')
-        self.menu_text = tk.Label(help_dlg, text=menu_msg3)
+        self.menu_text = tk.Label(help_dlg, text=menu_msg3, justify='left')
         self.menu_text.grid(column=0, row=17, sticky='nsw')
 
         help_dlg.transient(self)

@@ -41,16 +41,48 @@ class MainApplication(ttk.Frame):
         modal_dlg.grab_set()
         self.wait_window(modal_dlg)
 
+    def _configure_window(self, frame, canvas, event):
+        size = (frame.winfo_reqwidth(), frame.winfo_reqheight())
+        canvas.config(scrollregion='0 0 %s %s' % size)
+        if frame.winfo_reqwidth() != canvas.winfo_width():
+            canvas.config(width=frame.winfo_reqwidth())
+        if frame.winfo_reqheight() != canvas.winfo_height():
+            canvas.config(height=frame.winfo_reqheight())
+
+    def bound_to_mouse_wheel(self, canvas, event):
+        canvas.bind_all("<MouseWheel>", lambda e: self.on_mousewheel(canvas, e))
+
+    def unbound_to_mousewheel(self, canvas, event):
+        canvas.unbind_all("<MouseWheel>")
+
+    def on_mousewheel(self, canvas, event):
+        canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
     def display_help(self):
         help_dlg = tk.Toplevel(master=self)
-        vsb_help = tk.Scrollbar(help_dlg, orient=tk.VERTICAL)
-        vsb_help.grid(column=1, row=0, sticky='ns')
-        # vsb_help.config(command=self.Toplevel.yview)
-        # help_dlg.grid(column=0, row=0, sticky='nsew')
         help_dlg.columnconfigure(0, weight=1)
         help_dlg.rowconfigure(0, weight=1)
-        help_dlg.title("Help")
-        # Set Label font based on platform
+        help_dlg.title('Help')
+
+        vsb_help = tk.Scrollbar(help_dlg, orient=tk.VERTICAL)
+        vsb_help.grid(column=1, row=0, sticky='ns')
+
+        help_canvas = tk.Canvas(help_dlg, bd=0, highlightthickness=0)
+        help_canvas.grid(column=0, row=0, sticky='nsew')
+
+        vsb_help.config(command=help_canvas.yview)
+        help_canvas.config(yscrollcommand=vsb_help.set)
+
+        help_frame = tk.Frame(help_canvas)
+        help_frame.grid(column=0, row=0, sticky='nsew')
+        help_frame_id = help_canvas.create_window(0,0,window=help_frame, anchor='nw')
+
+        help_frame.bind('<Configure>', lambda e: self._configure_window(help_frame, help_canvas, e))
+        # help_frame.bind('<Enter>', lambda e: self.bound_to_mouse_wheel(help_canvas, e))
+        # help_frame.bind('<Leave>', lambda e: self.unbound_to_mousewheel(help_canvas, e))
+
+        head_font = None
+        head_size = None
         if sys.platform == "win32" or sys.platform == "win64":
             head_font = 'Magneto'
             head_size = 18
@@ -61,7 +93,7 @@ class MainApplication(ttk.Frame):
             head_font = 'URW Chancery L'
             head_size = 18
 
-        self.lum_label = tk.Label(help_dlg, text='About Lumarium', font=(head_font, head_size), justify='left')
+        self.lum_label = tk.Label(help_frame, text='About Lumarium', font=(head_font, head_size), justify='left')
         self.lum_label.grid(column=0, row=0, sticky='nsw')
 
         lum_message = 'Lumarium allows you to create on-screen displays and printable images at any location on the earth\n' \
@@ -72,12 +104,12 @@ class MainApplication(ttk.Frame):
                        'Messier deep space objects. The lines of the major constellations and labels for all named\n' \
                        'celestial objects may be toggled on and off. You may also use Lumarium to generate and save the\n' \
                        'star map as an image with or without labels and constellations for offline viewing or printing.'
-        self.lum_text = tk.Label(help_dlg, text=lum_message, justify='left')
+        self.lum_text = tk.Label(help_frame, text=lum_message, justify='left')
         self.lum_text.grid(column=0, row=1, sticky='nsw')
-        self.lum_text2 = tk.Label(help_dlg, text=lum_message2, justify='left')
+        self.lum_text2 = tk.Label(help_frame, text=lum_message2, justify='left')
         self.lum_text2.grid(column=0, row=2, sticky='nsw')
 
-        self.gen_label = tk.Label(help_dlg, text='General Functionality', font=(head_font, head_size), justify='left')
+        self.gen_label = tk.Label(help_frame, text='General Functionality', font=(head_font, head_size), justify='left')
         self.gen_label.grid(column=0, row=3, sticky='nsw')
 
         gen_message = 'Under the Date heading enter a date using the dropdown menus. Lumarium accepts dates between January\n' \
@@ -92,35 +124,35 @@ class MainApplication(ttk.Frame):
                        'Messier deep space objects, planets, constellations, and the moon.'
         gen_message6 = 'Click Generate Map once you have entered all infomation into the above fields to generate the star\n' \
                        'map. Click Reset to reset the map to its default values.'
-        self.lum_text = tk.Label(help_dlg, text=gen_message, justify='left')
+        self.lum_text = tk.Label(help_frame, text=gen_message, justify='left')
         self.lum_text.grid(column=0, row=4, sticky='nsw')
-        self.lum_text = tk.Label(help_dlg, text=gen_message2, justify='left')
+        self.lum_text = tk.Label(help_frame, text=gen_message2, justify='left')
         self.lum_text.grid(column=0, row=5, sticky='nsw')
-        self.lum_text = tk.Label(help_dlg, text=gen_message3, justify='left')
+        self.lum_text = tk.Label(help_frame, text=gen_message3, justify='left')
         self.lum_text.grid(column=0, row=6, sticky='nsw')
-        self.lum_text = tk.Label(help_dlg, text=gen_message4, justify='left')
+        self.lum_text = tk.Label(help_frame, text=gen_message4, justify='left')
         self.lum_text.grid(column=0, row=7, sticky='nsw')
-        self.lum_text = tk.Label(help_dlg, text=gen_message5, justify='left')
+        self.lum_text = tk.Label(help_frame, text=gen_message5, justify='left')
         self.lum_text.grid(column=0, row=8, sticky='nsw')
-        self.lum_text = tk.Label(help_dlg, text=gen_message6, justify='left')
+        self.lum_text = tk.Label(help_frame, text=gen_message6, justify='left')
         self.lum_text.grid(column=0, row=9, sticky='nsw')
 
-        self.ddl = tk.Label(help_dlg, text='Dropdown Menus', font=(head_font, head_size), justify='left')
+        self.ddl = tk.Label(help_frame, text='Dropdown Menus', font=(head_font, head_size), justify='left')
         self.ddl.grid(column=0, row=10, sticky='nsw')
 
         ddl_msg = 'You may either type in a valid entry into the box, or select the arrow to choose from a list of options.'
-        self.ddl_text = tk.Label(help_dlg, text=ddl_msg, justify='left')
+        self.ddl_text = tk.Label(help_frame, text=ddl_msg, justify='left')
         self.ddl_text.grid(column=0, row=11, sticky='nsw')
 
-        self.cb = tk.Label(help_dlg, text='Checkboxes', font=(head_font, head_size), justify='left')
+        self.cb = tk.Label(help_frame, text='Checkboxes', font=(head_font, head_size), justify='left')
         self.cb.grid(column=0, row=12, sticky='nsw')
 
         cb_msg = 'When toggled on, checkboxes will display a check or "X". Click on the box to toggle it. Both "Show Constellations"\n' \
                  'and "Show Labels" may be toggled on and off after the map has been generated.'
-        self.cb_text = tk.Label(help_dlg, text=cb_msg, justify='left')
+        self.cb_text = tk.Label(help_frame, text=cb_msg, justify='left')
         self.cb_text.grid(column=0, row=13, sticky='nsw')
 
-        self.menu = tk.Label(help_dlg, text='Menus', font=(head_font, head_size), justify='left')
+        self.menu = tk.Label(help_frame, text='Menus', font=(head_font, head_size), justify='left')
         self.menu.grid(column=0, row=14, sticky='nsw')
 
         menu_msg = 'Choose "Save Map" to save the current view of the map as a .jpeg image. Lumarium will prompt you for\n' \
@@ -128,11 +160,11 @@ class MainApplication(ttk.Frame):
                    'image editing program to invert the image prior to printing.'
         menu_msg2 = 'Choose "Help" to display this help dialog.'
         menu_msg3 = 'Choose "Exit" to exit Lumarium.'
-        self.menu_text = tk.Label(help_dlg, text=menu_msg, justify='left')
+        self.menu_text = tk.Label(help_frame, text=menu_msg, justify='left')
         self.menu_text.grid(column=0, row=15, sticky='nsw')
-        self.menu_text = tk.Label(help_dlg, text=menu_msg2, justify='left')
+        self.menu_text = tk.Label(help_frame, text=menu_msg2, justify='left')
         self.menu_text.grid(column=0, row=16, sticky='nsw')
-        self.menu_text = tk.Label(help_dlg, text=menu_msg3, justify='left')
+        self.menu_text = tk.Label(help_frame, text=menu_msg3, justify='left')
         self.menu_text.grid(column=0, row=17, sticky='nsw')
 
         help_dlg.transient(self)

@@ -94,7 +94,7 @@ class MainApplication(ttk.Frame):
             head_size = 18
 
         self.lum_label = tk.Label(help_frame, text='About Lumarium', font=(head_font, head_size), justify='left')
-        self.lum_label.grid(column=0, row=0, sticky='nsw')
+        self.lum_label.grid(column=0, row=0, sticky='nsw', padx=20, pady=20)
 
         lum_message = 'Lumarium allows you to create on-screen displays and printable images at any location on the earth\n' \
                       'for a given date and time and may serve as a guide to find the locations of stars, planets, the moon,\n' \
@@ -105,12 +105,12 @@ class MainApplication(ttk.Frame):
                        'celestial objects may be toggled on and off. You may also use Lumarium to generate and save the\n' \
                        'star map as an image with or without labels and constellations for offline viewing or printing.'
         self.lum_text = tk.Label(help_frame, text=lum_message, justify='left')
-        self.lum_text.grid(column=0, row=1, sticky='nsw')
+        self.lum_text.grid(column=0, row=1, sticky='nsw', padx=20)
         self.lum_text2 = tk.Label(help_frame, text=lum_message2, justify='left')
-        self.lum_text2.grid(column=0, row=2, sticky='nsw')
+        self.lum_text2.grid(column=0, row=2, sticky='nsw', padx=20)
 
         self.gen_label = tk.Label(help_frame, text='General Functionality', font=(head_font, head_size), justify='left')
-        self.gen_label.grid(column=0, row=3, sticky='nsw')
+        self.gen_label.grid(column=0, row=3, sticky='nsw', padx=20, pady=20)
 
         gen_message = 'Under the Date heading enter a date using the dropdown menus. Lumarium accepts dates between January\n' \
                       '1, 1900 and January 1, 2100.'
@@ -125,47 +125,50 @@ class MainApplication(ttk.Frame):
         gen_message6 = 'Click Generate Map once you have entered all infomation into the above fields to generate the star\n' \
                        'map. Click Reset to reset the map to its default values.'
         self.lum_text = tk.Label(help_frame, text=gen_message, justify='left')
-        self.lum_text.grid(column=0, row=4, sticky='nsw')
+        self.lum_text.grid(column=0, row=4, sticky='nsw', padx=20)
         self.lum_text = tk.Label(help_frame, text=gen_message2, justify='left')
-        self.lum_text.grid(column=0, row=5, sticky='nsw')
+        self.lum_text.grid(column=0, row=5, sticky='nsw', padx=20)
         self.lum_text = tk.Label(help_frame, text=gen_message3, justify='left')
-        self.lum_text.grid(column=0, row=6, sticky='nsw')
+        self.lum_text.grid(column=0, row=6, sticky='nsw', padx=20)
         self.lum_text = tk.Label(help_frame, text=gen_message4, justify='left')
-        self.lum_text.grid(column=0, row=7, sticky='nsw')
+        self.lum_text.grid(column=0, row=7, sticky='nsw', padx=20)
         self.lum_text = tk.Label(help_frame, text=gen_message5, justify='left')
-        self.lum_text.grid(column=0, row=8, sticky='nsw')
+        self.lum_text.grid(column=0, row=8, sticky='nsw', padx=20)
         self.lum_text = tk.Label(help_frame, text=gen_message6, justify='left')
-        self.lum_text.grid(column=0, row=9, sticky='nsw')
+        self.lum_text.grid(column=0, row=9, sticky='nsw', padx=20)
 
         self.ddl = tk.Label(help_frame, text='Dropdown Menus', font=(head_font, head_size), justify='left')
-        self.ddl.grid(column=0, row=10, sticky='nsw')
+        self.ddl.grid(column=0, row=10, sticky='nsw', padx=20, pady=20)
 
         ddl_msg = 'You may either type in a valid entry into the box, or select the arrow to choose from a list of options.'
         self.ddl_text = tk.Label(help_frame, text=ddl_msg, justify='left')
-        self.ddl_text.grid(column=0, row=11, sticky='nsw')
+        self.ddl_text.grid(column=0, row=11, sticky='nsw', padx=20)
 
         self.cb = tk.Label(help_frame, text='Checkboxes', font=(head_font, head_size), justify='left')
-        self.cb.grid(column=0, row=12, sticky='nsw')
+        self.cb.grid(column=0, row=12, sticky='nsw', padx=20, pady=20)
 
         cb_msg = 'When toggled on, checkboxes will display a check or "X". Click on the box to toggle it. Both "Show Constellations"\n' \
                  'and "Show Labels" may be toggled on and off after the map has been generated.'
         self.cb_text = tk.Label(help_frame, text=cb_msg, justify='left')
-        self.cb_text.grid(column=0, row=13, sticky='nsw')
+        self.cb_text.grid(column=0, row=13, sticky='nsw', padx=20)
 
         self.menu = tk.Label(help_frame, text='Menus', font=(head_font, head_size), justify='left')
-        self.menu.grid(column=0, row=14, sticky='nsw')
+        self.menu.grid(column=0, row=14, sticky='nsw', padx=20, pady=20)
 
         menu_msg = 'Choose "Save Map" to save the current view of the map as a .jpeg image. Lumarium will prompt you for\n' \
                    'a location adn filename to save the map. Once saved, the image may be printed. We suggest using an\n' \
                    'image editing program to invert the image prior to printing.'
         menu_msg2 = 'Choose "Help" to display this help dialog.'
         menu_msg3 = 'Choose "Exit" to exit Lumarium.'
+        menu_msg4 = ' '
         self.menu_text = tk.Label(help_frame, text=menu_msg, justify='left')
-        self.menu_text.grid(column=0, row=15, sticky='nsw')
+        self.menu_text.grid(column=0, row=15, sticky='nsw', padx=20)
         self.menu_text = tk.Label(help_frame, text=menu_msg2, justify='left')
-        self.menu_text.grid(column=0, row=16, sticky='nsw')
+        self.menu_text.grid(column=0, row=16, sticky='nsw', padx=20)
         self.menu_text = tk.Label(help_frame, text=menu_msg3, justify='left')
-        self.menu_text.grid(column=0, row=17, sticky='nsw')
+        self.menu_text.grid(column=0, row=17, sticky='nsw', padx=20)
+        self.menu_text = tk.Label(help_frame, text=menu_msg4, justify='left')
+        self.menu_text.grid(column=0, row=18, sticky='nsw', padx=20, pady=20)
 
         help_dlg.update_idletasks()
         width = help_dlg.winfo_width()
@@ -391,7 +394,7 @@ class UserFrame(ttk.Frame):
         self.set_combobox_values(self.combobox_month, 5, 1, 13)
         self.set_combobox_values(self.combobox_day, 22, 1, 32)
         self.set_combobox_values(self.combobox_year, 2018, 1900, 2101)
-        self.set_combobox_values(self.combobox_hour, 17, 0, 25)
+        self.set_combobox_values(self.combobox_hour, 23, 0, 25)
         self.set_combobox_values(self.combobox_minute, 0, 0, 60)
         self.set_combobox_values(self.combobox_utc, 0, -12, 15)
         self.set_combobox_values(self.combobox_latitude, 34.7, -90, 91)
@@ -546,7 +549,7 @@ class StarMapFrame(ttk.Frame):
             if star1 is not None and star2 is not None:
                 self.constellation_lines.append(self.draw_constellation_line(star1, star2))
                 count += 1
-        if count > len(const.line_stars) * .75:
+        if count >= len(const.line_stars) * .8:
             const.visible = 1
         else:
             const.visible = 0
@@ -700,7 +703,7 @@ class StarMapFrame(ttk.Frame):
                                 (offset * self.multiplier), text=str(object.proper_name), fill=fill, tag=tag)))
 
     def create_modal_dialog(self, object, x, y):
-        modal_dlg = tk.Toplevel(master=self)
+        modal_dlg = tk.Toplevel(master=self, bg='black')
         modal_dlg.columnconfigure(0, weight=1)
         modal_dlg.columnconfigure(1, weight=1)
         modal_dlg.columnconfigure(2, weight=1)
@@ -708,30 +711,12 @@ class StarMapFrame(ttk.Frame):
 
         if isinstance(object, Star):
             if object.proper_name != '':
-                tk.Label(modal_dlg, text='Star Name: ' + str(object.proper_name)).grid(column=0, row=0, columnspan=3,
-                                                                                       sticky='nw')
+                tk.Label(modal_dlg, text='Star Name: ' + str(object.proper_name), bg='black', fg='white').grid(column=0, row=0, columnspan=3, sticky='nw')
             else:
-                tk.Label(modal_dlg, text='Star HD ID: ' + str(object.hd_id)).grid(column=0, row=0, columnspan=3,
-                                                                                  sticky='nw')
-            tk.Label(modal_dlg, text='Star Altitude: ' + str(object.altitude)).grid(column=0, row=1, columnspan=3,
-                                                                                    sticky='nw')
-            tk.Label(modal_dlg, text='Star Azimuth: ' + str(object.azimuth)).grid(column=0, row=2, columnspan=3,
-                                                                                  sticky='nw')
-            tk.Label(modal_dlg, text='Star Magnitude: ' + str(object.magnitude)).grid(column=0, row=4, columnspan=3,
-                                                                                      sticky='nw')
-            tk.Label(modal_dlg, text='Star X: ' + str(object.x)).grid(column=0, row=5, columnspan=3,
-                                                                                      sticky='nw')
-            tk.Label(modal_dlg, text='Star Y: ' + str(object.y)).grid(column=0, row=6, columnspan=3,
-                                                                                      sticky='nw')
-            tk.Label(modal_dlg, text='Star Canvas X: ' + str(object.canvas_x)).grid(column=0, row=7, columnspan=3,
-                                                                      sticky='nw')
-            tk.Label(modal_dlg, text='Star Canvas Y: ' + str(object.canvas_y)).grid(column=0, row=8, columnspan=3,
-                                                                      sticky='nw')
-
-        # Don't really need to have dialog for constellations
-        # elif isinstance(object, Constellation):
-        #     tk.Label(modal_dlg, text='Constellation Name: ' + str(object.proper_name)).grid(column=0, row=0,
-        #                   columnspan=3, sticky='nsew')
+                tk.Label(modal_dlg, text='Star HD ID: ' + str(object.hd_id), bg='black', fg='white').grid(column=0, row=0, columnspan=3, sticky='nw')
+            tk.Label(modal_dlg, text='Star Altitude: ' + str(object.altitude), bg='black', fg='white').grid(column=0, row=1, columnspan=3, sticky='nw')
+            tk.Label(modal_dlg, text='Star Azimuth: ' + str(object.azimuth), bg='black', fg='white').grid(column=0, row=2, columnspan=3, sticky='nw')
+            tk.Label(modal_dlg, text='Star Magnitude: ' + str(object.magnitude), bg='black', fg='white').grid(column=0, row=4, columnspan=3, sticky='nw')
 
         elif isinstance(object, Moon):
             if getattr(sys, 'frozen', False):
@@ -750,36 +735,34 @@ class StarMapFrame(ttk.Frame):
                 logo = ImageTk.PhotoImage(Image.open(full))
             else:
                 logo = ImageTk.PhotoImage(Image.open(last))
-            tk.Label(modal_dlg, image=logo).grid(column=0, row=0, rowspan=3, sticky = 'nw')
-            tk.Label(modal_dlg, text='Moon').grid(column=1, row=0, columnspan=3, sticky='nw')
-            tk.Label(modal_dlg, text="Moon Altitude: " + str(object.alt)).grid(column=1, row=1, columnspan=3,
-                                                                               sticky='nw')
-            tk.Label(modal_dlg, text="Moon Azimuth: " + str(object.az)).grid(column=1, row=2, columnspan=3,
-                                                                            sticky='nw')
-            tk.Label(modal_dlg, text="Moon Phase: " + str(object.phase)).grid(column=1, row=3, columnspan=3,
-                                                                            sticky='nw')
+            tk.Label(modal_dlg, image=logo, bg='black', fg='white').grid(column=0, row=0, rowspan=4, sticky='nw')
+            tk.Label(modal_dlg, text='The Moon', bg='black', fg='white').grid(column=1, row=0, sticky='n')
+            tk.Label(modal_dlg, text="Moon Altitude: " + str(object.alt), bg='black', fg='white').grid(column=1, row=1, sticky='n')
+            tk.Label(modal_dlg, text="Moon Azimuth: " + str(object.az), bg='black', fg='white').grid(column=1, row=2, sticky='n')
+            tk.Label(modal_dlg, text="Moon Phase: " + str(object.phase), bg='black', fg='white').grid(column=1, row=3, sticky='n')
+
         elif isinstance(object, Planet):
-            tk.Label(modal_dlg, text='Planet Name: ' + str(object.proper_name)).grid(column=0, row=0, columnspan=3,
-                                                                            sticky='nw')
-            tk.Label(modal_dlg, text="Planet Altitude: " + str(object.alt)).grid(column=0, row=1, columnspan=3,
-                                                                            sticky='nw')
-            tk.Label(modal_dlg, text="Planet Azimuth: " + str(object.az)).grid(column=0, row=2, columnspan=3,
-                                                                            sticky='nw')
+            if getattr(sys, 'frozen', False):
+                directory = os.path.dirname(sys.executable)
+            elif __file__:
+                directory = os.path.dirname(__file__)
+            filename = str(object.proper_name) + '.jpg'
+            file = os.path.join(directory, 'resources', filename)
+            logo = ImageTk.PhotoImage(Image.open(file))
+            tk.Label(modal_dlg, image=logo, bg='black', fg='white').grid(column=0, row=0, rowspan=3, sticky='w')
+            tk.Label(modal_dlg, text='Planet Name: ' + str(object.proper_name), bg='black', fg='white').grid(column=1, row=0, sticky='n')
+            tk.Label(modal_dlg, text="Planet Altitude: " + str(object.alt), bg='black', fg='white').grid(column=1, row=1, sticky='n')
+            tk.Label(modal_dlg, text="Planet Azimuth: " + str(object.az), bg='black', fg='white').grid(column=1, row=2, sticky='n')
+
         elif isinstance(object, MessierObject):
             if object.proper_name != '':
-                tk.Label(modal_dlg, text='Messier Object Name: ' + str(object.proper_name)).grid(column=0, row=0,
-                                                                                columnspan=3, sticky='nw')
+                tk.Label(modal_dlg, text='Messier Object Name: ' + str(object.proper_name), bg='black', fg='white').grid(column=0, row=0, columnspan=3, sticky='nw')
             else:
-                tk.Label(modal_dlg, text='Messier Catalog ID: ' + str(object.messier_cat)).grid(column=0, row=0,
-                                                                                columnspan=3, sticky='nw')
-            tk.Label(modal_dlg, text='Messier Object Description: ' + str(object.description)).grid(column=0, row=1,
-                                                                                columnspan=3, sticky='nw')
-            tk.Label(modal_dlg, text='Messier Object Altitude: ' + str(object.altitude)).grid(column=0, row=2,
-                                                                                columnspan=3, sticky='nw')
-            tk.Label(modal_dlg, text='Messier Object Azimuth: ' + str(object.azimuth)).grid(column=0, row=3,
-                                                                                columnspan=3, sticky='nw')
-            tk.Label(modal_dlg, text='Messier Object Magnitude: ' + str(object.magnitude)).grid(column=0, row=4,
-                                                                                columnspan=3, sticky='nw')
+                tk.Label(modal_dlg, text='Messier Catalog ID: ' + str(object.messier_cat), bg='black', fg='white').grid(column=0, row=0, columnspan=3, sticky='nw')
+            tk.Label(modal_dlg, text='Messier Object Description: ' + str(object.description), bg='black', fg='white').grid(column=0, row=1, columnspan=3, sticky='nw')
+            tk.Label(modal_dlg, text='Messier Object Altitude: ' + str(object.altitude), bg='black', fg='white').grid(column=0, row=2, columnspan=3, sticky='nw')
+            tk.Label(modal_dlg, text='Messier Object Azimuth: ' + str(object.azimuth), bg='black', fg='white').grid(column=0, row=3, columnspan=3, sticky='nw')
+            tk.Label(modal_dlg, text='Messier Object Magnitude: ' + str(object.magnitude), bg='black', fg='white').grid(column=0, row=4, columnspan=3, sticky='nw')
 
         modal_dlg.geometry('+%d+%d' % (x, y))
         modal_dlg.transient(self.parent)

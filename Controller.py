@@ -62,12 +62,8 @@ class Controller():
     # Tells View to draw objects
     def generate_map(self):
 
-        # Trying to figure out how to delete/reset the labels before map is generated so that the constellation
-        # labels get removed and regenerated.
-        if not self.empty_map:
-            self.view.star_map_frame.canvas.delete('label')
-            self.view.star_map_frame.canvas.delete('const_label')
-            self.view.star_map_frame.label_widgets.clear()
+        for const in self.model.constellation_list:
+            const.visible = 0
 
         self.view.star_map_frame.multiplier = 1
         ready = True
@@ -156,9 +152,9 @@ class Controller():
                 for const in self.model.constellation_list:
                     const.set_center()
                     self.view.star_map_frame.draw_constellation(const, self.model.star_list)
-                    if self.view.user_frame.labels_value.get() == 1:
+                    if self.view.user_frame.labels_value.get() == 1 and const.visible == 1:
                         self.view.star_map_frame.display_object_label(const)
-                    elif self.view.user_frame.labels_value.get() == 0:
+                    elif self.view.user_frame.labels_value.get() == 0 and const.visible == 0:
                         self.view.star_map_frame.canvas.delete('const_label')
             elif self.view.user_frame.constellations_value.get() == 0:
                 for line in self.view.star_map_frame.constellation_lines:
@@ -209,6 +205,8 @@ class Controller():
         self.view.star_map_frame.canvas.yview_moveto(self.centerY)
         self.view.star_map_frame.canvas.scale("all", self.centerX, self.centerY, 1.0, 1.0)
 
+        self.empty_map = True
+
     '''def reset_app(self):
         self.view.star_map_frame.constellation_lines = []
         self.empty_map = True
@@ -242,7 +240,8 @@ class Controller():
         self.view.star_map_frame.canvas.configure(scrollregion=self.view.star_map_frame.canvas.bbox("all"))
 
         self.view.star_map_frame.multiplier *= scale
-        self.update_canvas_coords()
+        if not self.empty_map:
+            self.update_canvas_coords()
 
     # linux zoom
     def wheelup(self, event):

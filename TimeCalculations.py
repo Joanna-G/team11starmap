@@ -48,7 +48,11 @@ class TimeCalculations:
         self.dst = dst
 
         # Convert to UTC
-        date = datetime(self.year, self.month, self.day, self.hour, self.minute, self.second)
+        date = None
+        try:
+            date = datetime(self.year, self.month, self.day, self.hour, self.minute, self.second)
+        except ValueError as e:
+            raise ValueError
 
         if self.dst == 1:
             future_date = date - timedelta(hours=(self.utc_offset + 1))

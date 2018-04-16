@@ -34,8 +34,15 @@ class MainApplication(ttk.Frame):
 
         tk.Label(modal_dlg, text=error_message).grid(column=0, row=0, columnspan=3, sticky='nw', padx=50, pady=50)
 
+        modal_dlg.update_idletasks()
+        width = modal_dlg.winfo_width()
+        height = modal_dlg.winfo_height()
+        x = (modal_dlg.winfo_screenwidth() // 2) - (width // 2)
+        y = (modal_dlg.winfo_screenheight() // 2) - (height // 2)
+        modal_dlg.geometry('{}x{}+{}+{}'.format(width, height, x, y))
+
         # Don't know what this does or what it should be set to
-        modal_dlg.geometry('+%d+%d' % (10, 500))
+        # modal_dlg.geometry('+%d+%d' % (10, 500))
         modal_dlg.transient(self.parent)
         modal_dlg.focus_set()
         modal_dlg.grab_set()
@@ -394,7 +401,7 @@ class UserFrame(ttk.Frame):
         self.set_combobox_values(self.combobox_month, 5, 1, 13)
         self.set_combobox_values(self.combobox_day, 22, 1, 32)
         self.set_combobox_values(self.combobox_year, 2018, 1900, 2101)
-        self.set_combobox_values(self.combobox_hour, 23, 0, 25)
+        self.set_combobox_values(self.combobox_hour, 23, 0, 24)
         self.set_combobox_values(self.combobox_minute, 0, 0, 60)
         self.set_combobox_values(self.combobox_utc, 0, -12, 15)
         self.set_combobox_values(self.combobox_latitude, 34.7, -90, 91)

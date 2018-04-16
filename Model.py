@@ -192,3 +192,7 @@ class Model():
         for constellation in self.constellation_list:
             constellation.x = 0
             constellation.y = 0
+            constellation.visible = 0
+            constellation.set_center()
+            constellation.set_num_stars()
+            constellation.set_const_stars()

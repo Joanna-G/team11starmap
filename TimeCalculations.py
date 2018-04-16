@@ -48,13 +48,12 @@ class TimeCalculations:
         self.dst = dst
 
         # Convert to UTC
-        date = datetime.now()
-        date.replace(self.year, self.month, self.day, self.hour, self.minute, 0, 0)
+        date = datetime(self.year, self.month, self.day, self.hour, self.minute, self.second)
 
         if self.dst == 1:
-            future_date = date + timedelta(hours=(self.utc_offset + 1))
+            future_date = date - timedelta(hours=(self.utc_offset + 1))
         else:
-            future_date = date + timedelta(hours=self.utc_offset)
+            future_date = date - timedelta(hours=self.utc_offset)
 
         self.year = future_date.year
         self.month = future_date.month

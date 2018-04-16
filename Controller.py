@@ -61,6 +61,14 @@ class Controller():
     # Has Model calculate celestial objects locations
     # Tells View to draw objects
     def generate_map(self):
+
+        # Trying to figure out how to delete/reset the labels before map is generated so that the constellation
+        # labels get removed and regenerated.
+        if not self.empty_map:
+            self.view.star_map_frame.canvas.delete('label')
+            self.view.star_map_frame.canvas.delete('const_label')
+            self.view.star_map_frame.label_widgets.clear()
+
         self.view.star_map_frame.multiplier = 1
         ready = True
         for widget in self.view.user_frame.validation_widgets:
@@ -193,6 +201,8 @@ class Controller():
         self.view.star_map_frame.canvas.delete('all')
         self.view.star_map_frame.reset_values()
         self.model.reset_values()
+        for const in self.model.constellation_list:
+            const.visible = 0
 
         # Recenter the canvas
         self.view.star_map_frame.canvas.xview_moveto(self.centerX)

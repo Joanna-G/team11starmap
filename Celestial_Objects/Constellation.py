@@ -1,6 +1,6 @@
 # from Celestial_Objects import BaseCelestialObject
 # class Constellation(BaseCelestialObject):
-
+import  math
 
 # So, this questionably need to be a subclass of celestial Objects, so it currently isn't
 class Constellation:
@@ -25,8 +25,7 @@ class Constellation:
     def set_num_stars(self):
         self.number_stars = len(self.const_stars)
 
-    # Finding the center of the constellation. There has to be a more python-esque way of accomplishing this,
-    # but I'm not totally sure what it is at the moment. Ignore for now.
+    # Set the center of the constellation for labeling purposes
     def set_center(self):
         x_sum = 0
         y_sum = 0

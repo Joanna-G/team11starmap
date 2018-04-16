@@ -62,13 +62,13 @@ class UserFrame(ttk.Frame):
         # Set Label font based on platform
         if sys.platform == "win32" or sys.platform == "win64":
             self.font = 'Magneto'
-            self.size = 18
+            self.size = 22
         elif sys.platform == "darwin":
             self.font = 'Brush Script MT'
             self.size = 36
         elif sys.platform == "linux" or sys.platform == "linux2":
             self.font = 'URW Chancery L'
-            self.size = 18
+            self.size = 22
 
         menu_style = ttk.Style()
         menu_style.configure('TFrame', background=self.background_color)
@@ -364,8 +364,8 @@ class StarMapFrame(ttk.Frame):
 
         # Including the radius in the calculation for the canvas_x and canvas_y makes them match to the
         # actual x and y on first generation of the map. Not sure how useful that is.
-        star.canvas_x = -canvas_coords[0] - r
-        star.canvas_y = canvas_coords[1] + r
+        star.canvas_x = canvas_coords[0]
+        star.canvas_y = canvas_coords[1]
 
         # print(star.canvas_id, star.x, star.canvas_x, star.y, star.canvas_y, star.magnitude)
 
@@ -377,25 +377,28 @@ class StarMapFrame(ttk.Frame):
         self.canvas.tag_bind(star.canvas_id, '<ButtonPress-1>', lambda e: self.display_star_info(e, star))
 
     def draw_constellation_line(self, star_1, star_2):
-        if star_1.altitude and star_2.altitude >= 0:
+        if star_1.altitude >= 0 and star_2.altitude >= 0:
             if self.multiplier == 1:
-                const = self.canvas.create_line(star_1.canvas_x, star_1.canvas_y,
+                const_line = self.canvas.create_line(star_1.canvas_x, star_1.canvas_y,
                                             star_2.canvas_x, star_2.canvas_y, fill='pink')
+            # elif self.multiplier < 1:
+            #     const_line = self.canvas.create_line(star_1.canvas_x + star_1.radius, star_1.canvas_y + star_1.radius,
+            #                                 star_2.canvas_x + star_2.radius, star_2.canvas_y + star_2.radius,
+            #                                 fill='pink')
             else:
-                const = self.canvas.create_line(star_1.canvas_x + star_1.radius, star_1.canvas_y + star_1.radius,
-                                            star_2.canvas_x + star_2.radius, star_2.canvas_y + star_2.radius,
-                                            fill='pink')
+                const_line = self.canvas.create_line(star_1.canvas_x + star_1.radius * self.multiplier,
+                                                     star_1.canvas_y + star_1.radius * self.multiplier,
+                                                     star_2.canvas_x + star_2.radius * self.multiplier,
+                                                     star_2.canvas_y + star_2.radius * self.multiplier,
+                                                     fill='pink')
+        # # Don't need to be able to click on constellations to see names. - Jo
+        # self.canvas.tag_bind(const_line, '<ButtonPress-1>',
+        #                      lambda e: self.display_constellation_info(e, constellation))
 
-        # Redraw stars on top of constellation lines. Broken.
-        # self.draw_star(star_1, star_1.canvas_x, star_1.canvas_y)
-        # self.draw_star(star_2, star_2.canvas_x, star_2.canvas_y)
-
-        # Don't need to be able to click on constellations to see names. - Jo
-        # self.canvas.tag_bind(const, '<ButtonPress-1>', lambda e: self.display_constellation_info(e, constellation))
-
-        return const
+        return const_line
 
     def draw_constellation(self, const, star_list):
+        count = 0
         for index in const.line_stars:
             star1 = None
             star2 = None
@@ -407,7 +410,15 @@ class StarMapFrame(ttk.Frame):
                         star2 = star
             if star1 is not None and star2 is not None:
                 self.constellation_lines.append(self.draw_constellation_line(star1, star2))
-                const.visible = 1
+                count += 1
+        if count > len(const.line_stars) * .75:
+            const.visible = 1
+        else:
+            const.visible = 0
+
+            # if count + prev_count == len(self.constellation_lines):
+            #     const.visible = 1
+            #     prev_count = count
 
     def draw_moon(self, moon, phase, x, y):
         r = 15

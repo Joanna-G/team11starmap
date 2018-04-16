@@ -42,7 +42,90 @@ class MainApplication(ttk.Frame):
         self.wait_window(modal_dlg)
 
     def display_help(self):
-        pass
+        help_dlg = tk.Toplevel(master=self)
+        #help_dlg.grid(column=0, row=0, sticky='nsew')
+        help_dlg.columnconfigure(0, weight=1)
+        help_dlg.rowconfigure(0, weight=1)
+        help_dlg.title("Help")
+
+        self.lum_label = tk.Label(help_dlg, text='About Lumarium')
+        self.lum_label.grid(column=0, row=0, sticky='nsw')
+
+        lum_message = 'Lumarium allows you to create on-screen displays and printable images at any location on the earth\n' \
+                      'for a given date and time and may serve as a guide to find the locations of stars, planets, the moon,\n' \
+                      'and other celestial objects for observation.'
+        lum_message2 = 'Lumarium displays stars with a magnitude of less than 6.0 from the approximately 20,000 stars in\n' \
+                       'the Yale Star Catalog. It also shows the locations of major planets, the moon and its phase, and\n' \
+                       'Messier deep space objects. The lines of the major constellations and labels for all named\n' \
+                       'celestial objects may be toggled on and off. You may also use Lumarium to generate and save the\n' \
+                       'star map as an image with or without labels and constellations for offline viewing or printing.'
+        self.lum_text = tk.Label(help_dlg, text=lum_message)
+        self.lum_text.grid(column=0, row=1, sticky='nsw')
+        self.lum_text2 = tk.Label(help_dlg, text=lum_message2)
+        self.lum_text2.grid(column=0, row=2, sticky='nsw')
+
+        self.gen_label = tk.Label(help_dlg, text='General Functionality')
+        self.gen_label.grid(column=0, row=3, sticky='nsw')
+
+        gen_message = 'Under the Date heading enter a date using the dropdown menus. Lumarium accepts dates between January\n' \
+                      '1, 1900 and January 1, 2100.'
+        gen_message2 = 'Under the time heading, enter the local time using a 24-hour format and choose your current UTC\n' \
+                       ' offset. Check the box next to the words "Daylight Savings" if your location is currently observing\n' \
+                       'daylight savings time.'
+        gen_message3 = 'Under the Location heading, enter your current latitude and longitude using decimal degrees/hours.\n' \
+                       'For assistance in finding the correct latitude and longitude see https://www.latlong.net/.'
+        gen_message4 = 'Check the box next to "Show Constellations" if you would like Lumarium to display lines for the constellations\n'
+        gen_message5 = 'Check the box next to "Show Labels" if you would like Lumarium to display labels for all named stars,\n' \
+                       'Messier deep space objects, planets, constellations, and the moon.'
+        gen_message6 = 'Click Generate Map once you have entered all infomation into the above fields to generate the star\n' \
+                       'map. Click Reset to reset the map to its default values.'
+        self.lum_text = tk.Label(help_dlg, text=gen_message)
+        self.lum_text.grid(column=0, row=4, sticky='nsw')
+        self.lum_text = tk.Label(help_dlg, text=gen_message2)
+        self.lum_text.grid(column=0, row=5, sticky='nsw')
+        self.lum_text = tk.Label(help_dlg, text=gen_message3)
+        self.lum_text.grid(column=0, row=6, sticky='nsw')
+        self.lum_text = tk.Label(help_dlg, text=gen_message4)
+        self.lum_text.grid(column=0, row=7, sticky='nsw')
+        self.lum_text = tk.Label(help_dlg, text=gen_message5)
+        self.lum_text.grid(column=0, row=8, sticky='nsw')
+        self.lum_text = tk.Label(help_dlg, text=gen_message6)
+        self.lum_text.grid(column=0, row=9, sticky='nsw')
+
+        self.ddl = tk.Label(help_dlg, text='Dropdown Menus')
+        self.ddl.grid(column=0, row=10, sticky='nsw')
+
+        ddl_msg = 'You may either type in a valid entry into the box, or select the arrow to choose from a list of options.'
+        self.ddl_text = tk.Label(help_dlg, text=ddl_msg)
+        self.ddl_text.grid(column=0, row=11, sticky='nsw')
+
+        self.cb = tk.Label(help_dlg, text='Checkboxes')
+        self.cb.grid(column=0, row=12, sticky='nsw')
+
+        cb_msg = 'When toggled on, checkboxes will display a check or "X". Click on the box to toggle it. Both "Show Constellations"\n' \
+                 'and "Show Labels" may be toggled on and off after the map has been generated.'
+        self.cb_text = tk.Label(help_dlg, text=cb_msg)
+        self.cb_text.grid(column=0, row=13, sticky='nsw')
+
+        self.menu = tk.Label(help_dlg, text='Checkboxes')
+        self.menu.grid(column=0, row=14, sticky='nsw')
+
+        menu_msg = 'Choose "Save Map" to save the current view of the map as a .jpeg image. Lumarium will prompt you for\n' \
+                   'a location adn filename to save the map. Once saved, the image may be printed. We suggest using an\n' \
+                   'image editing program to invert the image prior to printing.'
+        menu_msg2 = 'Choose "Help" to display this help dialog.'
+        menu_msg3 = 'Choose "Exit" to exit Lumarium.'
+        self.menu_text = tk.Label(help_dlg, text=menu_msg)
+        self.menu_text.grid(column=0, row=15, sticky='nsw')
+        self.menu_text = tk.Label(help_dlg, text=menu_msg2)
+        self.menu_text.grid(column=0, row=16, sticky='nsw')
+        self.menu_text = tk.Label(help_dlg, text=menu_msg3)
+        self.menu_text.grid(column=0, row=17, sticky='nsw')
+
+        help_dlg.transient(self)
+        help_dlg.focus_set()
+        help_dlg.grab_set()
+        help_dlg.wait_window(help_dlg)
 
 
 class UserFrame(ttk.Frame):

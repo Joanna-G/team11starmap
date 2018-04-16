@@ -152,9 +152,9 @@ class Controller():
                 for const in self.model.constellation_list:
                     const.set_center()
                     self.view.star_map_frame.draw_constellation(const, self.model.star_list)
-                    if self.view.user_frame.labels_value.get() == 1:
+                    if self.view.user_frame.labels_value.get() == 1 and const.visible == 1:
                         self.view.star_map_frame.display_object_label(const)
-                    elif self.view.user_frame.labels_value.get() == 0:
+                    elif self.view.user_frame.labels_value.get() == 0 or const.visible == 0:
                         self.view.star_map_frame.canvas.delete('const_label')
             elif self.view.user_frame.constellations_value.get() == 0:
                 for line in self.view.star_map_frame.constellation_lines:

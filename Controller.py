@@ -108,7 +108,7 @@ class Controller():
         # Draw each star
         for star in self.model.star_list:
             if star.altitude >= 0:
-                self.view.star_map_frame.draw_star(star, -1 * star.x, star.y)
+                self.view.star_map_frame.draw_star(star, star.x, star.y)
                 # if star.proper_name is not None:
                 #     print(star.proper_name)
 
@@ -117,7 +117,7 @@ class Controller():
 
         # Draw Moon
         if self.model.moon.alt >= 0:
-            self.view.star_map_frame.draw_moon(self.model.moon, self.model.moon.phase, -1 * self.model.moon.x, self.model.moon.y)
+            self.view.star_map_frame.draw_moon(self.model.moon, self.model.moon.phase, self.model.moon.x, self.model.moon.y)
 
         # Calculate Planets' Positions
         self.model.Calculate_Planet_Positions()
@@ -133,7 +133,7 @@ class Controller():
         # Draw Each Messier Objects
         for messier in self.model.messier_list:
             if messier.altitude >= 0:
-                self.view.star_map_frame.draw_messier_object(messier, -1 * messier.x, messier.y)
+                self.view.star_map_frame.draw_messier_object(messier, messier.x, messier.y)
 
         # Toggle Constellations
         if self.view.user_frame.constellations_value.get() == 1:

@@ -770,6 +770,9 @@ class StarMapFrame(ttk.Frame):
         modal_dlg.grab_set()
         self.wait_window(modal_dlg)
 
+    def exit_application(self):
+        exit()
+
     # Save the current canvas as a jpeg
     def save_canvas(self):
         save_file = asksaveasfilename(filetypes=[('', '.jpeg')], defaultextension='*.jpeg')

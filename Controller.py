@@ -62,12 +62,8 @@ class Controller():
     # Tells View to draw objects
     def generate_map(self):
 
-        # Trying to figure out how to delete/reset the labels before map is generated so that the constellation
-        # labels get removed and regenerated.
-        if not self.empty_map:
-            self.view.star_map_frame.canvas.delete('label')
-            self.view.star_map_frame.canvas.delete('const_label')
-            self.view.star_map_frame.label_widgets.clear()
+        for const in self.model.constellation_list:
+            const.visible = 0
 
         self.view.star_map_frame.multiplier = 1
         ready = True
@@ -209,6 +205,8 @@ class Controller():
         self.view.star_map_frame.canvas.yview_moveto(self.centerY)
         self.view.star_map_frame.canvas.scale("all", self.centerX, self.centerY, 1.0, 1.0)
 
+        self.empty_map = True
+
     '''def reset_app(self):
         self.view.star_map_frame.constellation_lines = []
         self.empty_map = True
@@ -242,7 +240,8 @@ class Controller():
         self.view.star_map_frame.canvas.configure(scrollregion=self.view.star_map_frame.canvas.bbox("all"))
 
         self.view.star_map_frame.multiplier *= scale
-        self.update_canvas_coords()
+        if not self.empty_map:
+            self.update_canvas_coords()
 
     # linux zoom
     def wheelup(self, event):

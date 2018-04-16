@@ -507,7 +507,7 @@ class StarMapFrame(ttk.Frame):
             if star1 is not None and star2 is not None:
                 self.constellation_lines.append(self.draw_constellation_line(star1, star2))
                 count += 1
-        if count > len(const.line_stars) * .75:
+        if count >= len(const.line_stars) * .8:
             const.visible = 1
         else:
             const.visible = 0

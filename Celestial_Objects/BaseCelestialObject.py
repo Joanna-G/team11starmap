@@ -20,8 +20,8 @@ class BaseCelestialObject:
         # self.x = r * math.sin(math.radians(alt)) * math.cos(math.radians(az))
         # self.y = r * math.sin(math.radians(alt)) * math.sin(math.radians(az))
 
-        self.x = self.canvas_x = -1*(1000 * math.cos(math.radians(az)) * math.tan(math.radians(90 - alt) / 2))
-        self.y = self.canvas_y = 1000 * math.sin(math.radians(az)) * math.tan(math.radians(90 - alt) / 2)
+        self.x = self.canvas_x = -1 * (1000 * math.cos(math.radians(az)) * math.tan(math.radians(90 - alt) / 2))
+        self.y = self.canvas_y = 1 * (1000 * math.sin(math.radians(az)) * math.tan(math.radians(90 - alt) / 2))
         return self.x, self.y
 
     def calculate_ha_time(self, lst, ra):

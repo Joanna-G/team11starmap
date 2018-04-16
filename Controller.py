@@ -23,7 +23,7 @@ class Controller():
         self.filemenu = tk.Menu(self.menubar, tearoff=0)
         self.filemenu.add_command(label='Save Map', command=self.view.star_map_frame.save_canvas)
         self.filemenu.add_command(label='Help', command=self.view.display_help)
-        self.filemenu.add_command(label='Exit')
+        self.filemenu.add_command(label='Exit', command=self.view.star_map_frame.exit_application)
         self.menubar.add_cascade(label='File', menu=self.filemenu)
         self.root.config(menu=self.menubar)
 

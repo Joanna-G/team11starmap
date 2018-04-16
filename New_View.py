@@ -56,7 +56,7 @@ class MainApplication(ttk.Frame):
         canvas.unbind_all("<MouseWheel>")
 
     def on_mousewheel(self, canvas, event):
-        canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+        canvas.yview_scroll(int(-1 * (event.delta / abs(event.delta))), 'units')
 
     def display_help(self):
         help_dlg = tk.Toplevel(master=self)
@@ -78,8 +78,8 @@ class MainApplication(ttk.Frame):
         help_frame_id = help_canvas.create_window(0,0,window=help_frame, anchor='nw')
 
         help_frame.bind('<Configure>', lambda e: self._configure_window(help_frame, help_canvas, e))
-        # help_frame.bind('<Enter>', lambda e: self.bound_to_mouse_wheel(help_canvas, e))
-        # help_frame.bind('<Leave>', lambda e: self.unbound_to_mousewheel(help_canvas, e))
+        help_frame.bind('<Enter>', lambda e: self.bound_to_mouse_wheel(help_canvas, e))
+        help_frame.bind('<Leave>', lambda e: self.unbound_to_mousewheel(help_canvas, e))
 
         head_font = None
         head_size = None
@@ -166,6 +166,13 @@ class MainApplication(ttk.Frame):
         self.menu_text.grid(column=0, row=16, sticky='nsw')
         self.menu_text = tk.Label(help_frame, text=menu_msg3, justify='left')
         self.menu_text.grid(column=0, row=17, sticky='nsw')
+
+        help_dlg.update_idletasks()
+        width = help_dlg.winfo_width()
+        height = help_dlg.winfo_height()
+        x = (help_dlg.winfo_screenwidth() // 2) - (width // 2)
+        y = (help_dlg.winfo_screenheight() // 2) - (height // 2)
+        help_dlg.geometry('{}x{}+{}+{}'.format(width, height, x, y))
 
         help_dlg.transient(self)
         help_dlg.focus_set()

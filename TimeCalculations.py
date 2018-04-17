@@ -26,14 +26,8 @@ class TimeCalculations:
         self.t = self.calculate_T(self.jd_current)
         self.d = self.calculate_day(self.year, self.month, self.day, self.utc_offset)
 
-    # def convert_to_ut(self, year, month, day, hour, minute, utc_offset):
-    #     hour = hour + utc_offset
-    #     if hour > 24:
-    #         day += 1
-    #         hour -= 24
-    #     elif hour < 0:
-    #         day -= 1
-    #         hour += 24
+    def get_date_time(self):
+        return (self.year, self.month, self.day, self.hour, self.minute, self.utc_offset)
 
     def update_times(self, year, month, day, hour, minute, utc_offset, lat, lon, dst):
         self.utc_offset = utc_offset
@@ -118,7 +112,10 @@ class TimeCalculations:
         whole_days_since_epoch = midnight - 2451545
 
         gmst = 6.697374558 + 0.06570982441908 * whole_days_since_epoch + 1.00273790935 * hours_since_midnight + 0.000026 * math.pow(centuries_since_epoch, 2)
-        gmst_remainder = gmst % int(gmst)
+        try:
+            gmst_remainder = gmst % int(gmst)
+        except:
+            gmst_remainder = 0
         gmst_hours = math.floor(gmst) % 24
         gmst_minutes = math.floor(gmst_remainder * 60)
         gmst_minutes_decimal = gmst_remainder * 60

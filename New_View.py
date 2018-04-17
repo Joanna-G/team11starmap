@@ -471,6 +471,8 @@ class StarMapFrame(ttk.Frame):
         self.canvas.bind("<ButtonPress-1>", self.scroll_start)
         self.canvas.bind("<B1-Motion>", self.scroll_move)
 
+        # self.draw_bearings()
+
     def reset_values(self):
         self.multiplier = 1
         self.label_widgets.clear()
@@ -541,6 +543,12 @@ class StarMapFrame(ttk.Frame):
         #                      lambda e: self.display_constellation_info(e, constellation))
 
         return const_line
+
+    def draw_bearings(self):
+        self.canvas.create_text(-4000, 0, text='North', fill='white', font=('Magneto', 36))
+
+        # self.label_widgets.append((self.canvas.create_text(object.x, object.y, text=str(object.proper_name),
+        #                                                    fill=fill, tag=tag, font=(font, size))))
 
     def draw_constellation(self, const, star_list):
         count = 0

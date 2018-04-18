@@ -58,7 +58,7 @@ class Planet(BaseCelestialObject):
         except:
             az = 0
 
-        # Convert altitude and azimuth to degrees
+        # Convert alt and az to degrees
         alt = math.degrees(alt)
         az = math.degrees(az)
         if math.sin(ha_rad) > 0.0:

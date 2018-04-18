@@ -70,8 +70,8 @@ class Controller():
         for widget in self.view.user_frame.validation_widgets:
             ready = self.view.user_frame.validate_combobox(widget)
             if ready is False:
-                print('validate_widget: wrong values')
-                # self.view.create_error_dialog('Those values are invalid. \nPlease try again.')
+                # print('validate_widget: wrong values')
+                self.view.create_error_dialog('Those values are invalid. \nPlease try again.')
                 return
 
         # Clear Canvas
@@ -90,8 +90,8 @@ class Controller():
             longitude = float(self.view.user_frame.longitude_value.get())
             dst = int(self.view.user_frame.daylight_savings_value.get())
         except ValueError:
-            # self.view.create_error_dialog('Those values are incorrect.')
-            print('wrong values')
+            self.view.create_error_dialog('Those values are incorrect.')
+            # print('wrong values')
             return
 
         # Update the Model's TimeCalculations class with the newly inputted times
@@ -177,7 +177,7 @@ class Controller():
                         if star.proper_name != '':
                             self.view.star_map_frame.display_object_label(star)
                 for planet in self.model.planet_list:
-                    if planet.proper_name != 'Earth/Sun' and planet.alt >= 0:       # Don't need a label to show up for Earth
+                    if planet.proper_name != 'Earth/Sun' and planet.alt >= 0:
                         self.view.star_map_frame.display_object_label(planet)
 
                 if self.model.moon.alt >= 0:

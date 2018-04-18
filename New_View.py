@@ -432,7 +432,6 @@ class UserFrame(ttk.Frame):
             combobox.set(combobox.values[0])
             return False
 
-
 class StarMapFrame(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent)
@@ -589,12 +588,10 @@ class StarMapFrame(ttk.Frame):
         elif phase == 'Full':
             moon.canvas_id = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='white', outline='white')
         # If moon.phase is last, draw a circle with the left half white, right half black, white outline
-        elif phase == 'Last Quarter':
+        else:
             self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='black', outline='white')
             moon.canvas_id = self.canvas.create_arc(x - r, y - r, x + r, y + r, start=90.0, extent=180.0,
                                                     style=tk.CHORD, fill='white', outline='white')
-        else:
-            print("Error: Phase Incorrect")
 
         canvas_coords = self.canvas.coords(moon.canvas_id)
         moon.canvas_x = canvas_coords[0]
@@ -726,12 +723,21 @@ class StarMapFrame(ttk.Frame):
 
         if isinstance(object, Star):
             if object.proper_name != '':
-                tk.Label(modal_dlg, text='Star Name: ' + str(object.proper_name), bg='black', fg='white').grid(column=0, row=0, columnspan=3, sticky='nw')
+                tk.Label(modal_dlg, text='Star Name: ' + str(object.proper_name),
+                     bg='black', fg='white').grid(column=0, row=0, columnspan=3, sticky='nw')
             else:
-                tk.Label(modal_dlg, text='Star HD ID: ' + str(object.hd_id), bg='black', fg='white').grid(column=0, row=0, columnspan=3, sticky='nw')
-            tk.Label(modal_dlg, text='Star Altitude: ' + str(object.altitude), bg='black', fg='white').grid(column=0, row=1, columnspan=3, sticky='nw')
-            tk.Label(modal_dlg, text='Star Azimuth: ' + str(object.azimuth), bg='black', fg='white').grid(column=0, row=2, columnspan=3, sticky='nw')
-            tk.Label(modal_dlg, text='Star Magnitude: ' + str(object.magnitude), bg='black', fg='white').grid(column=0, row=4, columnspan=3, sticky='nw')
+                tk.Label(modal_dlg, text='Star HD ID: ' + str(object.hd_id),
+                     bg='black', fg='white').grid(column=0, row=0, columnspan=3, sticky='nw')
+            tk.Label(modal_dlg, text='Star Altitude: ' + str(object.altitude),
+                     bg='black', fg='white').grid(column=0, row=1, columnspan=3, sticky='nw')
+            tk.Label(modal_dlg, text='Star Azimuth: ' + str(object.azimuth),
+                     bg='black', fg='white').grid(column=0, row=2, columnspan=3, sticky='nw')
+            tk.Label(modal_dlg, text='Star Magnitude: ' + str(object.magnitude),
+                     bg='black', fg='white').grid(column=0, row=4, columnspan=3, sticky='nw')
+            tk.Label(modal_dlg, text='Star X: ' + str(object.x),
+                     bg='black', fg='white').grid(column=0, row=5, columnspan=3, sticky='nw')
+            tk.Label(modal_dlg, text='Star Canvas X: ' + str(object.canvas_x),
+                     bg='black', fg='white').grid(column=0, row=6, columnspan=3, sticky='nw')
 
         elif isinstance(object, Moon):
             if getattr(sys, 'frozen', False):
@@ -752,9 +758,12 @@ class StarMapFrame(ttk.Frame):
                 logo = ImageTk.PhotoImage(Image.open(last))
             tk.Label(modal_dlg, image=logo, bg='black', fg='white').grid(column=0, row=0, rowspan=4, sticky='nw')
             tk.Label(modal_dlg, text='The Moon', bg='black', fg='white').grid(column=1, row=0, sticky='n')
-            tk.Label(modal_dlg, text="Moon Altitude: " + str(object.alt), bg='black', fg='white').grid(column=1, row=1, sticky='n')
-            tk.Label(modal_dlg, text="Moon Azimuth: " + str(object.az), bg='black', fg='white').grid(column=1, row=2, sticky='n')
-            tk.Label(modal_dlg, text="Moon Phase: " + str(object.phase), bg='black', fg='white').grid(column=1, row=3, sticky='n')
+            tk.Label(modal_dlg, text="Moon Altitude: " + str(object.alt),
+                     bg='black', fg='white').grid(column=1, row=1, sticky='n')
+            tk.Label(modal_dlg, text="Moon Azimuth: " + str(object.az),
+                     bg='black', fg='white').grid(column=1, row=2, sticky='n')
+            tk.Label(modal_dlg, text="Moon Phase: " + str(object.phase),
+                     bg='black', fg='white').grid(column=1, row=3, sticky='n')
 
         elif isinstance(object, Planet):
             if getattr(sys, 'frozen', False):
@@ -765,19 +774,28 @@ class StarMapFrame(ttk.Frame):
             file = os.path.join(directory, 'resources', filename)
             logo = ImageTk.PhotoImage(Image.open(file))
             tk.Label(modal_dlg, image=logo, bg='black', fg='white').grid(column=0, row=0, rowspan=3, sticky='w')
-            tk.Label(modal_dlg, text='Planet Name: ' + str(object.proper_name), bg='black', fg='white').grid(column=1, row=0, sticky='n')
-            tk.Label(modal_dlg, text="Planet Altitude: " + str(object.alt), bg='black', fg='white').grid(column=1, row=1, sticky='n')
-            tk.Label(modal_dlg, text="Planet Azimuth: " + str(object.az), bg='black', fg='white').grid(column=1, row=2, sticky='n')
+            tk.Label(modal_dlg, text='Planet Name: ' + str(object.proper_name),
+                     bg='black', fg='white').grid(column=1, row=0, sticky='n')
+            tk.Label(modal_dlg, text="Planet Altitude: " + str(object.alt),
+                     bg='black', fg='white').grid(column=1, row=1, sticky='n')
+            tk.Label(modal_dlg, text="Planet Azimuth: " + str(object.az),
+                     bg='black', fg='white').grid(column=1, row=2, sticky='n')
 
         elif isinstance(object, MessierObject):
             if object.proper_name != '':
-                tk.Label(modal_dlg, text='Messier Object Name: ' + str(object.proper_name), bg='black', fg='white').grid(column=0, row=0, columnspan=3, sticky='nw')
+                tk.Label(modal_dlg, text='Messier Object Name: ' + str(object.proper_name),
+                         bg='black', fg='white').grid(column=0, row=0, columnspan=3, sticky='nw')
             else:
-                tk.Label(modal_dlg, text='Messier Catalog ID: ' + str(object.messier_cat), bg='black', fg='white').grid(column=0, row=0, columnspan=3, sticky='nw')
-            tk.Label(modal_dlg, text='Messier Object Description: ' + str(object.description), bg='black', fg='white').grid(column=0, row=1, columnspan=3, sticky='nw')
-            tk.Label(modal_dlg, text='Messier Object Altitude: ' + str(object.altitude), bg='black', fg='white').grid(column=0, row=2, columnspan=3, sticky='nw')
-            tk.Label(modal_dlg, text='Messier Object Azimuth: ' + str(object.azimuth), bg='black', fg='white').grid(column=0, row=3, columnspan=3, sticky='nw')
-            tk.Label(modal_dlg, text='Messier Object Magnitude: ' + str(object.magnitude), bg='black', fg='white').grid(column=0, row=4, columnspan=3, sticky='nw')
+                tk.Label(modal_dlg, text='Messier Catalog ID: ' + str(object.messier_cat),
+                         bg='black', fg='white').grid(column=0, row=0, columnspan=3, sticky='nw')
+            tk.Label(modal_dlg, text='Messier Object Description: ' + str(object.description),
+                     bg='black', fg='white').grid(column=0, row=1, columnspan=3, sticky='nw')
+            tk.Label(modal_dlg, text='Messier Object Altitude: ' + str(object.altitude),
+                     bg='black', fg='white').grid(column=0, row=2, columnspan=3, sticky='nw')
+            tk.Label(modal_dlg, text='Messier Object Azimuth: ' + str(object.azimuth),
+                     bg='black', fg='white').grid(column=0, row=3, columnspan=3, sticky='nw')
+            tk.Label(modal_dlg, text='Messier Object Magnitude: ' + str(object.magnitude),
+                     bg='black', fg='white').grid(column=0, row=4, columnspan=3, sticky='nw')
 
         modal_dlg.geometry('+%d+%d' % (x, y))
         modal_dlg.transient(self.parent)

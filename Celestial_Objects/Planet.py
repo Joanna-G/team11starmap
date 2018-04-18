@@ -1,6 +1,7 @@
 from Celestial_Objects import BaseCelestialObject
 import math
 
+
 class Planet(BaseCelestialObject):
     def __init__(self, planet_name, lscal, lprop, ascal, aprop, escal, eprop, iscal, iprop, wscal, wprop, oscal, oprop):
         BaseCelestialObject.__init__(self, None, None)
@@ -39,7 +40,7 @@ class Planet(BaseCelestialObject):
         if lon < 0:
             lon *= -1.0
 
-        #hour_angle = calculate_mst(year, month, day, hour, minute, 0, lat, lon)
+        # hour_angle = calculate_mst(year, month, day, hour, minute, 0, lat, lon)
         hour_angle = mst - ra
         if hour_angle < 0:
             hour_angle += 360
@@ -96,7 +97,7 @@ class Planet(BaseCelestialObject):
     def calculate_mean_longitude(self, lscal, lprop, cy):
         return self.mod2pi(math.radians(float(lscal) + float(lprop) * cy / 3600))
         # mean_long = math.radians(float(lscal) + float(lprop) * cy / 3600)
-         # mean_long = float(lscal) + float(lprop) * cy / 3600
+        # mean_long = float(lscal) + float(lprop) * cy / 3600
         # mean_long_rads = mean_long_rads % (math.pi*2)
         # mean_long = mean_long % (2 * math.pi)
 
@@ -159,7 +160,7 @@ class Planet(BaseCelestialObject):
                                 e_eccentricity, e_inclination, e_arg_perihelion, e_long_asc_node, e_mean_long, d):
 
         # calculate elements of planetary orbit of the planet
-        #pl_mean_long = self.calculate_mean_longitude(pl_lscal, pl_lprop, cy)
+        # pl_mean_long = self.calculate_mean_longitude(pl_lscal, pl_lprop, cy)
         # pl_axis = self.calculate_semi_axis(pl_ascal, pl_aprop, cy)
         # pl_eccentricity = self.calculate_eccentricity(pl_escal, pl_eprop, cy)
         # pl_inclination = self.calculate_inclination(pl_iscal, pl_iprop, cy)
@@ -176,11 +177,11 @@ class Planet(BaseCelestialObject):
 
         # calculate the position of the Earth in its orbit
         e_mean_anomaly = self.mod2pi(e_mean_long - e_arg_perihelion)
-        #e_mean_anomaly = (e_mean_long - e_arg_perihelion) % 360
+        # e_mean_anomaly = (e_mean_long - e_arg_perihelion) % 360
         # e_mean_anomaly = self.calculate_mean_anomaly("Earth/Sun", d)
-        #e_mean_anomaly = self.planet_list[2].mean_anomaly
+        # e_mean_anomaly = self.planet_list[2].mean_anomaly
         e_v = self.calculate_true_anomaly(e_mean_anomaly, math.radians(e_eccentricity))
-        #e_v = self.calculate_true_anomaly(e_mean_anomaly, e_eccentricity)
+        # e_v = self.calculate_true_anomaly(e_mean_anomaly, e_eccentricity)
         e_r = math.radians(e_axis * (1 - math.pow(e_eccentricity, 2)) / (1 + e_eccentricity * math.cos(e_v)))
 
         # calculate the heliocentric rectangular coordinates of Earth
@@ -190,11 +191,11 @@ class Planet(BaseCelestialObject):
 
         # calculate the position of the planet in its' orbit
         pl_mean_anomaly = self.mod2pi(pl_mean_long - pl_arg_perihelion)
-        #pl_mean_anomaly = (pl_mean_long - pl_arg_perihelion) % 360
-        #pl_mean_anomaly = self.calculate_mean_anomaly(pl_name, d)
-        #pl_mean_anomaly = self.planet
+        # pl_mean_anomaly = (pl_mean_long - pl_arg_perihelion) % 360
+        # pl_mean_anomaly = self.calculate_mean_anomaly(pl_name, d)
+        # pl_mean_anomaly = self.planet
         pl_v = self.calculate_true_anomaly(pl_mean_anomaly, math.radians(pl_eccentricity))
-        #pl_v = self.calculate_true_anomaly(pl_mean_anomaly, pl_eccentricity)
+        # pl_v = self.calculate_true_anomaly(pl_mean_anomaly, pl_eccentricity)
         pl_r = math.radians(pl_axis * (1 - math.pow(pl_eccentricity, 2)) / (1 + pl_eccentricity * math.cos(pl_v)))
 
         # calculate the heliocentric rectangular coordinates of the planet
@@ -224,8 +225,8 @@ class Planet(BaseCelestialObject):
         # calculate right ascension and declination from the rectangular equatorial coordinates
         # also calculates distance in AUs
         ra = math.degrees(self.mod2pi(math.atan2(yeq, xeq)))
-        #ra = math.atan2(yeq, xeq)
-        #ra = math.degrees(ra) % 360
+        # ra = math.atan2(yeq, xeq)
+        # ra = math.degrees(ra) % 360
         dec = math.degrees(math.atan(zeq / math.sqrt(math.pow(xeq, 2) + math.pow(yeq, 2))))
         dist = math.sqrt(math.pow(xeq, 2) + math.pow(yeq, 2) + math.pow(zeq, 2))
 
@@ -236,5 +237,3 @@ class Planet(BaseCelestialObject):
         print("Declination: ", dec)
 
         return (ra, dec, dist)
-
-

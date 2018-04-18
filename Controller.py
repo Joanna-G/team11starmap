@@ -255,13 +255,15 @@ class Controller():
         self.view.star_map_frame.canvas.scale("all", event.x, event.y, 1.1, 1.1)
         self.view.star_map_frame.canvas.configure(scrollregion=self.view.star_map_frame.canvas.bbox("all"))
         self.view.star_map_frame.multiplier *= 1.1
-        self.view.star_map_frame.update_canvas_coords()
+        self.update_canvas_coords()
+        # self.view.star_map_frame.update_canvas_coords()
 
     def wheeldown(self, event):
         self.view.star_map_frame.canvas.scale("all", event.x, event.y, 0.9, 0.9)
         self.view.star_map_frame.canvas.configure(scrollregion=self.view.star_map_frame.canvas.bbox("all"))
         self.view.star_map_frame.multiplier *= 0.9
-        self.view.star_map_frame.update_canvas_coords()
+        self.update_canvas_coords()
+        # self.view.star_map_frame.update_canvas_coords()
 
     def update_canvas_coords(self):
         # Update canvas x, y coordinates

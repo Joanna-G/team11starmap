@@ -391,7 +391,7 @@ class UserFrame(ttk.Frame):
         self.set_combobox_values(self.combobox_month, 'Month', 1, 13)
         self.set_combobox_values(self.combobox_day, 'Day', 1, 32)
         self.set_combobox_values(self.combobox_year, 'Year', 1900, 2101)
-        self.set_combobox_values(self.combobox_hour, 'Hour', 0, 25)
+        self.set_combobox_values(self.combobox_hour, 'Hour', 0, 24)
         self.set_combobox_values(self.combobox_minute, 'Minute', 0, 60)
         self.set_combobox_values(self.combobox_utc, 'UTC Offset', -12, 15)
         self.set_combobox_values(self.combobox_latitude, 'Lat', -90, 91)
@@ -800,7 +800,7 @@ class StarMapFrame(ttk.Frame):
         modal_dlg.geometry('+%d+%d' % (x, y))
         modal_dlg.transient(self.parent)
         modal_dlg.focus_set()
-        modal_dlg.grab_set()
+        # modal_dlg.grab_set()
         self.wait_window(modal_dlg)
 
     def exit_application(self):

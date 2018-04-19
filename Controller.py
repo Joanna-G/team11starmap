@@ -1,3 +1,4 @@
+#!/usr/local/bin/python
 import tkinter as tk
 import Model
 import New_View

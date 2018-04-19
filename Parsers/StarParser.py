@@ -1,12 +1,24 @@
 from Parsers import Parser
 import csv
 import os.path
+import sys
 
 
 class StarParser(Parser):
     def __init__(self):
+
+        # directory = ''
+        # if getattr(sys, 'frozen', False):
+        #     directory = os.path.dirname(sys.executable)
+        # elif __file__:
+        #     directory = os.path.dirname(__file__)
+        # filename = os.path.join(directory, 'resources', 'Stars.csv')
+        # fileDir = os.path.dirname(os.path.realpath('__file__'))
+        # Parser.__init__(self, filename)
+
         fileDir = os.path.dirname(os.path.realpath('__file__'))
-        Parser.__init__(self, os.path.join(fileDir, 'resources', 'Stars.csv'))
+        Parser.__init__(self, os.path.join(fileDir, 'resources', "Stars.csv"))
+
 
     # Parses the input File
     def parse_file(self):

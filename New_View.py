@@ -601,7 +601,8 @@ class StarMapFrame(ttk.Frame):
 
     def draw_planet(self, planet, x, y):
         r = 6
-        planet.canvas_id = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='blue', outline='blue')
+        planet.canvas_id = self.canvas.create_oval(x - r, y - r, x + r, y + r, fill='deep sky blue',
+                                                   outline='deep sky blue')
 
         canvas_coords = self.canvas.coords(planet.canvas_id)
         planet.canvas_x = canvas_coords[0]
@@ -686,7 +687,7 @@ class StarMapFrame(ttk.Frame):
             tag = 'label'
         elif isinstance(object, Planet):
             offset = 30
-            fill = 'blue'
+            fill = 'deep sky blue'
             tag = 'label'
         elif isinstance(object, Constellation):
             offset = 0
@@ -734,10 +735,10 @@ class StarMapFrame(ttk.Frame):
                      bg='black', fg='white').grid(column=0, row=2, columnspan=3, sticky='nw')
             tk.Label(modal_dlg, text='Star Magnitude: ' + str(object.magnitude),
                      bg='black', fg='white').grid(column=0, row=4, columnspan=3, sticky='nw')
-            tk.Label(modal_dlg, text='Star X: ' + str(object.x),
-                     bg='black', fg='white').grid(column=0, row=5, columnspan=3, sticky='nw')
-            tk.Label(modal_dlg, text='Star Canvas X: ' + str(object.canvas_x),
-                     bg='black', fg='white').grid(column=0, row=6, columnspan=3, sticky='nw')
+            # tk.Label(modal_dlg, text='Star X: ' + str(object.x),
+            #          bg='black', fg='white').grid(column=0, row=5, columnspan=3, sticky='nw')
+            # tk.Label(modal_dlg, text='Star Canvas X: ' + str(object.canvas_x),
+            #          bg='black', fg='white').grid(column=0, row=6, columnspan=3, sticky='nw')
 
         elif isinstance(object, Moon):
             if getattr(sys, 'frozen', False):
